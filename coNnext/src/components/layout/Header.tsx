@@ -1,10 +1,10 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import Connext from '../assets/logo/Con-next.svg';
-import Ticket from '../assets/logo/TicketLogo.svg';
-import Bell from '../assets/logo/BellLogo.svg';
-import Menu from '../assets/logo/MenuLogo.svg';
+import Connext from '../../assets/logo/Con-next.svg';
+import Ticket from '../../assets/logo/TicketLogo.svg';
+import Bell from '../../assets/logo/BellLogo.svg';
+import Menu from '../../assets/logo/MenuLogo.svg';
 
 const Header: React.FC = () => {
   const navigate = useNavigate(); 
