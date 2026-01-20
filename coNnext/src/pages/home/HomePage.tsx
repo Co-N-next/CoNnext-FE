@@ -1,6 +1,8 @@
 import { useRef, useState } from "react";
 import SelectBar from "../../components/common/SelectBar";
 import type { Concert, Venue } from "../../types/tickets";
+import { useNavigate } from "react-router-dom";
+
 
 import RV from "../../assets/dumy/ReVel.svg";
 import BTS from "../../assets/dumy/BTS.svg";
@@ -86,7 +88,7 @@ export default function HomePage() {
   const [activeTab, setActiveTab] = useState<TabKey>("concert");
   const [index, setIndex] = useState(0);
   const startX = useRef(0);
-
+  const navigate = useNavigate();
   /* ===== 공연 정렬 ===== */
   const sortedConcerts = [...concerts].sort((a, b) => {
     if (a.dDay !== b.dDay) return a.dDay - b.dDay;
@@ -133,7 +135,9 @@ export default function HomePage() {
           <>
             {/* ===== 다가오는 공연 ===== */}
             <section className="px-4 pt-6">
-              <h2 className="mb-4 text-lg font-semibold">
+              <h2 className="mb-4 text-lg font-semibold"
+              onClick={() => navigate("/concert")}
+              >
                 다가오는 공연 &gt;
               </h2>
 
