@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ChevronRight, Filter } from "lucide-react";
+import { ChevronRight} from "lucide-react";
 import type{ Concert } from "../../types/tickets";
 import RV from "../../assets/dumy/ReVel.svg";
 import RV1 from "../../assets/dumy/ReVel1.svg";
