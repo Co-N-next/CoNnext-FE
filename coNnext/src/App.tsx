@@ -5,7 +5,6 @@ import Layout from "./components/layout/Layout";
 import Splash from "./pages/login/Splash";
 import Login from "./pages/login/Login";
 import SignUp from "./pages/login/SignUp";
-import Home from "./pages/home/HomePage";
 import LatestConcert from "./pages/home/LatestConcert";
 import Mynews from "./pages/alarm/MyNews";
 import Notices from "./pages/alarm/Notices";
@@ -15,6 +14,7 @@ import HallMap from "./pages/hallMap/HallMap";
 import Mate from "./pages/mate/Mate";
 import MyPage from "./pages/myPage/MyPage";
 import Reserve from "./pages/reserve/ReserveList";*/
+import Home from "./pages/home/HomePage";
 import AddTicket from "./pages/reserve/AddTicket";
 
 
@@ -24,11 +24,11 @@ function App() {
       <Routes>
 
           <Route element={<Layout />}>
+          <Route path="/" element={<Home />} />
           {/*}
           <Route path="/start" element={<Splash />} />
           <Route path="login" element={<Login/>}/>
-          <Route path="signUp" element={<SignUp/>}/>
-          <Route path="/" element={<Home />} />
+          <Route path="signUp" element={<SignUp/>}/
           <Route path="/concert" element={<LatestConcert/>}/>
           <Route path="/mynews" element={<Mynews/>}/>
           <Route path="/notices" element={<Notices/>}/>
