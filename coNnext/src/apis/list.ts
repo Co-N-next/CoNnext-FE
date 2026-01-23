@@ -10,7 +10,7 @@ export const getList = async () => {
         title: "KSPO DOME",
         image: "/list_mock_image/Gocheok Sky Dome.jpg", // ✅ public/assets 경로
         isNew: true,
-        date: "2026-01-09", // TODAY
+        date: new Date().toISOString().slice(0, 10), //오늘날짜
       },
       {
         id: 2,
@@ -51,7 +51,7 @@ export const getList = async () => {
         title: "세종문화회관",
         image: "/list_mock_image/Jamsil Olympic Stadium.jpg",
         isNew: true,
-        date: "2026-01-14", // TODAY
+        date: new Date().toISOString().slice(0, 10), //오늘날짜
       },
       {
         id: 7,
