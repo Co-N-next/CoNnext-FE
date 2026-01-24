@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getList } from "../../apis/list";
+import { getList } from "../../pages/ConcertList/ConcertListMock/list";
 
 /**
  * 🔹 지금은 구조 연습용
@@ -20,7 +20,7 @@ export function useGetList(params?: {
     queryKey: ["lp-list", params?.search, params?.order], //“이 질문의 이름은 ‘lp-list + 검색조건 + 정렬조건’이야”
 
     // 🔥 PaginationDto 안 씀
-    queryFn: () => getList(), // 👉 실제로 서버에게 물어보는 행동 “getList() 실행해서공연장 목록 받아와”
+    queryFn: () => getList(), // 👉 실제로 서버에게 물어보는 행동 “getList() 실행해서공연장 목록 받아와”(list.ts파일)
 
     // ✅ 캐시 전략 (그냥 그대로 둬도 됨)
     staleTime: 1000 * 60 * 5, // 5분 👉 5분 동안은 ‘이 데이터 최신이야’라고 믿겠다 화면 왔다 갔다 해도다시 서버에 안 물어봄

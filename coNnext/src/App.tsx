@@ -1,4 +1,5 @@
 import "./App.css";
+
 import { Routes, Route } from "react-router-dom";
 import Layout from "./components/layout/Layout";
 import ConcertList from "./pages/ConcertList/ConcertList";
@@ -40,20 +41,22 @@ function App() {
         <Routes>
           <Route element={<Layout />}>
             <Route path="/" element={<Home />} />
-            {/*}
-          <Route path="/start" element={<Splash />} />
-          <Route path="login" element={<Login/>}/>
-          <Route path="signUp" element={<SignUp/>}/
-          <Route path="/concert" element={<LatestConcert/>}/>
-          <Route path="/mynews" element={<Mynews/>}/>
-          <Route path="/notices" element={<Notices/>}/>
-          <Route path="/find" element={<FindHall />} />
-          <Route path="/serch" element={<SerchHall />} />
-          <Route path="/map" element={<HallMap />} />
-          <Route path="/mate" element={<Mate />} />
-          <Route path="/mypage" element={<MyPage />} />
-          <Route path="/reserve" element={<Reserve />} />
- */}
+
+            {/* 
+<Route path="/start" element={<Splash />} />
+<Route path="login" element={<Login />} />
+<Route path="signUp" element={<SignUp />} />
+<Route path="/concert" element={<LatestConcert />} />
+<Route path="/mynews" element={<Mynews />} />
+<Route path="/notices" element={<Notices />} />
+<Route path="/find" element={<FindHall />} />
+<Route path="/serch" element={<SerchHall />} />
+<Route path="/map" element={<HallMap />} />
+<Route path="/mate" element={<Mate />} />
+<Route path="/mypage" element={<MyPage />} />
+<Route path="/reserve" element={<Reserve />} />
+*/}
+
             <Route path="/ConcertList" element={<ConcertList />} />
             <Route path="/MyNews" element={<MyNews />} />
 

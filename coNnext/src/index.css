@@ -1,9 +1,5 @@
-/* 🔹 A안: 전통적인 Tailwind 방식 (v3 ~ v4 초반) -강유정꺼*/
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-/* Tailwind v4 관련 문서 일부 */
-/* @import "tailwindcss"; */
+/* Tailwind v4  */
+@import "tailwindcss";
 
 :root {
   /* 기본 폰트를 Pretendard */
@@ -74,4 +70,16 @@
   src: url("/fonts/Pretendard-Medium.woff2") format("woff2");
   font-weight: 500;
   font-display: normal;
+}
+
+/* global.css 또는 index.css */
+@layer utilities {
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
 }
