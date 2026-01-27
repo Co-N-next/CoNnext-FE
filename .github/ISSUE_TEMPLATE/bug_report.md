@@ -1,38 +1,36 @@
 ---
-name: Bug report
-about: Create a report to help us improve
+name: "\U0001F41EBug"
+about: 버그 리포트 템플릿
 title: ''
 labels: ''
 assignees: ''
-
+ 
 ---
-
-**Describe the bug**
-A clear and concise description of what the bug is.
-
-**To Reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
-
-**Expected behavior**
-A clear and concise description of what you expected to happen.
-
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
-
-**Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
-
-**Smartphone (please complete the following information):**
- - Device: [e.g. iPhone6]
- - OS: [e.g. iOS8.1]
- - Browser [e.g. stock browser, safari]
- - Version [e.g. 22]
-
-**Additional context**
-Add any other context about the problem here.
+ 
+<!-- 작성하지 않은 항목은 모두 지워주세요 -->
+ 
+## 🐞버그 설명
+<!-- 어떤 상황에서 어떤 문제가 발생했는지 구체적으로 작성해주세요 -->
+ 
+ 
+<br/>
+ 
+## 🐛에러 로그
+<!-- 콘솔에 찍힌 에러 로그나 네트워크 응답 에러가 있다면 코드 블럭에 포함해주세요 -->
+ 
+ 
+<br/>
+ 
+## ✅작업할 내용
+<!-- 이 버그를 해결하기 위해 예상되는 작업을 세분화해서 체크박스 형태로 작성해주세요 -->
+ 
+<br/>
+ 
+## 📸스크린샷
+<!-- 시각적으로 이해를 돕기 위한 스크린샷이 있다면 첨부해주세요 -->
+ 
+<br/>
+ 
+ 
+## 📑참고 문서
+<!-- 참고할 수 있는 자료가 있다면 적어주세요 -->
