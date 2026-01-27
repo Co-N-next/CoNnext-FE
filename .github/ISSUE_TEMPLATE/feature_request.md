@@ -1,16 +1,20 @@
-## ✨ 기능 설명
-사용자 이메일과 비밀번호를 사용하여 서비스에 로그인하는 기능을 구현합니다.
+---
+name: Feature request
+about: Suggest an idea for this project
+title: ''
+labels: ''
+assignees: ''
 
-## ✅작업할 내용
-<!-- 이 버그를 해결하기 위해 예상되는 작업을 세분화해서 체크박스 형태로 작성해주세요 -->
- 
-<br/>
- 
-## 📸스크린샷
-<!-- 시각적으로 이해를 돕기 위한 스크린샷이 있다면 첨부해주세요 -->
- 
-<br/>
- 
- 
-## 📑참고 문서
-<!-- 참고할 수 있는 자료가 있다면 적어주세요 -->
+---
+
+**Is your feature request related to a problem? Please describe.**
+A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+
+**Describe the solution you'd like**
+A clear and concise description of what you want to happen.
+
+**Describe alternatives you've considered**
+A clear and concise description of any alternative solutions or features you've considered.
+
+**Additional context**
+Add any other context or screenshots about the feature request here.
