@@ -1,5 +1,6 @@
 export const getList = async () => {
   return {
+    //커밋
     status: true,
     statusCode: 201,
     message: "요청이 성공했습니다.",

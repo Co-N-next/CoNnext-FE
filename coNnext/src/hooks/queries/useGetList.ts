@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
-import { getList } from "../../pages/ConcertList/ConcertListMock/list";
+import { getList } from "../../pages/ConcertList/ConcertListMock/usual_list";
 
+//커밋
 /**
  * 🔹 지금은 구조 연습용
  * 🔹 타입 / 공통 상수 / enum 다 빼고

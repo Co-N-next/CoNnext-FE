@@ -1,12 +1,13 @@
 export interface Concert {
+  //커밋
   id: number;
   title: string;
   subtitle: string;
   artist: string;
   poster: string;
   dDay: number;
-  isNew:boolean;
-  views:number;
+  isNew: boolean;
+  views: number;
 }
 
 export interface Venue {
@@ -15,7 +16,7 @@ export interface Venue {
   location: string;
   image: string;
   dDay: number;
-  isNew:boolean;
+  isNew: boolean;
 }
 
 export interface BadgeProps {

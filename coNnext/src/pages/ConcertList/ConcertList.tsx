@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { IoSearch } from "react-icons/io5";
+import { IoSearch } from "react-icons/io5"; //커밋
 
 import { useGetList } from "../../hooks/queries/useGetList";
 import useDebounce from "../../hooks/queries/useDebounce";
@@ -216,9 +216,9 @@ const ConcertList = () => {
         </div>
         {/* 지금 많이 찾는 */}
         <section className="mt-8">
-          <h2 className="mb-4 text-[20px] font-semibold">지금 많이 찾는</h2>
+          <h2 className="mb-4 text-[20px] font-semibold">즐겨찾기</h2>
 
-          <div className="flex gap-4 overflow-x-auto pb-2">
+          <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
             {data.map((item: any) => (
               <VenueCard
                 key={item.id}

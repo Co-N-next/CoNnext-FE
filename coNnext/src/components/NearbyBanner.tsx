@@ -1,6 +1,6 @@
 // components/NearbyBanner.tsx
 type Props = {
-  count?: number;
+  count?: number; //커밋
   place: string;
 };
 

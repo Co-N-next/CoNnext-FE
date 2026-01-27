@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 function useDebounce<T>(value: T, delay: number) {
+  //커밋
   //검색어가 string이 아니라 number일수도 뭐가 올지도 몰라서 value 타입을 T로 둔다.
   const [debouncedValue, setDebouncedValue] = useState<T>(value);
 

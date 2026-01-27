@@ -3,7 +3,7 @@ type VenueCardProps = {
   title: string;
   place: string;
   isToday: boolean;
-  isNew?: boolean;
+  isNew?: boolean; //커밋
 };
 
 const VenueCard = ({ image, title, place, isToday, isNew }: VenueCardProps) => {

@@ -1,4 +1,4 @@
-import { Share2 } from "lucide-react";
+import { Share2 } from "lucide-react"; //커밋
 
 // mockTodayConcert.ts (같은 파일이어도 OK)
 export const mockTodayConcert = {
