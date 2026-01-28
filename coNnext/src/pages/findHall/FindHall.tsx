@@ -54,23 +54,22 @@ const FindHall = () => {
         )}
 
         {/* 검색창 (이동만) */}
-        <div className="relative mt-6">
+        <div className="relative mt-6" onClick={() => navigate("/search")}>
           <input
             readOnly
-            onFocus={() => navigate("/search")}
-            className="h-[56px] w-full rounded-xl bg-[#1F2A3A] pl-5 pr-16
-                       text-white placeholder:text-gray-400 outline-none"
             placeholder="공연장, 홀, 시설 검색"
+            className="h-[56px] w-full rounded-xl bg-[#1F2A3A]
+               pl-5 pr-16 text-white placeholder:text-gray-400
+               cursor-pointer"
           />
 
-          <button
-            type="button"
+          <div
             className="absolute right-2 top-1/2 -translate-y-1/2
-                       flex h-[40px] w-[40px] items-center justify-center
-                       rounded-lg bg-[#745AFF]"
+               flex h-[40px] w-[40px] items-center justify-center
+               rounded-lg bg-[#745AFF] pointer-events-none"
           >
             <IoSearch className="text-lg text-white" />
-          </button>
+          </div>
         </div>
 
         {/* 즐겨찾기 */}

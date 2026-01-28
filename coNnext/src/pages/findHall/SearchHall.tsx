@@ -52,6 +52,7 @@ const SearchHall = () => {
     setRecentKeywords(next);
   }, [debouncedValue]);
 
+  /* 개별 삭제 */
   const handleRemoveKeyword = (target: string) => {
     const filtered = recentKeywords.filter((k) => k !== target);
 
@@ -61,6 +62,12 @@ const SearchHall = () => {
     });
 
     setRecentKeywords(filtered);
+  };
+
+  /* 전체 삭제 ✅ (이게 빠져 있었음) */
+  const handleClearAll = () => {
+    RECENT_KEYS.forEach((key) => localStorage.removeItem(key));
+    setRecentKeywords([]);
   };
 
   return (
@@ -86,12 +93,26 @@ const SearchHall = () => {
       {/* 최근 검색어 */}
       {search === "" && recentKeywords.length > 0 && (
         <section>
-          <h2 className="mb-3 text-sm text-gray-400">최근 검색</h2>
+          <div className="mb-3 flex items-center justify-between">
+            <h2 className="text-sm text-gray-400">최근 검색</h2>
+            <button
+              onClick={handleClearAll}
+              className="text-xs text-gray-500 hover:text-gray-300"
+            >
+              전체 삭제
+            </button>
+          </div>
+
           <ul className="space-y-2">
             {recentKeywords.map((keyword) => (
               <li key={keyword} className="flex justify-between items-center">
                 <span>{keyword}</span>
-                <button onClick={() => handleRemoveKeyword(keyword)}>✕</button>
+                <button
+                  onClick={() => handleRemoveKeyword(keyword)}
+                  className="text-gray-500 hover:text-white"
+                >
+                  ✕
+                </button>
               </li>
             ))}
           </ul>
