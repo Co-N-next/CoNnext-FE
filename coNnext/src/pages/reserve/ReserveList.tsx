@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { useState } from "react";
 import type { Concert } from "../../types/concert";
 import ConcertCard from "../../components/ConcertCard";
@@ -182,3 +183,5 @@ const ReservationList = () => {
 };
 
 export default ReservationList;
+=======
+>>>>>>> 90d9491d37fe15f2f04a1d515ee33d890d73a1f7

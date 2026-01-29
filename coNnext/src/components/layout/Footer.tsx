@@ -12,8 +12,13 @@ const Footer: React.FC = () => {
     { id: 5, label: "마이페이지" },
   ];
 
+<<<<<<< HEAD
   return (
     <footer className="fixed bottom-0 left-1/2 -translate-x-1/2 bg-[#0f1729] border-t border-gray-800 z-50 w-full max-w-[450px]">
+=======
+   return (
+   <footer className="fixed bottom-0 left-1/2 -translate-x-1/2 bg-[#0f1729] border-t border-gray-800 z-50 w-full max-w-[450px]">
+>>>>>>> 90d9491d37fe15f2f04a1d515ee33d890d73a1f7
       <nav className="max-w-7xl mx-auto">
         <ul className="flex items-center justify-around py-3">
           {navItems.map((item) => (

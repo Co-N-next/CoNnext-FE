@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { useState } from "react";
 import { Search, UserPlus, Settings } from "lucide-react";
 import jinah from "../../assets/images/jinah.svg";
@@ -236,3 +237,5 @@ const Mate = () => {
 };
 
 export default Mate;
+=======
+>>>>>>> 90d9491d37fe15f2f04a1d515ee33d890d73a1f7
