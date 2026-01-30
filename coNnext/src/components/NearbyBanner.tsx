@@ -6,7 +6,7 @@ type Props = {
 
 export function NearbyBanner({ count, place }: Props) {
   return (
-    <div className="w-[369px] h-[112px] bg-[#745AFF] rounded-xl p-4 text-white flex flex-col">
+    <div className="w-[400px] h-[112px] bg-[#745AFF] rounded-xl p-4 text-white flex flex-col">
       {/* 1️⃣ 뱃지 */}
       <span className="inline-block w-fit bg-[#9576ff] text-white text-xs font-medium px-3 py-1 rounded-full select-none pointer-events-none">
         내 위치

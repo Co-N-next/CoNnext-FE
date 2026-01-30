@@ -2,15 +2,14 @@ type VenueCardProps = {
   image: string;
   title: string;
   place: string;
-  isToday: boolean;
+  isToday?: boolean;
   isNew?: boolean;
 };
-
 const VenueCard = ({ image, title, place, isToday, isNew }: VenueCardProps) => {
   return (
-    <div className="border border-white/20 text-white rounded-xl flex-shrink-0 w-[9.5rem] will-change-transform">
-      {/* 이미지 영역 */}
-      <div className="relative w-[150px] h-[150px] overflow-hidden rounded-xl">
+    <div className="border border-white/20 text-white rounded-xl w-full">
+      {/* 이미지 */}
+      <div className="relative w-full aspect-square overflow-hidden rounded-xl">
         <img src={image} alt={title} className="w-full h-full object-cover" />
 
         {isToday && (

@@ -5,9 +5,42 @@ import { useGetList } from "../../hooks/queries/useGetList";
 import { NearbyBanner } from "../../components/NearbyBanner";
 import VenueCard from "../../components/VenueCard";
 
+/* =========================
+ * utils
+ * ========================= */
+const isToday = (date: string) => {
+  const today = new Date().toISOString().slice(0, 10);
+  return date === today;
+};
+
+/* =========================
+ * mock / summary data
+ * ========================= */
+const nearbySummary = {
+  hasNearbyVenues: true,
+  count: 2,
+  nearestVenue: {
+    id: 12,
+    place: "잠실 주경기장",
+    distanceKm: 0.8,
+  },
+};
+
+const todayVenueSummary = {
+  hasTodayVenue: true,
+  venue: {
+    name: "KSPO DOME",
+    city: "서울특별시 송파구",
+    image: "https://images.unsplash.com/photo-1506157786151-b8491531f063",
+  },
+};
+
 const FindHall = () => {
   const navigate = useNavigate();
 
+  /* =========================
+   * data fetching
+   * ========================= */
   const {
     data = [],
     isPending,
@@ -16,92 +49,124 @@ const FindHall = () => {
     search: "",
   });
 
-  const isToday = (date: string) => {
-    const today = new Date().toISOString().slice(0, 10);
-    return date === today;
-  };
-
-  const nearbySummary = {
-    hasNearbyVenues: true,
-    count: 2,
-    nearestVenue: {
-      id: 12,
-      place: "잠실 주경기장",
-      distanceKm: 0.8,
-    },
-  };
-
+  /* =========================
+   * loading / error
+   * ========================= */
   if (isPending) {
-    return <div className="mt-20 text-center text-white">Loading...</div>;
+    return <div className="mt-14 text-center text-white">Loading...</div>;
   }
 
   if (isError) {
-    return <div className="mt-20 text-center text-white">Error</div>;
+    return <div className="mt-14 text-center text-white">Error</div>;
   }
 
+  /* =========================
+   * render
+   * ========================= */
   return (
     <div className="min-h-screen bg-[#0a0f1e] text-white flex justify-center">
-      <div className="w-full max-w-[600px] px-4 py-6">
-        {/* 제목 */}
-        <h1 className="mb-5 text-[25px] font-semibold">공연장 찾기</h1>
+      <div className="w-full max-w-[600px] px-2.5 py-2.5 space-y-4">
+        {/* =========================
+         * Header
+         * ========================= */}
+        <h1 className="text-[18px] font-semibold">공연장 찾기</h1>
 
-        {/* 근처 공연장 */}
+        {/* =========================
+         * Nearby Venue
+         * ========================= */}
         {nearbySummary.hasNearbyVenues && (
-          <NearbyBanner
-            count={nearbySummary.count}
-            place={nearbySummary.nearestVenue.place}
-          />
+          <div className="flex justify-center">
+            <NearbyBanner
+              count={nearbySummary.count}
+              place={nearbySummary.nearestVenue.place}
+            />
+          </div>
         )}
 
-        {/* 검색창 (이동만) */}
-        <div className="relative mt-6" onClick={() => navigate("/search")}>
+        {/* =========================
+         * Today Venue
+         * ========================= */}
+        {todayVenueSummary.hasTodayVenue && (
+          <section>
+            <h2 className="mb-4 text-[15px] font-semibold">오늘의 공연장</h2>
+
+            <div className="flex justify-center">
+              <div
+                className="w-[400px] h-[180px]
+                [&_div:first-child]:h-[120px]
+                [&_div:first-child]:aspect-auto"
+              >
+                <VenueCard
+                  image={todayVenueSummary.venue.image}
+                  title={todayVenueSummary.venue.name}
+                  place={todayVenueSummary.venue.city}
+                  isToday={undefined}
+                  isNew={undefined}
+                />
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* =========================
+         * Search
+         * ========================= */}
+        <div className="relative" onClick={() => navigate("/search")}>
           <input
             readOnly
             placeholder="공연장, 홀, 시설 검색"
-            className="h-[56px] w-full rounded-xl bg-[#1F2A3A]
-               pl-5 pr-16 text-white placeholder:text-gray-400
-               cursor-pointer"
+            className="h-[44px] w-full rounded-lg bg-[#1F2A3A]
+              pl-4 pr-12 text-[13px] text-white placeholder:text-gray-400
+              cursor-pointer"
           />
 
           <div
-            className="absolute right-2 top-1/2 -translate-y-1/2
-               flex h-[40px] w-[40px] items-center justify-center
-               rounded-lg bg-[#745AFF] pointer-events-none"
+            className="absolute right-1.5 top-1/2 -translate-y-1/2
+              flex h-[30px] w-[30px] items-center justify-center
+              rounded-md bg-[#745AFF] pointer-events-none"
           >
-            <IoSearch className="text-lg text-white" />
+            <IoSearch className="text-[13px] text-white" />
           </div>
         </div>
 
-        {/* 즐겨찾기 */}
-        <section className="mt-8">
-          <h2 className="mb-4 text-[20px] font-semibold">즐겨찾기</h2>
-          <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
+        {/* =========================
+         * Favorite Venues
+         * ========================= */}
+        <section>
+          <h2 className="mb-1 text-[15px] font-semibold">즐겨찾기</h2>
+
+          <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hover">
             {data.map((item: any) => (
-              <VenueCard
-                key={item.id}
-                image={item.image}
-                title={item.title}
-                place={item.place}
-                isToday={isToday(item.date)}
-                isNew={item.isNew}
-              />
+              <div key={item.id} className="min-w-[110px]">
+                <VenueCard
+                  image={item.image}
+                  title={item.title}
+                  place={item.place}
+                  isToday={isToday(item.date)}
+                  isNew={item.isNew}
+                />
+              </div>
             ))}
           </div>
         </section>
 
-        {/* 인기 검색 공연장 */}
-        <section className="mt-10">
-          <h2 className="mb-4 text-[20px] font-semibold">인기 검색 공연장</h2>
-          <div className="flex gap-4 overflow-x-auto pb-2">
+        {/* =========================
+         * Popular Venues
+         * ========================= */}
+        <section>
+          <h2 className="mb-1 text-[15px] font-semibold">인기 검색 공연장</h2>
+
+          <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hover">
             {data.map((item: any) => (
-              <VenueCard
-                key={item.id}
-                image={item.image}
-                title={item.title}
-                place={item.place}
-                isToday={isToday(item.date)}
-                isNew={item.isNew}
-              />
+              <div key={item.id} className="min-w-[110px]">
+                <VenueCard
+                  image={item.image}
+                  title={item.title}
+                  place={item.place}
+                  isToday={isToday(item.date)}
+                  isNew={item.isNew}
+                />
+              </div>
             ))}
           </div>
         </section>
