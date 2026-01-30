@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getList } from "../../pages/findHall/FindHall_list";
+import { getList } from "../../pages/findHall/findHall/list";
 
 /**
  * 🔹 지금은 구조 연습용
