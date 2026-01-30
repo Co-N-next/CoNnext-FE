@@ -32,41 +32,76 @@
 }
 
 @font-face {
-  font-family: 'Inter';
-  src: url('./assets/fonts/Inter-VariableFont_opsz,wght.ttf') format('truetype-variations');
-  font-weight: 100 900; 
+  font-family: "Inter";
+  src: url("./assets/fonts/Inter-VariableFont_opsz,wght.ttf")
+    format("truetype-variations");
+  font-weight: 100 900;
   font-style: normal;
   font-display: swap;
 }
 
-
 @font-face {
-  font-family: 'Lyyra';
-  src: url('./assets/fonts/lyyra-expanded-4.ttf') format('truetype');
+  font-family: "Lyyra";
+  src: url("./assets/fonts/lyyra-expanded-4.ttf") format("truetype");
   font-weight: 400;
   font-style: normal;
 }
 
 /* Yde Street Light*/
 @font-face {
-  font-family: 'YdeStreetL';
-  src: url('./assets/fonts/YdestreetL.ttf') format('truetype');
+  font-family: "YdeStreetL";
+  src: url("./assets/fonts/YdestreetL.ttf") format("truetype");
   font-weight: 300;
   font-style: normal;
 }
 
 /* Yde Street Bold*/
 @font-face {
-  font-family: 'YdeStreetB';
-  src: url('./assets/fonts/YdestreetB.ttf') format('truetype');
+  font-family: "YdeStreetB";
+  src: url("./assets/fonts/YdestreetB.ttf") format("truetype");
   font-weight: 700;
   font-style: normal;
 }
 
 /* Pretendard-Medium */
 @font-face {
-  font-family: 'Pretendard';
-  src: url('./assets/fonts/Pretendard-Medium.woff2') format('woff2');
-  font-weight: 500; 
+  font-family: "Pretendard";
+  src: url("./assets/fonts/Pretendard-Medium.woff2") format("woff2");
+  font-weight: 500;
   font-display: normal;
+}
+
+/* globals.css에 추가 */
+.scrollbar-hover {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.scrollbar-hover::-webkit-scrollbar {
+  height: 6px;
+  background: transparent;
+}
+
+.scrollbar-hover::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-hover::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 10px;
+  transition: background 0.3s ease;
+}
+
+/* hover 시에만 스크롤바 표시 */
+.scrollbar-hover:hover {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.4) transparent;
+}
+
+.scrollbar-hover:hover::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.scrollbar-hover:hover::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.6);
 }
