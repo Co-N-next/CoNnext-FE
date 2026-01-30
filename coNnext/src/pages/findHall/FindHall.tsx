@@ -15,7 +15,7 @@ const isToday = (date: string) => {
 
 /* =========================
  * mock / summary data
- * ========================= */
+ * ========================== */
 const nearbySummary = {
   hasNearbyVenues: true,
   count: 2,

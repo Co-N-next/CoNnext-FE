@@ -1,4 +1,4 @@
-// components/NearbyBanner.tsx
+// /components/NearbyBanner.tsx
 type Props = {
   count?: number;
   place: string;

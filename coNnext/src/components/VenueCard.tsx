@@ -5,6 +5,7 @@ type VenueCardProps = {
   isToday?: boolean;
   isNew?: boolean;
 };
+//
 const VenueCard = ({ image, title, place, isToday, isNew }: VenueCardProps) => {
   return (
     <div className="border border-white/20 text-white rounded-xl w-full">
