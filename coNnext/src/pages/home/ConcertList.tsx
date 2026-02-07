@@ -50,7 +50,8 @@ export default function UpcomingConcertPage() {
 
   /* ===== 필터 적용 ===== */
   const filteredConcerts = [...concerts].sort((a, b) => {
-    if (filter === "views") return b.views - a.views;
+    if (filter === "views") return (b.views ?? 0) - (a.views ?? 0);
+
     if (a.dDay !== b.dDay) return a.dDay - b.dDay;
     return a.title.localeCompare(b.title, "ko");
   });
@@ -62,7 +63,7 @@ export default function UpcomingConcertPage() {
 
   return (
     <div className="min-h-screen bg-[#0a0f1e] text-white flex justify-center relative">
-      <div className="w-full max-w-[450px] px-4 pb-6">
+      <div className="w-full max-w-112.5 px-4 pb-6">
         {/* ===== 헤더 ===== */}
         <div className="flex items-center justify-between gap-3 py-4">
           <div className="flex items-center gap-3">
@@ -92,7 +93,7 @@ export default function UpcomingConcertPage() {
               <img
                 src={concert.poster}
                 alt={concert.title}
-                className="h-[96px] w-[72px] rounded-lg object-cover shrink-0"
+                className="h-24 w-18 rounded-lg object-cover shrink-0"
               />
 
               {/* 텍스트 */}
@@ -129,7 +130,7 @@ export default function UpcomingConcertPage() {
           />
           
           {/* 정렬 메뉴 */}
-          <div className="fixed right-0 top-0 bottom-0 w-1/2 max-w-[200px] z-50">
+          <div className="fixed right-0 top-0 bottom-0 w-1/2 max-w-50 z-50">
             <div className="bg-[#1e293b] rounded-l-2xl mt-20 mr-4 shadow-2xl">
               <div className="py-2">
                 <button

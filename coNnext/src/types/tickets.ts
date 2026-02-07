@@ -1,12 +1,12 @@
 export interface Concert {
   id: number;
   title: string;
-  subtitle: string;
+  subtitle?: string;
   artist: string;
   poster: string;
   dDay: number;
   isNew:boolean;
-  views:number;
+  views?:number;
 }
 
 export interface Venue {

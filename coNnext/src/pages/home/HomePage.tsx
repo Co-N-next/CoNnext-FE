@@ -124,7 +124,7 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-[#0a0f1e] text-white flex justify-center">
-      <div className="w-full max-w-[450px]">
+      <div className="w-full max-w-112.5">
         <SelectBar
           tabs={TABS}
           activeTab={activeTab}
@@ -163,8 +163,8 @@ export default function HomePage() {
                         alt={item.title}
                         className={`rounded-xl ${
                           isMain
-                            ? "h-[320px] w-[210px]"
-                            : "h-[240px] w-[150px]"
+                            ? "h-80 w-52.5"
+                            : "h-60 w-37.5"
                         }`}
                       />
 
@@ -192,11 +192,11 @@ export default function HomePage() {
 
               <div className="flex gap-4 overflow-x-auto pb-2">
                 {sortedVenues.map((v) => (
-                  <div key={v.id} className="relative w-[220px] shrink-0">
+                  <div key={v.id} className="relative w-55 shrink-0">
                     <img
                       src={v.image}
                       alt={v.name}
-                      className="h-[130px] w-full rounded-xl object-cover"
+                      className="h-32.5 w-full rounded-xl object-cover"
                     />
                     <Badge dDay={v.dDay} isNew={v.isNew} />
                     <div className="mt-2 text-sm">

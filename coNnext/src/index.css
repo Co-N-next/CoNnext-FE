@@ -2,40 +2,23 @@
 
 :root {
   /* 기본 폰트를 Pretendard */
-  font-family: "Pretendard", sans-serif;
-}
-/* Pretendard Regular (400) */
-@font-face {
-  font-family: "Pretendard";
-  src: url("/fonts/Pretendard-Regular.woff") format("woff");
+  font-family: 'PretendardRegular', sans-serif;
   font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-/* Pretendard Medium (500) */
-@font-face {
-  font-family: "Pretendard";
-  src: url("/fonts/Pretendard-Medium.woff") format("woff");
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-
-/* Pretendard SemiBold (600) */
-@font-face {
-  font-family: "Pretendard";
-  src: url("/fonts/Pretendard-SemiBold.woff") format("woff");
-  font-weight: 600;
-  font-style: normal;
-  font-display: swap;
 }
 
 @font-face {
-  font-family: 'Inter';
+  font-family: 'InterNormal';
   src: url('./assets/fonts/Inter-VariableFont_opsz,wght.ttf') format('truetype-variations');
   font-weight: 100 900; 
   font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'InterSemibold';
+  src: url('./assets/fonts/Inter-VariableFont_opsz,wght.ttf') format('truetype-variations');
+  font-weight: 100 900; 
+  font-style: semibold;
   font-display: swap;
 }
 
@@ -65,8 +48,24 @@
 
 /* Pretendard-Medium */
 @font-face {
-  font-family: 'Pretendard';
+  font-family: 'PretendardMedium';
   src: url('./assets/fonts/Pretendard-Medium.woff2') format('woff2');
   font-weight: 500; 
+  font-display: normal;
+}
+
+/* Pretendard-Semibold */
+@font-face {
+  font-family: 'PretendardSemibold';
+  src: url('./assets/fonts/Pretendard-SemiBold.woff2') format('woff2');
+  font-weight: 500; 
+  font-display: normal;
+}
+
+/* Pretendard-Regular */
+@font-face {
+  font-family: 'PretendardRegular';
+  src: url('./assets/fonts/Pretendard-Regular.woff2') format('woff2');
+  font-weight: 400; 
   font-display: normal;
 }

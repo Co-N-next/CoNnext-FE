@@ -2,7 +2,6 @@ import { useNavigate } from "react-router-dom";
 import { ExternalLink } from "lucide-react";
 import type { Concert } from "../../types/tickets";
 import RV from "../../assets/dumy/ReVel.svg";
-import BackButton from "../../assets/logo/BackButton.svg";
 
 /* ===== 더미 데이터 ===== */
 const concertData: Concert & {
@@ -37,11 +36,11 @@ export default function ConcertInfo() {
 
   return (
     <div className="min-h-screen bg-[#0a0f1e] text-white">
-      <div className="w-full max-w-[450px] mx-auto">
+      <div className="w-full max-w-112.5 mx-auto">
         {/* ===== 메인 이벤트 이미지 섹션 ===== */}
         <div className="relative">
           {/* 큰 메인 이미지 */}
-          <div className="relative h-[500px] w-full overflow-hidden">
+          <div className="relative h-125 w-full overflow-hidden">
             <img
               src={concertData.poster}
               alt={concertData.title}
@@ -49,7 +48,7 @@ export default function ConcertInfo() {
             />
             
             {/* 오버레이 그라데이션 - 아래로 갈수록 어둡게 */}
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/30 to-black/90" />
+            <div className="absolute inset-0 bg-linear-to-b from-transparent via-black/30 to-black/90" />
             
             {/* 왼쪽 하단: 썸네일과 콘서트 정보 (세로 배치) */}
             <div className="absolute bottom-6 left-4 flex flex-col gap-3">

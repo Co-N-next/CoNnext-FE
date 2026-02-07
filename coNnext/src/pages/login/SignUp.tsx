@@ -5,8 +5,10 @@ import BackButton from '../../assets/logo/BackButton.svg';
 import EmailDelete from '../../assets/logo/EmailDelete.svg';
 import EyeOn from '../../assets/logo/EyeOn.svg';
 import EyeOff from '../../assets/logo/EyeOff.svg';
-import CheckboxOn from '../../assets/logo/CheckboxOn.svg';
-import CheckboxOff from '../../assets/logo/CheckboxOff.svg';
+import SelectNone from '../../assets/logo/SelectNone.svg';
+import SelectAll from '../../assets/logo/SelectAll.svg';
+import Unchecked from '../../assets/logo/Unchecked.svg';
+import Checked from '../../assets/logo/Checked.svg';
 
 const SignUpScreen: React.FC = () => {
   const navigate = useNavigate();
@@ -129,7 +131,7 @@ const SignUpScreen: React.FC = () => {
     height: '20px'
   };
 
-  return (
+   return (
     <div 
       className="min-h-screen w-full flex flex-col items-center"
       style={{
@@ -138,7 +140,7 @@ const SignUpScreen: React.FC = () => {
         position: 'relative'
       }}
     >
-      <div className="w-full max-w-[345px]">
+      <div className="w-full max-w-86.25">
         {/* Back Button */}
         <button 
           onClick={() => navigate('/login')}
@@ -323,9 +325,9 @@ const SignUpScreen: React.FC = () => {
             onClick={handleAllAgreement}
           >
             <img 
-              src={agreements.all ? CheckboxOn : CheckboxOff} 
+              src={agreements.all ? SelectAll : SelectNone} 
               alt="전체 동의" 
-              style={{ width: '19px', height: '19px', marginRight: '8px' }} 
+              style={{  marginRight: '8px' }} 
             />
             <span style={{
               fontFamily: 'PretendardMedium',
@@ -350,16 +352,16 @@ const SignUpScreen: React.FC = () => {
                 onClick={() => handleAgreement('service')}
               >
                 <img 
-                  src={agreements.service ? CheckboxOn : CheckboxOff} 
+                  src={agreements.service ? Checked : Unchecked} 
                   alt="서비스 이용약관" 
-                  style={{ width: '19px', height: '19px', marginRight: '8px' }} 
+                  style={{  marginRight: '8px' }} 
                 />
                 <span style={{
                   fontFamily: 'PretendardMedium',
                   fontSize: '13px',
                   color: '#A1A1A1'
                 }}>
-                  서비스 이용약관 동의 (필수)
+                  서비스 이용약관 동의 <span className="text-[#B59FFF]">(필수)</span>
                 </span>
               </div>
               <button style={{
@@ -386,16 +388,16 @@ const SignUpScreen: React.FC = () => {
                 onClick={() => handleAgreement('privacy')}
               >
                 <img 
-                  src={agreements.privacy ? CheckboxOn : CheckboxOff} 
+                  src={agreements.privacy ? Checked : Unchecked} 
                   alt="개인정보 수집" 
-                  style={{ width: '19px', height: '19px', marginRight: '8px' }} 
+                  style={{ marginRight: '8px' }} 
                 />
                 <span style={{
                   fontFamily: 'PretendardMedium',
                   fontSize: '13px',
                   color: '#A1A1A1'
                 }}>
-                  개인정보 수집 및 이용 동의 (필수)
+                  개인정보 수집 및 이용 동의 <span className="text-[#B59FFF]">(필수)</span>
                 </span>
               </div>
               <button style={{
@@ -419,9 +421,9 @@ const SignUpScreen: React.FC = () => {
                 onClick={() => handleAgreement('marketing')}
               >
                 <img 
-                  src={agreements.marketing ? CheckboxOn : CheckboxOff} 
+                  src={agreements.marketing ? Checked : Unchecked} 
                   alt="마케팅 이용" 
-                  style={{ width: '19px', height: '19px', marginRight: '8px' }} 
+                  style={{  marginRight: '8px' }} 
                 />
                 <span style={{
                   fontFamily: 'PretendardMedium',
@@ -447,43 +449,28 @@ const SignUpScreen: React.FC = () => {
         </div>
 
         {/* Submit Button - 수정됨 */}
-        <div
-          style={{
-            position: 'absolute',
-            top: '774px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            width: '345px'
-          }}
-        >
-          <button
-            onClick={() => {
-              if (isFormValid) {
-                navigate('/');
-              }
-            }}
-            disabled={!isFormValid}
-            style={{
-               width: '345px',
-              height: '40px',
-              borderRadius: '10px',
-              border: 'none',
-              background: isFormValid ? '#7F5AFF' : '#7A7A7A',
-              color: '#FFFFFF',
-              fontFamily: 'PretendardMedium',
-              fontWeight: 500,
-              fontSize: '13px',
-              lineHeight: '130%',
-              letterSpacing: '-0.025em',
-              cursor: isFormValid ? 'pointer' : 'not-allowed',
-              transition: 'all 0.3s ease',
-              opacity: 1
-            }}
-            className={isFormValid ? 'hover:opacity-90 active:scale-[0.98]' : ''}
-          >
-            다음
-          </button>
-        </div>
+        <div className="fixed bottom-10 left-1/2 w-86.25 -translate-x-1/2 z-50">
+      <button
+        onClick={() => {
+          if (isFormValid) {
+            navigate('/');
+          }
+        }}
+        disabled={!isFormValid}
+        className={`
+          w-86.25 h-10 rounded-[10px] border-none
+          font-['PretendardMedium'] font-medium text-[13px] leading-[130%] tracking-[-0.025em]
+          text-[#FFFFFF] transition-all duration-300 opacity-100
+          ${
+            isFormValid
+              ? 'bg-[#7F5AFF] cursor-pointer hover:opacity-90 active:scale-[0.98]'
+              : 'bg-[#7A7A7A] cursor-not-allowed'
+          }
+        `}
+      >
+        다음
+      </button>
+    </div>
       </div>
     </div>
   );
