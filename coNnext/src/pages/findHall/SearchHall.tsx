@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { IoSearch } from "react-icons/io5";
+import Search from "../../components/common/Search";
+import before from "../../assets/logo/before.svg";
+import PopularVenueTicker from "../../components/PopularVenueTicker";
 
 import { useGetList } from "../../hooks/queries/useGetList";
 import useDebounce from "../../hooks/queries/useDebounce";
@@ -16,6 +18,19 @@ const RECENT_KEYS = [
   "최근 검색어6",
 ];
 
+const popularVenueMock = [
+  { id: 1, name: "KSPO DOME" },
+  { id: 2, name: "잠실 주경기장" },
+  { id: 3, name: "고척 스카이돔" },
+  { id: 4, name: "서울 월드컵 경기장" },
+  { id: 5, name: "KSPO DOME" },
+  { id: 6, name: "잠실 주경기장" },
+  { id: 7, name: "고척 스카이돔" },
+  { id: 8, name: "서울 월드컵 경기장" },
+  { id: 9, name: "고척 스카이돔" },
+  { id: 10, name: "서울 월드컵 경기장" },
+];
+
 const SearchHall = () => {
   const navigate = useNavigate();
 
@@ -27,6 +42,10 @@ const SearchHall = () => {
   const { data = [] } = useGetList({
     search: debouncedValue,
   });
+
+  /* ✅ 검색 결과 공통 처리 (지금 / 나중 API 대비) */
+  const items = (data as any)?.items ?? data;
+  const totalCount = (data as any)?.totalCount ?? items.length;
 
   /* 최근 검색어 초기 로딩 */
   useEffect(() => {
@@ -64,7 +83,7 @@ const SearchHall = () => {
     setRecentKeywords(filtered);
   };
 
-  /* 전체 삭제 ✅ (이게 빠져 있었음) */
+  /* 전체 삭제 */
   const handleClearAll = () => {
     RECENT_KEYS.forEach((key) => localStorage.removeItem(key));
     setRecentKeywords([]);
@@ -72,22 +91,22 @@ const SearchHall = () => {
 
   return (
     <div className="min-h-screen bg-[#0a0f1e] text-white px-4 py-6">
-      {/* 상단 검색 */}
+      {/* 상단 헤더 */}
+      <div className="flex items-center gap-3">
+        <button onClick={() => navigate(-1)}>
+          <img src={before} alt="뒤로가기" className="w-5 h-5" />
+        </button>
+        <h1 className="text-lg font-semibold">공연장 찾기</h1>
+      </div>
+
+      {/* 인기 공연장 */}
+      <div className="mt-5">
+        <PopularVenueTicker list={popularVenueMock} />
+      </div>
+
+      {/* 검색창 */}
       <div className="flex items-center gap-3 mb-4">
-        <button onClick={() => navigate(-1)}>←</button>
-
-        <div className="relative flex-1">
-          <input
-            autoFocus
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="공연장, 홀, 시설 검색"
-            className="h-[56px] w-full rounded-xl bg-[#1F2A3A]
-                       pl-5 pr-14 outline-none"
-          />
-
-          <IoSearch className="absolute right-4 top-1/2 -translate-y-1/2" />
-        </div>
+        <Search value={search} onChange={(e) => setSearch(e.target.value)} />
       </div>
 
       {/* 최근 검색어 */}
@@ -121,18 +140,26 @@ const SearchHall = () => {
 
       {/* 검색 결과 */}
       {search && (
-        <section className="mt-6 grid grid-cols-2 gap-3">
-          {data.map((item: any) => (
-            <div key={item.id} className="scale-[0.95]">
-              <VenueCard
-                image={item.image}
-                title={item.title}
-                place={item.place}
-                isToday={false}
-                isNew={item.isNew}
-              />
-            </div>
-          ))}
+        <section className="mt-6">
+          {/* 결과 개수 */}
+          <div className="mb-3 ml-3 text-sm text-gray-400">
+            검색 결과
+            <span className="text-white font-medium">{totalCount}</span>건
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            {items.map((item: any) => (
+              <div key={item.id} className="scale-[0.95]">
+                <VenueCard
+                  image={item.image}
+                  title={item.title}
+                  place={item.place}
+                  isToday={false}
+                  isNew={item.isNew}
+                />
+              </div>
+            ))}
+          </div>
         </section>
       )}
     </div>

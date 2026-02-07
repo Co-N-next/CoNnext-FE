@@ -1,9 +1,10 @@
 import { useNavigate } from "react-router-dom";
-import { IoSearch } from "react-icons/io5";
+import Search from "../../components/common/Search";
 
 import { useGetList } from "../../hooks/queries/useGetList";
 import { NearbyBanner } from "../../components/NearbyBanner";
 import VenueCard from "../../components/VenueCard";
+import PopularVenueTicker from "../../components/PopularVenueTicker";
 
 /* =========================
  * utils
@@ -25,7 +26,18 @@ const nearbySummary = {
     distanceKm: 0.8,
   },
 };
-
+const popularVenueMock = [
+  { id: 1, name: "KSPO DOME" },
+  { id: 2, name: "잠실 주경기장" },
+  { id: 3, name: "고척 스카이돔" },
+  { id: 4, name: "서울 월드컵 경기장" },
+  { id: 5, name: "KSPO DOME" },
+  { id: 6, name: "잠실 주경기장" },
+  { id: 7, name: "고척 스카이돔" },
+  { id: 8, name: "서울 월드컵 경기장" },
+  { id: 9, name: "고척 스카이돔" },
+  { id: 10, name: "서울 월드컵 경기장" },
+];
 const todayVenueSummary = {
   hasTodayVenue: true,
   venue: {
@@ -64,13 +76,16 @@ const FindHall = () => {
    * render
    * ========================= */
   return (
-    <div className="min-h-screen bg-[#0a0f1e] text-white flex justify-center">
+    <div className="min-h-screen bg-[#0a0f1f] text-white flex justify-center">
       <div className="w-full max-w-[600px] px-2.5 py-2.5 space-y-4">
         {/* =========================
          * Header
          * ========================= */}
         <h1 className="text-[18px] font-semibold">공연장 찾기</h1>
-
+        {/* =========================
+         * Popular Rolling
+         * ========================= */}
+        <PopularVenueTicker list={popularVenueMock} />
         {/* =========================
          * Nearby Venue
          * ========================= */}
@@ -111,23 +126,7 @@ const FindHall = () => {
         {/* =========================
          * Search
          * ========================= */}
-        <div className="relative" onClick={() => navigate("/search")}>
-          <input
-            readOnly
-            placeholder="공연장, 홀, 시설 검색"
-            className="h-[44px] w-full rounded-lg bg-[#1F2A3A]
-              pl-4 pr-12 text-[13px] text-white placeholder:text-gray-400
-              cursor-pointer"
-          />
-
-          <div
-            className="absolute right-1.5 top-1/2 -translate-y-1/2
-              flex h-[30px] w-[30px] items-center justify-center
-              rounded-md bg-[#745AFF] pointer-events-none"
-          >
-            <IoSearch className="text-[13px] text-white" />
-          </div>
-        </div>
+        <Search readOnly onClick={() => navigate("/search")} />
 
         {/* =========================
          * Favorite Venues

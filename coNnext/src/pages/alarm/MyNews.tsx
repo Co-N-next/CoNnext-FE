@@ -88,26 +88,44 @@ function getTimeInfo(createdAt: string) {
   const diffHours = Math.floor(diffMinutes / 60);
   const diffDays = Math.floor(diffHours / 24);
 
+  // ✅ 오늘 (24시간 이내)
   if (diffHours < 24) {
-    if (diffMinutes < 1) return { section: "TODAY", timeText: "방금 전" };
+    if (diffMinutes < 1)
+      return { section: "TODAY" as const, timeText: "방금 전" };
     if (diffMinutes < 60)
-      return { section: "TODAY", timeText: `${diffMinutes}분 전` };
-    return { section: "TODAY", timeText: `${diffHours}시간 전` };
+      return {
+        section: "TODAY" as const,
+        timeText: `${diffMinutes}분 전`,
+      };
+    return {
+      section: "TODAY" as const,
+      timeText: `${diffHours}시간 전`,
+    };
   }
 
+  // ✅ 일주일 전 (1일 초과 ~ 7일 이내)
+  if (diffDays <= 7) {
+    return {
+      section: "WEEK_AGO" as const,
+      timeText: `${diffDays}일 전`,
+    };
+  }
+
+  // ❌ 그보다 오래된 건 이번 화면에서는 제외
   return {
-    section: "WEEK_AGO",
+    section: "OLD" as const,
     timeText: `${diffDays}일 전`,
   };
 }
 
 /* ================= 컴포넌트 ================= */
 export default function TodayConcertBanner() {
-  const parsedNews = newsList.map((news) => {
-    const { section, timeText } = getTimeInfo(news.createdAt);
-    return { ...news, section, timeText };
-  });
-
+  const parsedNews = newsList
+    .map((news) => {
+      const { section, timeText } = getTimeInfo(news.createdAt);
+      return { ...news, section, timeText };
+    })
+    .filter((news) => news.section !== "OLD");
   const todayList = parsedNews.filter((n) => n.section === "TODAY");
   const weekAgoList = parsedNews.filter((n) => n.section === "WEEK_AGO");
 
@@ -136,13 +154,32 @@ export default function TodayConcertBanner() {
       <div className="mx-4 mt-4 text-gray-400">오늘 예정된 공연이 없어요</div>
     );
   }
+  const handleShare = async () => {
+    const shareUrl = window.location.href;
 
+    // 📱 모바일(아이폰/안드로이드) → OS 공유 시트
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: mockTodayConcert.concertTitle,
+          text: `${mockTodayConcert.place}에서 오늘 공연 있어요!`,
+          url: shareUrl,
+        });
+      } catch (e) {
+        // 사용자가 취소한 경우도 여기로 옴 (에러 아님)
+        console.log("공유 취소");
+      }
+      return;
+    }
+
+    // 💻 PC / 미지원 환경 → 링크 복사
+    await navigator.clipboard.writeText(shareUrl);
+    alert("링크가 복사되었어요!");
+  };
   return (
     <>
       {/* ================= 오늘의 공연 ================= */}
       <div className="w-full">
-        {" "}
-        {/* ✅ 여기에 px-4가 있다면 반드시 지우세요 */}{" "}
         <section className="relative mx-4 mt-4 aspect-[16/9] overflow-hidden rounded-2xl">
           <img
             src={mockTodayConcert.imageUrl}
@@ -151,7 +188,10 @@ export default function TodayConcertBanner() {
           />
           <div className="absolute inset-0 bg-black/50" />
 
-          <button className="absolute top-4 right-4 z-20 flex h-9 w-9 items-center justify-center rounded-full border border-white">
+          <button
+            onClick={handleShare}
+            className="absolute top-4 right-4 z-20 flex h-9 w-9 items-center justify-center rounded-full border border-white/30"
+          >
             <Share2 size={18} className="text-white" />
           </button>
 
