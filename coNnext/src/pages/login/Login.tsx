@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom'
+import api from "../../api/axios.ts";
 
 import BackButton from '../../assets/logo/BackButton.svg';
 import kakaoSymbol from '../../assets/logo/kakaotalkSymbol.svg';
@@ -14,12 +15,7 @@ const LoginScreen: React.FC = () => {
   const [password, setPassword] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
 
-  // 더미 데이터 - 실제로는 백엔드에서 검증
-  const DUMMY_USERS = [
-    { email: 'user@connext.com', password: 'connext123!' },
-    { email: 'test@example.com', password: 'test1234' },
-    { email: 'halinpark04@gmail.com', password: '3929pg' }
-  ];
+ 
 
   const inputStyle: React.CSSProperties = {
     width: '345px',
@@ -36,25 +32,47 @@ const LoginScreen: React.FC = () => {
     outline: 'none',
   };
 
-  const handleLogin = () => {
-    // 입력값 검증
-    if (!id || !password) {
-      setErrorMessage('이메일과 비밀번호를 입력해주세요.');
-      return;
+  const handleLogin = async () => {
+  if (!id || !password) {
+    setErrorMessage("이메일과 비밀번호를 모두 입력해주세요.");
+    return;
+  }
+
+  try {
+    const res = await api.post(
+      "/auth/login/local",
+      { email: id, password },
+      { withCredentials: true } // 🔥 refresh 쿠키 받기 필수
+    );
+
+    // ✅ 1. HTTP 200이면 무조건 성공
+    const authHeader =
+      res.headers["authorization"] || res.headers["Authorization"];
+
+    // ✅ 2. Access Token이 있으면 저장 (있을 수도 있고 없을 수도 있음)
+    if (authHeader) {
+      localStorage.setItem(
+        "accessToken",
+        authHeader.replace("Bearer ", "")
+      );
     }
 
-    // 더미 데이터로 로그인 검증
-    const user = DUMMY_USERS.find(u => u.email === id && u.password === password);
-    
-    if (user) {
-      // 로그인 성공
-      setErrorMessage('');
-      navigate('/');
+    setErrorMessage("");
+    navigate("/"); // ✅ 무조건 이동
+
+  } catch (error: any) {
+    const status = error.response?.status;
+
+    if (status === 401) {
+      setErrorMessage("이메일 또는 비밀번호가 올바르지 않습니다.");
+    } else if (status === 403) {
+      setErrorMessage("탈퇴한 회원입니다.");
     } else {
-      // 로그인 실패
-      setErrorMessage('이메일, 또는 비밀번호가 잘못되었습니다. 다시 입력해주세요.');
+      setErrorMessage("서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
     }
-  };
+  }
+};
+
 
   return (
     <div className="min-h-screen w-full flex flex-col items-center justify-start"
@@ -64,7 +82,7 @@ const LoginScreen: React.FC = () => {
   }}>
     
     {/* 전체 컨테이너 - 두 박스를 세로로 배치 */}
-      <div className="flex flex-col w-full max-w-[345px] gap-[64px]">
+      <div className="flex flex-col w-full max-w-86.25 gap-16">
 
          {/* 첫 번째 박스: Back Button + 로고 + ? 버튼 */}
         <div 
@@ -328,7 +346,7 @@ const LoginScreen: React.FC = () => {
 
               
 {/* 회원가입 버튼 - 수정됨 */}
-     <div 
+      <div 
       className="flex justify-center" 
       style={{ 
         position: 'absolute',
