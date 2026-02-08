@@ -1,16 +1,19 @@
-import React from 'react';
+import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const Footer: React.FC = () => {
-    const navItems = [
-    { id: 1, label: '홈' },
-    { id: 2, label: '예매 내역' },
-    { id: 3, label: '공연장' },
-    { id: 4, label: '메이트' },
-    { id: 5, label: '마이페이지' },
+  const navigate = useNavigate();
+
+  const navItems = [
+    { id: 1, label: "홈" },
+    { id: 2, label: "예매 내역" },
+    { id: 3, label: "공연장" },
+    { id: 4, label: "메이트" },
+    { id: 5, label: "마이페이지" },
   ];
 
   return (
-    <footer className="fixed bottom-0 left-1/2 -translate-x-1/2 bg-[#0f1729] border-t border-gray-800 z-50 w-full max-w-[450px]">
+    <footer className="fixed bottom-0 left-0 right-0 bg-[#0f1729] border-t border-gray-800 z-50">
       <nav className="max-w-7xl mx-auto">
         <ul className="flex items-center justify-around py-3">
           {navItems.map((item) => (

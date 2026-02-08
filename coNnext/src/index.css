@@ -1,9 +1,60 @@
 @import "tailwindcss";
 
-:root {
-  /* 기본 폰트를 Pretendard */
-  font-family: "Pretendard", sans-serif;
+/* 스크롤바 숨김 */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* 레이아웃 고정 높이 */
+:root {
+  --header-height: 80px;
+  --selectbar-height: 56px;
+  --footer-height: 80px;
+}
+
+:root {
+  /* 기본 폰트 */
+  font-family: "Pretendard", sans-serif;
+
+  /* 디자인 토큰 - 색상 */
+  --color-bg-page: #0a0f1e;
+  --color-bg-card: #0f1729;
+  --color-bg-hover: #16203a;
+  --color-bg-surface: #1e293b;
+  --color-accent: #8b7cff;
+  --color-accent-hover: #7667ff;
+  --color-text-primary: #ffffff;
+  --color-text-muted: #a1a1a1;
+  --color-text-secondary: #9ca3af;
+  --color-border: rgb(31 41 55);
+
+  /* 디자인 토큰 - 타이포그래피 */
+  --text-title: 18px;
+  --text-body: 16px;
+  --text-caption: 13px;
+  --text-xs: 12px;
+
+  /* 디자인 토큰 - 간격/사이즈 */
+  --spacing-poster-side: 93px;
+  --size-poster-main-w: 207px;
+  --size-poster-main-h: 276px;
+  --size-poster-sub-w: 162px;
+  --size-poster-sub-h: 216px;
+  --size-venue-image: 150px;
+  --radius-card: 12px;
+}
+
+/* 페이지 전체 배경 (흰 배경 방지, 푸터와 이어지게), 좌우 스크롤 방지 */
+html,
+body {
+  background-color: var(--color-bg-page);
+  overflow-x: hidden;
+}
+
 /* Pretendard Regular (400) */
 @font-face {
   font-family: "Pretendard";
@@ -32,41 +83,40 @@
 }
 
 @font-face {
-  font-family: 'Inter';
-  src: url('./assets/fonts/Inter-VariableFont_opsz,wght.ttf') format('truetype-variations');
-  font-weight: 100 900; 
+  font-family: "Inter";
+  src: url("./assets/fonts/Inter-VariableFont_opsz,wght.ttf") format("truetype-variations");
+  font-weight: 100 900;
   font-style: normal;
   font-display: swap;
 }
 
-
 @font-face {
-  font-family: 'Lyyra';
-  src: url('./assets/fonts/lyyra-expanded-4.ttf') format('truetype');
+  font-family: "Lyyra";
+  src: url("./assets/fonts/lyyra-expanded-4.ttf") format("truetype");
   font-weight: 400;
   font-style: normal;
 }
 
 /* Yde Street Light*/
 @font-face {
-  font-family: 'YdeStreetL';
-  src: url('./assets/fonts/YdestreetL.ttf') format('truetype');
+  font-family: "YdeStreetL";
+  src: url("./assets/fonts/YdestreetL.ttf") format("truetype");
   font-weight: 300;
   font-style: normal;
 }
 
 /* Yde Street Bold*/
 @font-face {
-  font-family: 'YdeStreetB';
-  src: url('./assets/fonts/YdestreetB.ttf') format('truetype');
+  font-family: "YdeStreetB";
+  src: url("./assets/fonts/YdestreetB.ttf") format("truetype");
   font-weight: 700;
   font-style: normal;
 }
 
 /* Pretendard-Medium */
 @font-face {
-  font-family: 'Pretendard';
-  src: url('./assets/fonts/Pretendard-Medium.woff2') format('woff2');
-  font-weight: 500; 
+  font-family: "Pretendard";
+  src: url("./assets/fonts/Pretendard-Medium.woff2") format("woff2");
+  font-weight: 500;
   font-display: normal;
 }

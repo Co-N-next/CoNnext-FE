@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ChevronRight} from "lucide-react";
-import type{ Concert } from "../../types/tickets";
+import { ChevronRight } from "lucide-react";
+import type { Concert } from "../../types/tickets";
 import RV from "../../assets/dumy/ReVel.svg";
-import RV1 from "../../assets/dumy/ReVel1.svg";
+import RV1 from "../../assets/dumy/ReVel1.png";
 import BTS from "../../assets/dumy/BTS.svg";
 import FilterIcon from "../../assets/logo/FilterIcon.svg";
 
@@ -127,28 +127,26 @@ export default function UpcomingConcertPage() {
             className="fixed inset-0 bg-black/50 z-40"
             onClick={() => setIsMenuOpen(false)}
           />
-          
+
           {/* 정렬 메뉴 */}
           <div className="fixed right-0 top-0 bottom-0 w-1/2 max-w-[200px] z-50">
             <div className="bg-[#1e293b] rounded-l-2xl mt-20 mr-4 shadow-2xl">
               <div className="py-2">
                 <button
                   onClick={() => handleFilterChange("dday")}
-                  className={`w-full px-4 py-3 text-left text-sm font-medium transition-colors ${
-                    filter === "dday"
+                  className={`w-full px-4 py-3 text-left text-sm font-medium transition-colors ${filter === "dday"
                       ? "bg-[#0f1729] text-white"
                       : "text-gray-400 hover:bg-[#0f1729]/50"
-                  }`}
+                    }`}
                 >
-                  가까운 공연 순
+                  D-Day 가까운 순
                 </button>
                 <button
                   onClick={() => handleFilterChange("views")}
-                  className={`w-full px-4 py-3 text-left text-sm font-medium transition-colors ${
-                    filter === "views"
+                  className={`w-full px-4 py-3 text-left text-sm font-medium transition-colors ${filter === "views"
                       ? "bg-[#0f1729] text-white"
                       : "text-gray-400 hover:bg-[#0f1729]/50"
-                  }`}
+                    }`}
                 >
                   조회순
                 </button>

@@ -1,13 +1,14 @@
-export interface Concert {
+export type Concert = {
   id: number;
   title: string;
-  subtitle: string;
   artist: string;
   poster: string;
   dDay: number;
-  isNew:boolean;
-  views:number;
-}
+  isNew: boolean;
+  subtitle?: string;  // optional
+  views?: number;     // optional
+};
+
 
 export interface Venue {
   id: number;
