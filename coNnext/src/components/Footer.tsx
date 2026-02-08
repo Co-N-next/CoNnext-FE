@@ -1,8 +1,8 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+//import { useNavigate } from "react-router-dom";
 
 const Footer: React.FC = () => {
-  const navigate = useNavigate();
+  //const navigate = useNavigate();
 
   const navItems = [
     { id: 1, label: "홈" },

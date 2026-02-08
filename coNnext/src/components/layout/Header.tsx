@@ -5,7 +5,11 @@ import Connext from '../../assets/logo/Con-next.svg';
 import Ticket from '../../assets/logo/TicketLogo.svg';
 import Bell from '../../assets/logo/BellLogo.svg';
 
-const Header: React.FC = () => {
+type HeaderProps = {
+  onTicketClick?: () => void;
+};
+
+const Header: React.FC<HeaderProps> = ({ onTicketClick }) => {
   const navigate = useNavigate();
 
   return (
@@ -24,10 +28,15 @@ const Header: React.FC = () => {
 
         {/* 아이콘 */}
         <div className="flex items-center gap-[10px] w-[92px] h-[24px] justify-end">
-          <button className="w-6 h-6 p-0 hover:opacity-80 transition-opacity flex-shrink-0">
+          {/* 🎟 예매 아이콘 */}
+          <button
+            onClick={onTicketClick}
+            className="w-6 h-6 p-0 hover:opacity-80 transition-opacity flex-shrink-0"
+          >
             <img src={Ticket} alt="Ticket" className="w-6 h-6 block" />
           </button>
 
+          {/* 🔔 알림 */}
           <button className="w-6 h-6 p-0 hover:opacity-80 transition-opacity flex-shrink-0">
             <img src={Bell} alt="Bell" className="w-6 h-6 block" />
           </button>
