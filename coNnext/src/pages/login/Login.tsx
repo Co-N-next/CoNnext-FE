@@ -58,8 +58,8 @@ const LoginScreen: React.FC = () => {
     }
 
     setErrorMessage("");
-    navigate("/"); // ✅ 무조건 이동
-
+    navigate("/");
+    
   } catch (error: any) {
     const status = error.response?.status;
 
