@@ -29,6 +29,16 @@ const AddDetail = () => {
     number: "",
   });
 
+  // 좌석 입력 필드 설정
+  const SEAT_INPUT_BASE_CLASS = "px-[8px] py-[13px] flex items-center justify-end gap-[10px] rounded-[8px] border-[0.5px] border-[#A1A1A1] bg-[#222222]/50 text-white text-right placeholder-[#E8E8E8] outline-none focus:border-[#7F5AFF] focus:ring-1 focus:ring-[#7F5AFF]";
+  
+  const seatFields = [
+    { key: "floor" as keyof typeof seatInfo, placeholder: "층", width: "w-[50px]" },
+    { key: "section" as keyof typeof seatInfo, placeholder: "구역", width: "w-[73px]" },
+    { key: "row" as keyof typeof seatInfo, placeholder: "열", width: "w-[84px]" },
+    { key: "number" as keyof typeof seatInfo, placeholder: "번", width: "w-[114px]" },
+  ];
+
   // ✅ 1. 화면 진입 시 공연 회차 정보(날짜 목록) 가져오기
   useEffect(() => {
     const loadDetails = async () => {
@@ -289,46 +299,18 @@ const AddDetail = () => {
         <div className="mb-8">
           <label className="block text-[15px] font-bold mb-3">좌석 선택</label>
           <div className="flex flex-row gap-[8px] h-[42px] text-[13px]">
-            {/* 층 */}
-            <input
-              type="text"
-              placeholder="층"
-              value={seatInfo.floor}
-              onChange={(e) =>
-                setSeatInfo({ ...seatInfo, floor: e.target.value })
-              }
-              className="w-[50px] px-[8px] py-[13px] flex items-center justify-end gap-[10px] rounded-[8px] border-[0.5px] border-[#A1A1A1] bg-[#222222]/50 text-white text-right placeholder-[#E8E8E8] outline-none focus:border-[#7F5AFF] focus:ring-1 focus:ring-[#7F5AFF]"
-            />
-            {/* 구역 */}
-            <input
-              type="text"
-              placeholder="구역"
-              value={seatInfo.section}
-              onChange={(e) =>
-                setSeatInfo({ ...seatInfo, section: e.target.value })
-              }
-              className="w-[73px] px-[8px] py-[13px] flex items-center justify-end gap-[10px] rounded-[8px] border-[0.5px] border-[#A1A1A1] bg-[#222222]/50 text-white text-right placeholder-[#E8E8E8] outline-none focus:border-[#7F5AFF] focus:ring-1 focus:ring-[#7F5AFF]"
-            />
-            {/* 열 */}
-            <input
-              type="text"
-              placeholder="열"
-              value={seatInfo.row}
-              onChange={(e) =>
-                setSeatInfo({ ...seatInfo, row: e.target.value })
-              }
-              className="w-[84px] px-[8px] py-[13px] flex items-center justify-end gap-[10px] rounded-[8px] border-[0.5px] border-[#A1A1A1] bg-[#222222]/50 text-white text-right placeholder-[#E8E8E8] outline-none focus:border-[#7F5AFF] focus:ring-1 focus:ring-[#7F5AFF]"
-            />
-            {/* 번 */}
-            <input
-              type="text"
-              placeholder="번"
-              value={seatInfo.number}
-              onChange={(e) =>
-                setSeatInfo({ ...seatInfo, number: e.target.value })
-              }
-              className="w-[114px] px-[8px] py-[13px] flex items-center justify-end gap-[10px] rounded-[8px] border-[0.5px] border-[#A1A1A1] bg-[#222222]/50 text-white text-right placeholder-[#E8E8E8] outline-none focus:border-[#7F5AFF] focus:ring-1 focus:ring-[#7F5AFF]"
-            />
+            {seatFields.map((field) => (
+              <input
+                key={field.key}
+                type="text"
+                placeholder={field.placeholder}
+                value={seatInfo[field.key]}
+                onChange={(e) =>
+                  setSeatInfo({ ...seatInfo, [field.key]: e.target.value })
+                }
+                className={`${field.width} ${SEAT_INPUT_BASE_CLASS}`}
+              />
+            ))}
           </div>
           
           <button
