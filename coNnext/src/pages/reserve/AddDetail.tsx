@@ -5,6 +5,16 @@ import type { Concert } from "../../types/concert";
 import { fetchConcertDetail } from "../../api/concert"; // ✅ API 함수 임포트
 import { createReservation } from "../../api/reservation";
 
+// 좌석 입력 필드 설정
+const seatInputBaseClass = "px-[8px] py-[13px] flex items-center justify-end gap-[10px] rounded-[8px] border-[0.5px] border-[#A1A1A1] bg-[#222222]/50 text-white text-right placeholder-[#E8E8E8] outline-none focus:border-[#7F5AFF] focus:ring-1 focus:ring-[#7F5AFF]";
+
+const seatFields = [
+  { key: "floor" as const, placeholder: "층", width: "w-[50px]" },
+  { key: "section" as const, placeholder: "구역", width: "w-[73px]" },
+  { key: "row" as const, placeholder: "열", width: "w-[84px]" },
+  { key: "number" as const, placeholder: "번", width: "w-[114px]" },
+] as const;
+
 const AddDetail = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -28,16 +38,6 @@ const AddDetail = () => {
     row: "",
     number: "",
   });
-
-  // 좌석 입력 필드 설정
-  const SEAT_INPUT_BASE_CLASS = "px-[8px] py-[13px] flex items-center justify-end gap-[10px] rounded-[8px] border-[0.5px] border-[#A1A1A1] bg-[#222222]/50 text-white text-right placeholder-[#E8E8E8] outline-none focus:border-[#7F5AFF] focus:ring-1 focus:ring-[#7F5AFF]";
-  
-  const seatFields = [
-    { key: "floor" as keyof typeof seatInfo, placeholder: "층", width: "w-[50px]" },
-    { key: "section" as keyof typeof seatInfo, placeholder: "구역", width: "w-[73px]" },
-    { key: "row" as keyof typeof seatInfo, placeholder: "열", width: "w-[84px]" },
-    { key: "number" as keyof typeof seatInfo, placeholder: "번", width: "w-[114px]" },
-  ];
 
   // ✅ 1. 화면 진입 시 공연 회차 정보(날짜 목록) 가져오기
   useEffect(() => {
@@ -308,7 +308,7 @@ const AddDetail = () => {
                 onChange={(e) =>
                   setSeatInfo({ ...seatInfo, [field.key]: e.target.value })
                 }
-                className={`${field.width} ${SEAT_INPUT_BASE_CLASS}`}
+                className={`${field.width} ${seatInputBaseClass}`}
               />
             ))}
           </div>
