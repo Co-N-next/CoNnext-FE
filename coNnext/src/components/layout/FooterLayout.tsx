@@ -1,21 +1,23 @@
-import React from "react";
 import { Outlet } from "react-router-dom";
-import Header from "./Header";
 import Footer from "./Footer";
 
-const Layout: React.FC = () => {
+const FooterLayout = () => {
   return (
     <div className="min-h-screen flex justify-center">
       <div className="w-full max-w-[450px] min-h-screen flex flex-col relative">
-        <Header />
-
-        <main className="flex-1 w-full overflow-y-auto pt-20 pb-20">
+        
+        {/* Header가 없습니다 */}
+        
+        {/* 자식 페이지(MateMap)가 그려질 공간 */}
+        <main className="flex-1 w-full overflow-y-auto pb-20">
           <Outlet />
         </main>
+
+        {/* 푸터 */}
         <Footer />
       </div>
     </div>
   );
 };
 
-export default Layout;
+export default FooterLayout;

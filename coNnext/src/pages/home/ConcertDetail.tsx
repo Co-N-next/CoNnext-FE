@@ -1,36 +1,36 @@
 import { useNavigate } from "react-router-dom";
 import { ExternalLink } from "lucide-react";
-import type { Concert } from "../../types/tickets";
-import RV from "../../assets/dumy/ReVel.svg";
-import BackButton from "../../assets/logo/BackButton.svg";
+// import type { Concert } from "../../types/tickets";
+// import RV from "../../assets/dumy/ReVel.svg";
+// import BackButton from "../../assets/logo/BackButton.svg";
 
-/* ===== 더미 데이터 ===== */
-const concertData: Concert & {
-  date: string;
-  time: string;
-  rating: string;
-  duration: string;
-  venueName: string;
-  venueLocation: string;
-  venueImage: string;
-  artistImage?: string;
-} = {
-  id: 1,
-  title: "볼빨간사춘기 첫 팬미팅",
-  subtitle: "[Wild and Free]",
-  artist: "볼빨간사춘기",
-  poster: RV,
-  dDay: 0,
-  isNew: false,
-  views: 3200,
-  date: "2024.12.15 (일)",
-  time: "19:00",
-  rating: "전체관람가",
-  duration: "총 90분",
-  venueName: "KSPO DOME",
-  venueLocation: "서울특별시 송파구",
-  venueImage: RV,
-};
+// /* ===== 더미 데이터 ===== */
+// const concertData: Concert & {
+//   date: string;
+//   time: string;
+//   rating: string;
+//   duration: string;
+//   venueName: string;
+//   venueLocation: string;
+//   venueImage: string;
+//   artistImage?: string;
+// } = {
+//   id: 1,
+//   title: "볼빨간사춘기 첫 팬미팅",
+//   subtitle: "[Wild and Free]",
+//   artist: "볼빨간사춘기",
+//   poster: RV,
+//   dDay: 0,
+//   isNew: false,
+//   views: 3200,
+//   date: "2024.12.15 (일)",
+//   time: "19:00",
+//   rating: "전체관람가",
+//   duration: "총 90분",
+//   venueName: "KSPO DOME",
+//   venueLocation: "서울특별시 송파구",
+//   venueImage: RV,
+// };
 
 export default function ConcertInfo() {
   const navigate = useNavigate();

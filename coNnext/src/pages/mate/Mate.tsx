@@ -1,7 +1,13 @@
-<<<<<<< HEAD
 import { useState } from "react";
-import { Search, UserPlus, Settings } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Search, ChevronRight, PlusCircle } from "lucide-react";
 import jinah from "../../assets/images/jinah.svg";
+import mate from "../../assets/images/mate.svg";
+import star from "../../assets/Icons/star_on.svg";
+import setting from "../../assets/Icons/Settings.svg";
+import userplus from "../../assets/Icons/User Plus.svg";
+import kakao from "../../assets/Variables/kakao.svg";
+
 interface Mate {
   id: string;
   name: string;
@@ -9,7 +15,9 @@ interface Mate {
 }
 
 const Mate = () => {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
+  const [isFriendRequestOpen, setIsFriendRequestOpen] = useState(false);
 
   const featuredMate: Mate = {
     id: "1",
@@ -17,30 +25,29 @@ const Mate = () => {
     imageUrl: jinah,
   };
 
+  // 이 곳에 원하는 이미지 URL을 넣어주세요
+  const MATE_IMAGE_URL = mate;
+
   const frequentMates: Mate[] = [
     {
       id: "2",
       name: "mate1",
-      imageUrl:
-        "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=200&h=200&fit=crop",
+      imageUrl: MATE_IMAGE_URL,
     },
     {
       id: "3",
       name: "mate2",
-      imageUrl:
-        "https://images.unsplash.com/photo-1524678606370-a47ad25cb82a?w=200&h=200&fit=crop",
+      imageUrl: MATE_IMAGE_URL,
     },
     {
       id: "4",
       name: "mate3",
-      imageUrl:
-        "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&h=200&fit=crop",
+      imageUrl: MATE_IMAGE_URL,
     },
     {
       id: "5",
       name: "mate4",
-      imageUrl:
-        "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=200&h=200&fit=crop",
+      imageUrl: MATE_IMAGE_URL,
     },
   ];
 
@@ -48,74 +55,62 @@ const Mate = () => {
     {
       id: "6",
       name: "mate1",
-      imageUrl:
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop",
+      imageUrl: MATE_IMAGE_URL,
     },
     {
       id: "7",
       name: "mate2",
-      imageUrl:
-        "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200&h=200&fit=crop",
+      imageUrl: MATE_IMAGE_URL,
     },
     {
       id: "8",
       name: "mate3",
-      imageUrl:
-        "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=200&h=200&fit=crop",
+      imageUrl: MATE_IMAGE_URL,
     },
     {
       id: "9",
       name: "mate4",
-      imageUrl:
-        "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=200&h=200&fit=crop",
+      imageUrl: MATE_IMAGE_URL,
     },
     {
       id: "10",
       name: "mate5",
-      imageUrl:
-        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop",
+      imageUrl: MATE_IMAGE_URL,
     },
     {
       id: "11",
       name: "mate6",
-      imageUrl:
-        "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=200&h=200&fit=crop",
+      imageUrl: MATE_IMAGE_URL,
     },
     {
       id: "12",
       name: "mate7",
-      imageUrl:
-        "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=200&h=200&fit=crop",
+      imageUrl: MATE_IMAGE_URL,
     },
     {
       id: "13",
       name: "mate8",
-      imageUrl:
-        "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop",
+      imageUrl: MATE_IMAGE_URL,
     },
     {
       id: "14",
       name: "mate9",
-      imageUrl:
-        "https://images.unsplash.com/photo-1488161628813-04466f872be2?w=200&h=200&fit=crop",
+      imageUrl: MATE_IMAGE_URL,
     },
     {
       id: "15",
       name: "mate10",
-      imageUrl:
-        "https://images.unsplash.com/photo-1499952127939-9bbf5af6c51c?w=200&h=200&fit=crop",
+      imageUrl: MATE_IMAGE_URL,
     },
     {
       id: "16",
       name: "mate11",
-      imageUrl:
-        "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=200&fit=crop",
+      imageUrl: MATE_IMAGE_URL,
     },
     {
       id: "17",
       name: "mate12",
-      imageUrl:
-        "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&h=200&fit=crop",
+      imageUrl: MATE_IMAGE_URL,
     },
   ];
 
@@ -123,11 +118,11 @@ const Mate = () => {
     <div className="min-h-screen bg-[#0E172A] text-white">
       <div className="max-w-2xl mx-auto pb-50">
         {/* Section 1: 메이트 헤더 및 추천 메이트 카드 */}
-        <section className="p-[24px]">
+        <section className="p-[16px]">
           <h1 className="text-[25px] font-semibold mb-[20px]">메이트</h1>
 
           {/* 카드 컨테이너 */}
-          <div className="w-[353px] h-[237px] bg-[#1E293B] rounded-[12px] flex items-center gap-[12px] p-[12px]">
+          <div className="w-[353px] h-[237px] bg-[#1E293B] rounded-[12px] flex items-center gap-[12px] p-[12px] mr-[10\">
             {/* 이미지 */}
             <img
               src={featuredMate.imageUrl}
@@ -138,7 +133,16 @@ const Mate = () => {
             {/* 텍스트 영역 */}
             <div className="flex-1 h-full flex flex-col justify-between py-[8px]">
               {/* 제목 */}
-              <h2 className="text-[16px] font-semibold">{featuredMate.name}</h2>
+              <div className="flex justify-between">
+                <p className="text-[16px] font-semibold">{featuredMate.name}</p>
+                <div 
+                  className="flex items-center gap-0.5 cursor-pointer hover:opacity-80 transition"
+                  onClick={() => navigate("/mate/more")}
+                >
+                  <p className="text-[#A1A1A1] text-[13px] font-medium leading-[1.4]">더보기</p>
+                  <ChevronRight size={14} className="text-[#A1A1A1]" />
+                </div>
+              </div>
 
               {/* 설명 텍스트 */}
               <div className="flex-1 flex flex-col justify-center">
@@ -151,8 +155,11 @@ const Mate = () => {
               </div>
 
               {/* 버튼 */}
-              <button className="w-[168px] h-[40px] bg-[#7F5AFF] hover:bg-[#6B4DE6] text-white text-[13px] font-medium rounded-[12px] transition">
-                메이트 초대하기
+              <button
+                onClick={() => navigate("/mate/map")}
+                className="w-[168px] h-[40px] bg-[#7F5AFF] hover:bg-[#6B4DE6] text-white text-[13px] font-medium rounded-[12px] transition"
+              >
+                메이트 위치보기
               </button>
             </div>
           </div>
@@ -173,63 +180,84 @@ const Mate = () => {
             </button>
           </div>
 
-          <div className="flex justify-end gap-3 mt-4">
-            <button className="text-gray-400 hover:text-white transition">
-              <UserPlus className="text-[#FEFEFE] w-6 h-6" />
-            </button>
-            <button className="text-gray-400 hover:text-white transition">
-              <Settings className="text-[#FEFEFE] w-6 h-6" />
-            </button>
+          <div className="flex justify-end gap-2.5 mt-4 px-2">
+
+              <button 
+                className="text-gray-400 hover:text-white transition"
+                onClick={() => setIsFriendRequestOpen(!isFriendRequestOpen)}
+              >
+                <img src={userplus} alt="" className="w-[24px] h-[24px]"/>
+              </button>
+
+              {/* Friend Request Popup */}
+              {isFriendRequestOpen && (
+                <div className="absolute left-1/2 -translate-x-1/2 w-[220px] bg-[#2E364A] rounded-[16px] shadow-xl overflow-hidden z-50 border border-[#364057]">
+                  <button className="w-full flex items-center justify-between px-[20px] py-[16px] hover:bg-[#364057] transition group">
+                    <span className="text-[15px] font-medium text-white group-hover:text-white/90">카카오톡으로 친구 신청</span>
+                    <div className="rounded-full p-1">
+                      <img src={kakao} alt="" className="text-white w-[24px] h-[24px]"/>
+                    </div>
+                  </button>
+                  <div className="h-[1px] bg-[#3B455D] mx-[20px]"></div>
+                  <button className="w-full flex items-center justify-between px-[20px] py-[16px] hover:bg-[#364057] transition group">
+                    <span className="text-[15px] font-medium text-white group-hover:text-white/90">닉네임으로 친구 신청</span>
+                    <PlusCircle className="w-6 h-6 text-white" />
+                  </button>
+                </div>
+              )}
+              <button className="text-gray-400 hover:text-white transition">
+                <img src={setting} alt="" className="w-[24px] h-[24px]"/>
+              </button>
+
+            
           </div>
         </section>
 
         {/* Section 3: 자주 찾는 메이트 */}
-        <section className="px-6 mb-8">
-          <div className="flex items-center gap-2 mb-4">
-            <svg
-              className="w-6 h-6 text-indigo-500"
-              fill="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
-            </svg>
-            <h2 className="text-xl font-bold">자주 찾는 메이트</h2>
+        <section className="px-3 mb-[24px]">
+          <div className="flex items-center gap-1 mb-4">
+           <img src={star} alt="" className="w-[20px] h-[20px]"/>
+            <h2 className="text-[18px] font-bold">자주 찾는 메이트</h2>
           </div>
-
-          <div className="grid grid-cols-4 gap-4">
+          <div className="bg-[#252D3F] rounded-[12px] p-[12px] pt-[16px]">
+            <div className="grid grid-cols-4 gap-[32px]">
             {frequentMates.map((mate) => (
               <div key={mate.id} className="flex flex-col items-center">
-                <div className="w-[60px] h-[60px] bg-gray-700 rounded-2xl overflow-hidden mb-2">
+                <div className="w-[60px] h-[60px] bg-gray-700 rounded-full overflow-hidden mb-1">
                   <img
                     src={mate.imageUrl}
                     alt={mate.name}
                     className="w-full h-full object-cover"
                   />
                 </div>
-                <span className="text-sm text-gray-400">{mate.name}</span>
+                <span className="text-[12px] text-[#F2EFFF]">{mate.name}</span>
               </div>
             ))}
           </div>
+          </div>
+          
         </section>
 
         {/* Section 4: 전체 메이트 */}
-        <section className="px-6">
-          <h2 className="text-xl font-bold mb-4">전체 메이트</h2>
-
-          <div className="grid grid-cols-4 gap-4">
+        <section className="">
+          <h2 className="text-[18px] font-bold mb-4 px-4">전체 메이트</h2>
+          <div className="bg-[#252D3F] p-[8px] pt-[12px] m-[12px] rounded-[12px]">
+            <div className="grid grid-cols-4 gap-4">
             {allMates.map((mate) => (
               <div key={mate.id} className="flex flex-col items-center">
-                <div className="w-[60px] h-[60px] bg-gray-700 rounded-2xl overflow-hidden mb-2">
+                <div className="w-[60px] h-[60px] bg-gray-700 rounded-full overflow-hidden mb-1">
                   <img
                     src={mate.imageUrl}
                     alt={mate.name}
                     className="w-full h-full object-cover"
                   />
                 </div>
-                <span className="text-sm text-gray-400">{mate.name}</span>
+                <span className="text-[12px] text-[#F2EFFF]">{mate.name}</span>
               </div>
             ))}
           </div>
+          </div>
+          
         </section>
       </div>
     </div>
@@ -237,5 +265,3 @@ const Mate = () => {
 };
 
 export default Mate;
-=======
->>>>>>> 90d9491d37fe15f2f04a1d515ee33d890d73a1f7

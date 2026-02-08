@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+
 export function useShake(onShake: () => void) {
   useEffect(() => {
     let lastX = 0;

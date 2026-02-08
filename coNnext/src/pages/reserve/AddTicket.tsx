@@ -1,69 +1,29 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-<<<<<<< HEAD
+import axios from "axios";
 import SelectBar from "../../components/SelectBar";
 import { Search, ChevronLeft, Check } from "lucide-react";
 import type { Concert } from "../../types/concert";
-import redvelvet from "../../assets/images/redvelvet.svg";
+import { searchConcerts } from "../../api/concert"; // API 함수 임포트
 
 interface AddTicketProps {
   onBack?: () => void;
 }
 
-const MOCK_RESULTS: Concert[] = [
-  {
-    id: "1",
-    title: "Red Velvet 4th Concert <R to V>",
-    subtitle: "R to V",
-    artist: "레드벨벳 (Red Velvet)",
-    date: "2022.06.25(월)",
-    time: "18:00",
-    venue: "고척스카이돔",
-    seat: "",
-    imageUrl: redvelvet,
-  },
-  {
-    id: "2",
-    title: "Red Velvet 4th Concert <R to V>",
-    subtitle: "R to V",
-    artist: "레드벨벳 (Red Velvet)",
-    date: "2022.06.26(화)",
-    time: "16:00",
-    venue: "고척스카이돔",
-    seat: "",
-    imageUrl: redvelvet,
-  },
-  {
-    id: "3",
-    title: "Red Velvet 4th Concert <R to V>",
-    subtitle: "R to V",
-    artist: "레드벨벳 (Red Velvet)",
-    date: "2022.06.26(화)",
-    time: "16:00",
-    venue: "고척스카이돔",
-    seat: "",
-    imageUrl: redvelvet,
-  },
-  {
-    id: "4",
-    title: "Red Velvet 4th Concert <R to V>",
-    subtitle: "R to V",
-    artist: "레드벨벳 (Red Velvet)",
-    date: "2022.06.26(화)",
-    time: "16:00",
-    venue: "고척스카이돔",
-    seat: "",
-    imageUrl: redvelvet,
-  },
-];
-
 const AddTicket = ({ onBack }: AddTicketProps = {}) => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("public");
-  const [inputText, setInputText] = useState("레드벨벳");
+  
+  // 검색어 입력 State
+  const [inputText, setInputText] = useState("");
 
-  // ✅ 핵심: 선택된 공연 정보를 담는 State (이게 있으면 확인 화면, 없으면 리스트 화면)
+  // ✅ 선택된 공연 정보 (이게 있으면 확인 화면, 없으면 검색 리스트 화면)
   const [selectedConcert, setSelectedConcert] = useState<Concert | null>(null);
+
+  // ✅ API 연동을 위한 State (검색 결과, 로딩, 검색 여부)
+  const [searchResults, setSearchResults] = useState<Concert[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false); // 검색을 한 적이 있는지 체크
 
   // 뒤로가기 핸들러
   const handleBack = () => {
@@ -78,23 +38,62 @@ const AddTicket = ({ onBack }: AddTicketProps = {}) => {
     else navigate("/reserve");
   };
 
+  // ✅ 검색 핸들러 (API 호출)
+  const handleSearch = async () => {
+    if (!inputText.trim()) return;
+
+    try {
+      setIsLoading(true);
+      setHasSearched(true); // 검색 시도함 표시
+      
+      // API 호출
+      const results = await searchConcerts(inputText);
+      setSearchResults(results);
+      
+    } catch (error) {
+      console.error("검색 실패:", error);
+      
+      // 더 구체적인 에러 메시지 제공
+      if (axios.isAxiosError(error)) {
+        if (error.response?.status === 404) {
+          alert("검색 결과를 찾을 수 없습니다.");
+        } else if (error.response?.status === 500) {
+          alert("서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+        } else if (error.code === 'ECONNABORTED') {
+          alert("요청 시간이 초과되었습니다. 네트워크 연결을 확인해주세요.");
+        } else {
+          alert(`검색 중 오류가 발생했습니다. (${error.message})`);
+        }
+      } else {
+        alert("알 수 없는 오류가 발생했습니다.");
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // 키보드 엔터 이벤트
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") handleSearch();
+  };
+
   // ---------------------------------------------------------
   // 1. 확인 화면 렌더링 (선택된 공연이 있을 때 보여줄 화면)
   // ---------------------------------------------------------
   if (selectedConcert) {
     return (
       <div className="min-h-screen bg-[#0F1320] text-white font-sans flex flex-col">
-        <div className="max-w-2xl mx-auto">
+        <div className="max-w-2xl mx-auto w-full flex-1 flex flex-col">
           <SelectBar activeTab={activeTab} onTabChange={setActiveTab} />
-          <div className="max-w-2xl mx-auto w-full flex-1 flex flex-col">
-            {/* 헤더 */}
-            <div className="flex items-center gap-2 px-4 py-4 mb-4">
-              <button onClick={handleBack} className="p-1">
-                <ChevronLeft size={24} className="text-white" />
-              </button>
-              <h1 className="text-lg font-bold">예매 내역 추가하기</h1>
-            </div>
+          
+          {/* 헤더 */}
+          <div className="flex items-center gap-2 px-4 py-4 mb-4">
+            <button onClick={handleBack} className="p-1">
+              <ChevronLeft size={24} className="text-white" />
+            </button>
+            <h1 className="text-lg font-bold">예매 내역 추가하기</h1>
           </div>
+
           {/* 안내 멘트 */}
           <div className="px-6 mb-10">
             <p className="text-[17px] leading-relaxed text-gray-200">
@@ -104,9 +103,10 @@ const AddTicket = ({ onBack }: AddTicketProps = {}) => {
               눌러주세요!
             </p>
           </div>
+
           {/* 공연 카드 */}
           <div className="px-6 flex gap-5">
-            <div className="w-[120px] h-[160px] rounded-[12px] shadow-lg flex-shrink-0 ">
+            <div className="w-[120px] h-[160px] rounded-[12px] shadow-lg flex-shrink-0 overflow-hidden bg-gray-800">
               <img
                 src={selectedConcert.imageUrl}
                 alt={selectedConcert.title}
@@ -134,10 +134,10 @@ const AddTicket = ({ onBack }: AddTicketProps = {}) => {
               </div>
             </div>
           </div>
+
           {/* 하단 버튼 영역 */}
           <div className="mt-auto px-5 pb-8 pt-4 w-full flex gap-3">
             <button
-              // ✅ 수정된 부분: '맞아요' 클릭 시 /add-detail 페이지로 이동하며 concert 데이터 전달
               onClick={() =>
                 navigate("/add-detail", { state: { concert: selectedConcert } })
               }
@@ -183,10 +183,14 @@ const AddTicket = ({ onBack }: AddTicketProps = {}) => {
                 type="text"
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
+                onKeyDown={handleKeyDown} // 엔터키 이벤트 연결
                 placeholder="아티스트 또는 공연명으로 검색하세요."
                 className="flex-1 bg-transparent text-white placeholder-gray-500 outline-none border-none text-[14px]"
               />
-              <button className="w-[40px] h-[40px] bg-[#7F5AFF] hover:bg-[#6B4DE6] rounded-lg flex items-center justify-center transition-colors shadow-lg flex-shrink-0">
+              <button 
+                onClick={handleSearch} // 버튼 클릭 이벤트 연결
+                className="w-[40px] h-[40px] bg-[#7F5AFF] hover:bg-[#6B4DE6] rounded-lg flex items-center justify-center transition-colors shadow-lg flex-shrink-0"
+              >
                 <Search size={22} className="text-white" />
               </button>
             </div>
@@ -194,7 +198,8 @@ const AddTicket = ({ onBack }: AddTicketProps = {}) => {
 
           <div className="flex justify-between items-center mb-4 text-xs">
             <span className="text-gray-300">
-              검색결과 {MOCK_RESULTS.length}건
+              {/* 실제 검색 결과 개수 표시 */}
+              검색결과 {searchResults.length}건
             </span>
             <div className="flex gap-3 text-gray-500">
               <button className="flex items-center gap-1 text-white font-medium">
@@ -206,20 +211,35 @@ const AddTicket = ({ onBack }: AddTicketProps = {}) => {
 
           {/* 리스트 영역 */}
           <div className="space-y-0 pb-10">
-            {MOCK_RESULTS.map((item) => (
+            {/* 1. 로딩 중일 때 */}
+            {isLoading && (
+              <div className="py-20 text-center text-gray-400">
+                검색 중입니다...
+              </div>
+            )}
+
+            {/* 2. 검색 결과가 없을 때 (로딩 끝남 + 검색함 + 결과 0개) */}
+            {!isLoading && hasSearched && searchResults.length === 0 && (
+              <div className="py-20 text-center text-gray-500">
+                검색 결과가 없습니다.
+              </div>
+            )}
+
+            {/* 3. 검색 결과 목록 표시 */}
+            {!isLoading && searchResults.map((item) => (
               <div
                 key={item.id}
-                onClick={() => setSelectedConcert(item)} // ✅ 클릭 시 state 변경 -> 화면 전환됨
+                onClick={() => setSelectedConcert(item)}
                 className="flex px-2 gap-[27px] cursor-pointer group hover:bg-white/5 rounded-xl transition-colors py-2"
               >
-                <div className="w-[103px] h-[144px] rounded-[10px] shadow-[0_4px_4px_0_rgba(0,0,0,0.24)] flex-shrink-0 ">
+                <div className="w-[103px] h-[144px] rounded-[10px] shadow-[0_4px_4px_0_rgba(0,0,0,0.24)] flex-shrink-0 overflow-hidden bg-gray-800">
                   <img
                     src={item.imageUrl}
                     alt={item.title}
                     className="w-full h-full object-cover"
                   />
                 </div>
-                <div className="flex flex-col py-1 overflow-hidden justify-between">
+                <div className="flex flex-col py-1 overflow-hidden justify-between w-full">
                   <div>
                     <h3 className="pr-3 font-bold text-white text-[16px] leading-snug">
                       {item.title}
@@ -228,13 +248,10 @@ const AddTicket = ({ onBack }: AddTicketProps = {}) => {
                       {item.artist}
                     </p>
                   </div>
-                  <div className="space-y-1 mb-3 ">
+                  <div className="space-y-1 mb-3">
                     <div className="flex text-[13px] text-gray-400">
                       <span className="w-8 flex-shrink-0">일시</span>
                       <div className="flex flex-col flex-1 px-6">
-                        <span className=" text-white">
-                          {item.date} {item.time}
-                        </span>
                         <span className="text-white">
                           {item.date} {item.time}
                         </span>
@@ -248,115 +265,6 @@ const AddTicket = ({ onBack }: AddTicketProps = {}) => {
                 </div>
               </div>
             ))}
-=======
-import SelectBar from "../../components/common/SelectBar";
-import { Search } from "lucide-react";
-
-interface AddTicketProps {
-  onBack?: () => void;
-  onSubmit?: (reservationText: string) => void;
-}
-
-const TABS = [
-  { key: "public", label: "공연장" },
-  { key: "pharmacy", label: "야구장" },
-] as const;
-
-type AddTicketTab = (typeof TABS)[number]["key"];
-
-const AddTicket = ({ onBack, onSubmit }: AddTicketProps = {}) => {
-  const navigate = useNavigate();
-
-  const [activeTab, setActiveTab] = useState<AddTicketTab>("public");
-  const [inputText, setInputText] = useState("");
-
-  //제출 버튼 핸들러
-  const handleSubmit = () => {
-    if (!inputText.trim()) return;
-
-    if (onSubmit) {
-      onSubmit(inputText);
-    } else {
-      console.log("입력한 예매 내역:", {
-        type: activeTab,
-        text: inputText,
-      });
-    }
-  //제출 후 입력 필두 초기화
-    setInputText("");
-
-    if (onBack) {
-      onBack();
-    } else {
-      navigate("/reserve");
-    }
-  };
-  //취소 버튼 핸들러
-  const handleCancel = () => {
-    if (onBack) {
-      onBack();
-    } else {
-      navigate("/reserve");
-    }
-  };
-
-  const handleSearch = () => {
-    console.log("검색:", {
-      type: activeTab,
-      keyword: inputText,
-    });
-  };
-
-  return (
-    <div className="min-h-screen bg-[#0a0f1e] text-white">
-      <div className="max-w-2xl mx-auto">
-        <SelectBar
-          tabs={TABS}
-          activeTab={activeTab}
-          onTabChange={setActiveTab}
-        />
-
-        <div>
-          <h1 className="text-xl font-bold px-6 py-3 mt-4">
-            예매 내역 추가하기
-          </h1>
-
-          <div className="p-4 space-y-4">
-            <div className="flex items-center gap-2">
-              <textarea
-                value={inputText}
-                onChange={(e) => setInputText(e.target.value)}
-                placeholder={
-                  activeTab === "public"
-                    ? "공연 이름 검색"
-                    : "야구 경기 검색"
-                }
-                className="flex-1 max-h-[44px] bg-[#1E293B] border border-gray-700 rounded-[10px] p-2 text-white text-[13px] placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
-              />
-              <button
-                onClick={handleSearch}
-                className="p-2 rounded-lg bg-[#7F5AFF] hover:bg-[#6a46e5] transition"
-              >
-                <Search size={18} />
-              </button>
-            </div>
-
-            <div className="flex gap-4 mt-6">
-              <button
-                onClick={handleCancel}
-                className="flex-1 bg-gray-700 hover:bg-gray-600 text-white py-3 rounded-lg font-medium transition"
-              >
-                취소
-              </button>
-              <button
-                onClick={handleSubmit}
-                disabled={!inputText.trim()}
-                className="flex-1 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white py-3 rounded-lg font-medium transition"
-              >
-                저장
-              </button>
-            </div>
->>>>>>> 90d9491d37fe15f2f04a1d515ee33d890d73a1f7
           </div>
         </div>
       </div>

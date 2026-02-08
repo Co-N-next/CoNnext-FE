@@ -1,59 +1,59 @@
 import { useRef, useState } from "react";
 import SelectBar from "../../components/common/SelectBar";
-import type { Concert, Venue } from "../../types/tickets";
+// import type { Concert, Venue } from "../../types/tickets";
 import { useNavigate } from "react-router-dom";
 
 
-import RV from "../../assets/dumy/ReVel.svg";
-import BTS from "../../assets/dumy/BTS.svg";
-import RV1 from "../../assets/dumy/ReVel1.svg";
+// import RV from "../../assets/dumy/ReVel.svg";
+// import BTS from "../../assets/dumy/BTS.svg";
+// import RV1 from "../../assets/dumy/ReVel1.svg";
 
 /* ================= 더미 데이터 ================= */
-const concerts: Concert[] = [
-  {
-    id: 1,
-    title: "Red Velvet 4th Concert",
-    artist: "Red Velvet",
-    poster: RV,
-    dDay: 0,
-    isNew: false,
-  },
-  {
-    id: 2,
-    title: "My Dear ReVe",
-    artist: "Red Velvet",
-    poster: RV1,
-    dDay: 3,
-    isNew: true,
-  },
-  {
-    id: 3,
-    title: "BTS He Soul Tour",
-    artist: "BTS",
-    poster: BTS,
-    dDay: 10,
-    isNew: false,
-  },
-];
+// const concerts: Concert[] = [
+//   {
+//     id: 1,
+//     title: "Red Velvet 4th Concert",
+//     artist: "Red Velvet",
+//     poster: RV,
+//     dDay: 0,
+//     isNew: false,
+//   },
+//   {
+//     id: 2,
+//     title: "My Dear ReVe",
+//     artist: "Red Velvet",
+//     poster: RV1,
+//     dDay: 3,
+//     isNew: true,
+//   },
+//   {
+//     id: 3,
+//     title: "BTS He Soul Tour",
+//     artist: "BTS",
+//     poster: BTS,
+//     dDay: 10,
+//     isNew: false,
+//   },
+// ];
 
-const venues: Venue[] = [
-  {
-    id: 1,
-    name: "KSPO DOME",
-    location: "서울특별시 송파구",
-    image: RV,
-    dDay: 0,
-    isNew: false,
-  },
-  {
-    id: 2,
-    name: "잠실 주경기장",
-    location: "서울특별시 송파구",
-    image: RV1,
-    dDay: 5,
-    isNew: true,
-  },
-];
+// const venues: Venue[] = [
+//   {
+//     id: 1,
+//     name: "KSPO DOME",
+//     location: "서울특별시 송파구",
+//     image: RV,
+//     dDay: 0,
+//     isNew: false,
+//   },
+//   {
+//     id: 2,
+//     name: "잠실 주경기장",
+//     location: "서울특별시 송파구",
+//     image: RV1,
+//     dDay: 5,
+//     isNew: true,
+//   },
+// ];
 
 /* ================= 탭 ================= */
 const TABS = [

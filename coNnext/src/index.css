@@ -3,8 +3,7 @@
 :root {
   /* 기본 폰트를 Pretendard */
   font-family: "Pretendard", sans-serif;
-<<<<<<< HEAD
-=======
+
 }
 /* Pretendard Regular (400) */
 @font-face {
@@ -31,7 +30,6 @@
   font-weight: 600;
   font-style: normal;
   font-display: swap;
->>>>>>> 90d9491d37fe15f2f04a1d515ee33d890d73a1f7
 }
 /* Pretendard Regular (400) */
 @font-face {
