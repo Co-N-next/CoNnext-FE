@@ -119,7 +119,7 @@ function getTimeInfo(createdAt: string) {
 }
 
 /* ================= 컴포넌트 ================= */
-export default function TodayConcertBanner() {
+export default function MyNews() {
   const parsedNews = newsList
     .map((news) => {
       const { section, timeText } = getTimeInfo(news.createdAt);

@@ -3,6 +3,12 @@ import { useNavigate } from "react-router-dom";
 import Search from "../../components/common/Search";
 import before from "../../assets/logo/before.svg";
 import PopularVenueTicker from "../../components/PopularVenueTicker";
+import {
+  getSearchHistory,
+  postSearchHistory,
+  deleteSearchHistory,
+  deleteAllSearchHistory,
+} from "../../api/SearchHistory";
 
 import { useGetList } from "../../hooks/queries/useGetList";
 import useDebounce from "../../hooks/queries/useDebounce";
@@ -35,72 +41,96 @@ const SearchHall = () => {
   const navigate = useNavigate();
 
   const [search, setSearch] = useState("");
-  const [recentKeywords, setRecentKeywords] = useState<string[]>([]);
-
+  const [recentKeywords, setRecentKeywords] = useState<
+    { id: number; keyword: string }[]
+  >([]);
   const debouncedValue = useDebounce(search, 1000);
 
-  const { data = [] } = useGetList({
+  const { data } = useGetList({
     search: debouncedValue,
   });
 
-  /* ✅ 검색 결과 공통 처리 (지금 / 나중 API 대비) */
-  const items = (data as any)?.items ?? data;
-  const totalCount = (data as any)?.totalCount ?? items.length;
-
+  const items = data?.payload ?? [];
+  const totalCount = data?.pageInfo?.totalElements ?? 0;
   /* 최근 검색어 초기 로딩 */
   useEffect(() => {
-    const keywords = RECENT_KEYS.map((key) => localStorage.getItem(key)).filter(
-      Boolean,
-    ) as string[];
+    const fetchRecentKeywords = async () => {
+      try {
+        const res = await getSearchHistory("VENUE");
 
-    setRecentKeywords(keywords.slice(0, MAX_RECENT));
+        setRecentKeywords(
+          res.payload.map((item) => ({
+            id: item.id,
+            keyword: item.keyword,
+          })),
+        );
+      } catch (e) {
+        console.error(e);
+      }
+    };
+
+    fetchRecentKeywords();
   }, []);
 
   /* 최근 검색어 저장 */
   useEffect(() => {
     if (!debouncedValue.trim()) return;
 
-    const filtered = recentKeywords.filter((k) => k !== debouncedValue);
-    const next = [debouncedValue, ...filtered].slice(0, MAX_RECENT);
+    const saveKeyword = async () => {
+      try {
+        await postSearchHistory({
+          keyword: debouncedValue,
+          searchType: "VENUE",
+        });
 
-    RECENT_KEYS.forEach((key) => localStorage.removeItem(key));
-    next.forEach((keyword, index) => {
-      localStorage.setItem(`최근 검색어${index + 1}`, keyword);
-    });
+        // 다시 조회해서 최신 상태 동기화
+        const res = await getSearchHistory("VENUE");
+        setRecentKeywords(
+          res.payload.map((item) => ({
+            id: item.id,
+            keyword: item.keyword,
+          })),
+        );
+      } catch (e) {
+        console.error(e);
+      }
+    };
 
-    setRecentKeywords(next);
+    saveKeyword();
   }, [debouncedValue]);
-
   /* 개별 삭제 */
-  const handleRemoveKeyword = (target: string) => {
-    const filtered = recentKeywords.filter((k) => k !== target);
+  const handleRemoveKeyword = async (id: number) => {
+    try {
+      await deleteSearchHistory(id);
 
-    RECENT_KEYS.forEach((key) => localStorage.removeItem(key));
-    filtered.forEach((keyword, index) => {
-      localStorage.setItem(`최근 검색어${index + 1}`, keyword);
-    });
-
-    setRecentKeywords(filtered);
+      setRecentKeywords((prev) => prev.filter((item) => item.id !== id));
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   /* 전체 삭제 */
-  const handleClearAll = () => {
-    RECENT_KEYS.forEach((key) => localStorage.removeItem(key));
-    setRecentKeywords([]);
+  const handleClearAll = async () => {
+    try {
+      await deleteAllSearchHistory("VENUE");
+      setRecentKeywords([]);
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   return (
     <div className="min-h-screen bg-[#0a0f1e] text-white px-4 py-6">
       {/* 상단 헤더 */}
       <div className="flex items-center gap-3">
-        <button onClick={() => navigate(-1)}>
+        <button onClick={() => navigate("/find")}>
           <img src={before} alt="뒤로가기" className="w-5 h-5" />
         </button>
         <h1 className="text-lg font-semibold">공연장 찾기</h1>
       </div>
 
       {/* 인기 공연장 */}
-      <div className="mt-5">
+      <div className="mt-8">
         <PopularVenueTicker list={popularVenueMock} />
       </div>
 
@@ -123,11 +153,11 @@ const SearchHall = () => {
           </div>
 
           <ul className="space-y-2">
-            {recentKeywords.map((keyword) => (
-              <li key={keyword} className="flex justify-between items-center">
-                <span>{keyword}</span>
+            {recentKeywords.map((item) => (
+              <li key={item.id} className="flex justify-between items-center">
+                <span>{item.keyword}</span>
                 <button
-                  onClick={() => handleRemoveKeyword(keyword)}
+                  onClick={() => handleRemoveKeyword(item.id)}
                   className="text-gray-500 hover:text-white"
                 >
                   ✕
@@ -139,7 +169,8 @@ const SearchHall = () => {
       )}
 
       {/* 검색 결과 */}
-      {search && (
+      {/* 검색 결과 */}
+      {debouncedValue && (
         <section className="mt-6">
           {/* 결과 개수 */}
           <div className="mb-3 ml-3 text-sm text-gray-400">
@@ -147,19 +178,25 @@ const SearchHall = () => {
             <span className="text-white font-medium">{totalCount}</span>건
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            {items.map((item: any) => (
-              <div key={item.id} className="scale-[0.95]">
-                <VenueCard
-                  image={item.image}
-                  title={item.title}
-                  place={item.place}
-                  isToday={false}
-                  isNew={item.isNew}
-                />
-              </div>
-            ))}
-          </div>
+          {items.length === 0 ? (
+            <div className="mt-10 text-center text-gray-400">
+              검색 결과가 없습니다.
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-3">
+              {items.map((item) => (
+                <div key={item.id} className="scale-[0.95]">
+                  <VenueCard
+                    image={item.imageUrl}
+                    title={item.name}
+                    place={item.city}
+                    isToday={false}
+                    isNew={false}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
         </section>
       )}
     </div>

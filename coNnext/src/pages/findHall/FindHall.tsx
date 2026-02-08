@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import Search from "../../components/common/Search";
-
-import { useGetList } from "../../hooks/queries/useGetList";
+import { useTrendingVenues } from "../../hooks/queries/useTrendingVenues";
 import { NearbyBanner } from "../../components/NearbyBanner";
 import VenueCard from "../../components/VenueCard";
 import PopularVenueTicker from "../../components/PopularVenueTicker";
@@ -26,18 +25,10 @@ const nearbySummary = {
     distanceKm: 0.8,
   },
 };
-const popularVenueMock = [
-  { id: 1, name: "KSPO DOME" },
-  { id: 2, name: "잠실 주경기장" },
-  { id: 3, name: "고척 스카이돔" },
-  { id: 4, name: "서울 월드컵 경기장" },
-  { id: 5, name: "KSPO DOME" },
-  { id: 6, name: "잠실 주경기장" },
-  { id: 7, name: "고척 스카이돔" },
-  { id: 8, name: "서울 월드컵 경기장" },
-  { id: 9, name: "고척 스카이돔" },
-  { id: 10, name: "서울 월드컵 경기장" },
-];
+
+// ⛔ 기존 popularVenueMock 유지 (구조 최대한 유지)
+// const popularVenueMock = [ ... ];
+
 const todayVenueSummary = {
   hasTodayVenue: true,
   venue: {
@@ -53,14 +44,9 @@ const FindHall = () => {
   /* =========================
    * data fetching
    * ========================= */
-  const {
-    data = [],
-    isPending,
-    isError,
-  } = useGetList({
-    search: "",
-  });
+  const { data, isPending, isError } = useTrendingVenues();
 
+  const venues = data?.payload ?? [];
   /* =========================
    * loading / error
    * ========================= */
@@ -75,17 +61,31 @@ const FindHall = () => {
   /* =========================
    * render
    * ========================= */
+  //임시
+  console.log("trending venues data:", data);
+  console.log("payload length:", venues.length);
+
   return (
     <div className="min-h-screen bg-[#0a0f1f] text-white flex justify-center">
       <div className="w-full max-w-[600px] px-2.5 py-2.5 space-y-4">
         {/* =========================
          * Header
          * ========================= */}
+        {/* 임시 */}
+        <p className="text-white text-sm">venues count: {venues.length}</p>
         <h1 className="text-[18px] font-semibold">공연장 찾기</h1>
+
         {/* =========================
          * Popular Rolling
          * ========================= */}
-        <PopularVenueTicker list={popularVenueMock} />
+        {/* 🔥 변경: mock → 서버 데이터 기반으로 name만 가공 */}
+        <PopularVenueTicker
+          list={venues.map((item) => ({
+            id: item.id,
+            name: item.name,
+          }))}
+        />
+
         {/* =========================
          * Nearby Venue
          * ========================= */}
@@ -135,14 +135,15 @@ const FindHall = () => {
           <h2 className="mb-1 text-[15px] font-semibold">즐겨찾기</h2>
 
           <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hover">
-            {data.map((item: any) => (
+            {/* 🔥 변경: 서버 데이터 필드명에 맞춤 */}
+            {venues.map((item) => (
               <div key={item.id} className="min-w-[110px]">
                 <VenueCard
-                  image={item.image}
-                  title={item.title}
-                  place={item.place}
-                  isToday={isToday(item.date)}
-                  isNew={item.isNew}
+                  image={item.imageUrl}
+                  title={item.name}
+                  place={item.city}
+                  isToday={false}
+                  isNew={false}
                 />
               </div>
             ))}
@@ -156,14 +157,15 @@ const FindHall = () => {
           <h2 className="mb-1 text-[15px] font-semibold">인기 검색 공연장</h2>
 
           <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hover">
-            {data.map((item: any) => (
+            {/* 🔥 변경: 위 섹션과 동일하게 서버 데이터 사용 */}
+            {venues.map((item) => (
               <div key={item.id} className="min-w-[110px]">
                 <VenueCard
-                  image={item.image}
-                  title={item.title}
-                  place={item.place}
-                  isToday={isToday(item.date)}
-                  isNew={item.isNew}
+                  image={item.imageUrl}
+                  title={item.name}
+                  place={item.city}
+                  isToday={false}
+                  isNew={false}
                 />
               </div>
             ))}
