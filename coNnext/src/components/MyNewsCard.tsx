@@ -17,7 +17,7 @@ const MyNewsCard = ({ profileImg, name, type, time }: MyNewsCardProps) => {
 
   const isPending = status === "PENDING";
 
-  const title = type === "LOCATION" ? "친구" : "위치 공유";
+  const title = type === "LOCATION" ? "위치 공유" : "친구";
   const actionText = type === "LOCATION" ? "위치 공유 요청" : "친구 요청";
 
   const contentText =
@@ -50,7 +50,7 @@ const MyNewsCard = ({ profileImg, name, type, time }: MyNewsCardProps) => {
               src={profileImg}
               alt="profile"
               className={`rounded-full object-cover transition-all duration-300
-                ${isPending ? "h-25 w-25" : "h-16 w-16"}
+                ${isPending ? "h-24 w-24" : "h-16 w-16"}
               `}
             />
 

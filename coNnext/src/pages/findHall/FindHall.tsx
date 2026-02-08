@@ -4,7 +4,7 @@ import { useTrendingVenues } from "../../hooks/queries/useTrendingVenues";
 import { NearbyBanner } from "../../components/NearbyBanner";
 import VenueCard from "../../components/VenueCard";
 import PopularVenueTicker from "../../components/PopularVenueTicker";
-
+import type { Venue } from "../../types/venue";
 /* =========================
  * utils
  * ========================= */
@@ -46,8 +46,7 @@ const FindHall = () => {
    * ========================= */
   const { data, isPending, isError } = useTrendingVenues();
 
-  const venues = data?.payload ?? [];
-  /* =========================
+  const venues: Venue[] = data?.payload ?? []; /* =========================
    * loading / error
    * ========================= */
   if (isPending) {
@@ -92,7 +91,7 @@ const FindHall = () => {
         {nearbySummary.hasNearbyVenues && (
           <div className="flex justify-center">
             <NearbyBanner
-              count={nearbySummary.count}
+              radiusMeter={nearbySummary.count}
               place={nearbySummary.nearestVenue.place}
             />
           </div>
@@ -112,11 +111,12 @@ const FindHall = () => {
                 [&_div:first-child]:aspect-auto"
               >
                 <VenueCard
-                  image={todayVenueSummary.venue.image}
-                  title={todayVenueSummary.venue.name}
-                  place={todayVenueSummary.venue.city}
-                  isToday={undefined}
-                  isNew={undefined}
+                  id={0} // 임시값 (mock)
+                  name={todayVenueSummary.venue.name}
+                  city={todayVenueSummary.venue.city}
+                  imageUrl={todayVenueSummary.venue.image}
+                  isToday={true}
+                  isNew={false}
                 />
               </div>
             </div>
@@ -139,10 +139,11 @@ const FindHall = () => {
             {venues.map((item) => (
               <div key={item.id} className="min-w-[110px]">
                 <VenueCard
-                  image={item.imageUrl}
-                  title={item.name}
-                  place={item.city}
-                  isToday={false}
+                  id={item.id}
+                  name={item.name}
+                  city={item.city}
+                  imageUrl={item.imageUrl}
+                  isToday={true}
                   isNew={false}
                 />
               </div>
@@ -161,10 +162,11 @@ const FindHall = () => {
             {venues.map((item) => (
               <div key={item.id} className="min-w-[110px]">
                 <VenueCard
-                  image={item.imageUrl}
-                  title={item.name}
-                  place={item.city}
-                  isToday={false}
+                  id={item.id}
+                  name={item.name}
+                  city={item.city}
+                  imageUrl={item.imageUrl}
+                  isToday={true}
                   isNew={false}
                 />
               </div>

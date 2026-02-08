@@ -4,6 +4,8 @@ export interface Venue {
   name: string;
   city: string;
   imageUrl: string;
+  isToday?: boolean;
+  isNew?: boolean;
 }
 
 // 페이지 정보
@@ -29,4 +31,24 @@ export interface SearchVenuesResponse {
   message: string;
   pageInfo: PageInfo;
   payload: Venue[];
+}
+
+//근처공연장 타입정의
+
+//요청
+export interface GetNearestVenueRequest {
+  latitude: number;
+  longitude: number;
+  radius?: number; // meter 단위, default = 500
+}
+//응답값
+export interface NearestVenuePayload {
+  id: number;
+  name: string;
+}
+
+export interface GetNearestVenueResponse {
+  statusCode: number;
+  message: string;
+  payload: NearestVenuePayload;
 }

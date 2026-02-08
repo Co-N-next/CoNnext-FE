@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Search from "../../components/common/Search";
 import before from "../../assets/logo/before.svg";
 import PopularVenueTicker from "../../components/PopularVenueTicker";
+import type { Venue } from "../../types/venue";
 import {
   getSearchHistory,
   postSearchHistory,
@@ -13,16 +14,6 @@ import {
 import { useGetList } from "../../hooks/queries/useGetList";
 import useDebounce from "../../hooks/queries/useDebounce";
 import VenueCard from "../../components/VenueCard";
-
-const MAX_RECENT = 7;
-const RECENT_KEYS = [
-  "최근 검색어1",
-  "최근 검색어2",
-  "최근 검색어3",
-  "최근 검색어4",
-  "최근 검색어5",
-  "최근 검색어6",
-];
 
 const popularVenueMock = [
   { id: 1, name: "KSPO DOME" },
@@ -50,7 +41,7 @@ const SearchHall = () => {
     search: debouncedValue,
   });
 
-  const items = data?.payload ?? [];
+  const items: Venue[] = data?.payload ?? [];
   const totalCount = data?.pageInfo?.totalElements ?? 0;
   /* 최근 검색어 초기 로딩 */
   useEffect(() => {
@@ -59,7 +50,7 @@ const SearchHall = () => {
         const res = await getSearchHistory("VENUE");
 
         setRecentKeywords(
-          res.payload.map((item) => ({
+          res.payload.slice(0, 7).map((item) => ({
             id: item.id,
             keyword: item.keyword,
           })),
@@ -75,6 +66,12 @@ const SearchHall = () => {
   /* 최근 검색어 저장 */
   useEffect(() => {
     if (!debouncedValue.trim()) return;
+
+    // 🔒 이미 최근 검색어에 있으면 저장 안 함
+    const exists = recentKeywords.some(
+      (item) => item.keyword === debouncedValue,
+    );
+    if (exists) return;
 
     const saveKeyword = async () => {
       try {
@@ -97,7 +94,7 @@ const SearchHall = () => {
     };
 
     saveKeyword();
-  }, [debouncedValue]);
+  }, [debouncedValue, recentKeywords]);
   /* 개별 삭제 */
   const handleRemoveKeyword = async (id: number) => {
     try {
@@ -187,9 +184,10 @@ const SearchHall = () => {
               {items.map((item) => (
                 <div key={item.id} className="scale-[0.95]">
                   <VenueCard
-                    image={item.imageUrl}
-                    title={item.name}
-                    place={item.city}
+                    id={item.id}
+                    name={item.name}
+                    city={item.city}
+                    imageUrl={item.imageUrl}
                     isToday={false}
                     isNew={false}
                   />

@@ -23,7 +23,7 @@ const NoticeCard = ({ type, title, content, time }: NoticeCardProps) => {
   }, [content]);
 
   return (
-    <div className="  p-2">
+    <div className="p-2">
       <div className="flex gap-3">
         {/* 아이콘 */}
         <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#101010] to-[#4D379C] flex items-center justify-center">
@@ -46,7 +46,6 @@ const NoticeCard = ({ type, title, content, time }: NoticeCardProps) => {
           </p>
         </div>
       </div>
-
       {/* 더보기 버튼 - 오른쪽 정렬 */}
       {showMoreButton && (
         <div className="flex justify-end">
