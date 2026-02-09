@@ -19,11 +19,27 @@ export default function AlarmPage() {
     <div className="min-h-screen bg-[#0a0f1e] text-white flex justify-center">
       <div className="w-full max-w-[450px]">
         {/* SelectBar 위치와 배경색을 HomePage와 동일하게 */}
-        <div className="mt-10">
+        <div className="mt-5">
           <SelectBar
             tabs={TABS}
             activeTab={activeTab}
             onTabChange={(key) => setActiveTab(key as AlarmTab)}
+            /* indicator */
+            indicatorColor="#FFFFFF"
+            indicatorWidth={100}
+            indicatorHeight={3}
+            indicatorRadius="0px" /* text color */
+            activeTextColor="#FFFFFF"
+            inactiveTextColor="#9CA3AF"
+            /* typography (피그마 그대로) */
+            fontFamily="Pretendard"
+            fontSize="16px"
+            fontWeight={600}
+            lineHeight={1.3}
+            letterSpacing="0.025em"
+            /* spacing (여기만 따로 조절) */
+            paddingY={11}
+            paddingX={0}
           />
         </div>
 

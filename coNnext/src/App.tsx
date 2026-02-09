@@ -3,14 +3,13 @@ import "./App.css";
 import { Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-
+import AlarmIndex from "./pages/alarm/AlarmIndex";
 import Layout from "./components/layout/Layout";
-
+import BareLayout from "./components/layout/BareLayout";
 /* 🔽 페이지 imports */
 import Home from "./pages/home/HomePage";
 import FindHall from "./pages/findHall/FindHall";
 import SearchHall from "./pages/findHall/SearchHall";
-import MyNews from "./pages/alarm/MyNews";
 import AddTicket from "./pages/reserve/AddTicket";
 
 /*
@@ -38,30 +37,24 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <Routes>
-        {/* ✅ 모든 페이지는 Layout 기준 */}
+        {/* ✅ 기본 Layout */}
         <Route element={<Layout />}>
           <Route path="/" element={<Home />} />
-
-          {/*
-          <Route path="/start" element={<Splash />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signUp" element={<SignUp />} />
-          <Route path="/concert" element={<LatestConcert />} />
-          <Route path="/notices" element={<Notices />} />
-          <Route path="/map" element={<HallMap />} />
-          <Route path="/mate" element={<Mate />} />
-          <Route path="/mypage" element={<MyPage />} />
-          <Route path="/reserve" element={<Reserve />} />
-          */}
-
           <Route path="/find" element={<FindHall />} />
-          <Route path="/search" element={<SearchHall />} />
-          <Route path="/mynews" element={<MyNews />} />
+
+          {/* 🔔 알림 영역 */}
+          <Route path="/alarm" element={<AlarmIndex />} />
+
           <Route path="/add" element={<AddTicket />} />
+        </Route>
+
+        {/* ✅ search만 BareLayout */}
+        <Route element={<BareLayout />}>
+          <Route path="/search" element={<SearchHall />} />
         </Route>
       </Routes>
 
-      {/* 🔧 개발 환경에서만 React Query Devtools */}
+      {/* false로 하면 야자수는 개발모드에서만 보이고 배포에서는 안보임. */}
       {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />}
     </QueryClientProvider>
   );

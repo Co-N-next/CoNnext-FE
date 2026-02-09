@@ -92,7 +92,7 @@ const Notices = () => {
 
           {/* 텍스트 */}
           <span className="font-pretendard text-[16px] font-medium leading-[120%] tracking-[0]">
-            {isExpanded ? "닫기" : "더보기"}
+            {isExpanded ? "줄이기" : "더보기"}
           </span>
         </span>
       </button>

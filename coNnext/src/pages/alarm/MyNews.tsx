@@ -155,27 +155,23 @@ export default function MyNews() {
     );
   }
   const handleShare = async () => {
-    const shareUrl = window.location.href;
+    console.log("공유 버튼 눌림"); // 👈 이거부터 찍어
 
-    // 📱 모바일(아이폰/안드로이드) → OS 공유 시트
+    const shareUrl = `${window.location.origin}/concert/${concertId}`;
+
     if (navigator.share) {
-      try {
-        await navigator.share({
-          title: mockTodayConcert.concertTitle,
-          text: `${mockTodayConcert.place}에서 오늘 공연 있어요!`,
-          url: shareUrl,
-        });
-      } catch (e) {
-        // 사용자가 취소한 경우도 여기로 옴 (에러 아님)
-        console.log("공유 취소");
-      }
-      return;
+      await navigator.share({
+        title: "오늘의 공연 공유하기",
+        text: "오늘 이 공연 같이 가요!",
+        url: shareUrl,
+      });
+    } else {
+      // PC / 지원 안 되는 환경
+      await navigator.clipboard.writeText(shareUrl);
+      alert("링크가 복사됐어요!");
     }
-
-    // 💻 PC / 미지원 환경 → 링크 복사
-    await navigator.clipboard.writeText(shareUrl);
-    alert("링크가 복사되었어요!");
   };
+
   return (
     <>
       {/* ================= 오늘의 공연 ================= */}
@@ -190,10 +186,13 @@ export default function MyNews() {
 
           <button
             onClick={handleShare}
-            className="absolute top-4 right-4 z-20 flex h-9 w-9 items-center justify-center rounded-full border border-white/30"
+            className="absolute top-4 right-4 z-20 flex h-9 w-9 items-center justify-center rounded-full border border-white/30 hover:bg-gray-500"
           >
             <Share2 size={18} className="text-white" />
           </button>
+          <h2 className="absolute top-4 left-4 z-20 translate-x-2 translate-y-2 font-ydestreetB text-[20px] leading-[1.2] text-white">
+            오늘의 공연이에요!
+          </h2>
 
           <div className="absolute bottom-4 left-4 right-4 text-gray-200 text-sm">
             <h2 className="text-base font-bold">
@@ -209,13 +208,7 @@ export default function MyNews() {
         </section>
         <button
           onClick={() => window.open(mockTodayConcert.mapLink)}
-          className="
-        mx-4 mt-3
-        w-[calc(100%-2rem)]
-        rounded-xl     bg-[#7f5aff]
-
-        py-2 text-sm font-semibold text-white
-      "
+          className="mx-4 mt-3 w-[calc(100%-2rem)] rounded-xl bg-[#7f5aff] py-2 text-sm font-semibold text-white"
         >
           지도 바로가기
         </button>
@@ -266,23 +259,25 @@ export default function MyNews() {
       {/* ================= 전체 더보기 / 닫기 ================= */}
       {allCount > INITIAL_COUNT && (
         <button
-          className="mt-6 flex items-center justify-center gap-2 w-full text-gray-400 text-sm hover:text-gray-300 transition-colors"
+          className={`mt-6 flex w-full items-center justify-center gap-2 text-sm text-gray-400 transition-colors hover:text-gray-300 ${
+            isExpanded ? "mb-2" : "mb-10"
+          }`}
           onClick={handleToggle}
         >
-          {/* 화살표 + 텍스트 래퍼 */}
-          <span className="flex items-center gap-2">
-            {/* 화살표 (24x24) */}
+          <span className="mb-10 flex items-center gap-2">
+            {/* 화살표 */}
             <span
-              className={`w-6 h-6 flex items-center justify-center transition-transform duration-200 ${
+              className={`flex h-6 w-6 items-center justify-center transition-transform duration-200 ${
                 isExpanded ? "rotate-180" : ""
               }`}
             >
-              <span className="w-3 h-3 border-b-2 border-r-2 border-current rotate-45 translate-y-[-2px]" />
+              {/* 기본이 ▼ */}
+              <span className="h-3 w-3 translate-y-[-2px] rotate-45 border-b-2 border-r-2 border-current" />
             </span>
 
             {/* 텍스트 */}
-            <span className="font-pretendard text-[16px] font-medium leading-[120%] tracking-[0]">
-              {isExpanded ? "닫기" : "더보기"}
+            <span className="font-pretendard text-[16px] font-medium leading-[1.2]">
+              {isExpanded ? "줄이기" : "더보기"}
             </span>
           </span>
         </button>
