@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom'
 import api from "../../api/axios.ts";
 
-import BackButton from '../../assets/logo/BackButton.svg';
-import kakaoSymbol from '../../assets/logo/kakaotalkSymbol.svg';
-import naverSymbol from '../../assets/logo/naverSymbol.svg';
-import googleSymbol from '../../assets/logo/googleSymbol.svg';
+import BackButton from '../../assets/Icons/back.svg';
+import kakaoSymbol from '../../assets/Variables/kakao.svg';
+import naverSymbol from '../../assets/Variables/naver.svg';
+import googleSymbol from '../../assets/Variables/google.svg';
 
 
 const LoginScreen: React.FC = () => {
@@ -99,20 +99,13 @@ const LoginScreen: React.FC = () => {
   className="absolute flex items-start justify-start hover:opacity-70 transition-opacity"
   style={{
     width: '24px',
-    height: '24px',
-    top: '0',
-    left: '0'
+    height: '24px'
   }}
 >
   <img 
     src={BackButton} 
     alt="뒤로가기" 
-    style={{ 
-      width: '8px', 
-      height: '14px', 
-      marginTop: '6px', 
-      marginLeft: '8px' 
-    }} 
+
   />
 </button>
 
@@ -295,10 +288,7 @@ const LoginScreen: React.FC = () => {
         <img 
           src={kakaoSymbol} 
           alt="Kakao" 
-          style={{ 
-            width: '24px', 
-            height: '24px'
-          }} 
+         
         />
       </button>
 
@@ -314,10 +304,7 @@ const LoginScreen: React.FC = () => {
         <img 
           src={naverSymbol} 
           alt="Naver" 
-          style={{ 
-            width: '24px', 
-            height: '24px'
-          }} 
+         
         />
       </button>
 
@@ -332,10 +319,7 @@ const LoginScreen: React.FC = () => {
         <img 
           src={googleSymbol} 
           alt="Google" 
-          style={{ 
-            width: '24px', 
-            height: '24px'
-          }} 
+          
         />
       </button>
     </div>
