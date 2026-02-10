@@ -1,4 +1,4 @@
-import api from "./axios";
+import api from "./api";
 
 export const getMyInfo = () => {
   return api.get("/users/me");

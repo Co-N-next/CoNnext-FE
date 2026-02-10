@@ -1,3 +1,4 @@
+
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
 
@@ -18,6 +19,8 @@ type Props = {
 };
 
 export default function ConcertDetailModal({ open, onClose, data }: Props) {
+  console.log("MODAL DATA >>>", data);
+
   return (
     <AnimatePresence>
       {open && (

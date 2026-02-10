@@ -1,19 +1,21 @@
 import { useState } from "react";
 import Header from "../../components/layout/Header";
 import ConcertDetailModal from "../../components/modal/ConcertDetailModal";
-import type { ConcertDetail } from "../../types/concert";
+import type { ConcertData } from "../../data/dummyConcert";
 import { useShake } from "../../hooks/useShake";
-
+import Revel from "../../assets/dumy/Revel.svg";
 export default function UpcomingConcertPage() {
   const [open, setOpen] = useState(false);
-
-  const data: ConcertDetail = {
-    title: "Red Velvet 4th Concert",
-    artist: "Red Velvet (레드벨벳)",
-    place: "KSPO DOME",
-    dateTime: "2025.11.15(월) 18:00",
-    seat: "N층 MM구역 QQ열 ##번",
-  };
+  
+const data: ConcertData = {
+  title: "Red Velvet 4th Concert",
+  artist: "Red Velvet (레드벨벳)",
+  place: "KSPO DOME",
+  date: "2025.11.15(월)",
+  time: "18:00",
+  seat: "N층 MM구역 QQ열 ##번",
+  poster: Revel,
+};
 
   // 흔들기 트리거
   useShake(() => setOpen(true));
@@ -32,6 +34,8 @@ export default function UpcomingConcertPage() {
         open={open}
         onClose={() => setOpen(false)}
         data={data}
+
+        
       />
     </>
   );

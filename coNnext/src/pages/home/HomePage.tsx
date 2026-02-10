@@ -167,7 +167,7 @@ export default function HomePage() {
       className="min-h-screen text-white flex justify-center overflow-x-hidden"
       style={{ backgroundColor: "var(--color-bg-page)" }}
     >
-      {/* 셀렉트바: 헤더 밑 고정 */}
+      
       <div
         className="fixed left-1/2 -translate-x-1/2 z-40 w-full max-w-[450px] top-20"
         style={{ backgroundColor: "var(--color-bg-card)" }}
@@ -179,7 +179,7 @@ export default function HomePage() {
         />
       </div>
 
-      {/* 스크롤 영역: 셀렉트바 높이만큼 상단 여백 */}
+      
       <div className="w-full max-w-[450px] pt-14">
         {activeTab === "concert" && (
           <>
@@ -193,7 +193,6 @@ export default function HomePage() {
                 다가오는 공연 &gt;
               </h2>
 
-              {/* 포스터: 메인 207*276, 서브 162*216, 가로선 중앙 정렬, 서브는 어둡게 */}
               <div
                 className="flex items-center justify-center select-none min-h-[320px]"
                 style={{
@@ -205,7 +204,7 @@ export default function HomePage() {
                 onMouseDown={onMouseDown}
                 onMouseUp={onMouseUp}
               >
-                {/* 왼쪽 서브 포스터 (어둡게, 배지 없음) */}
+                
                 <div
                   role="button"
                   tabIndex={0}
@@ -229,7 +228,6 @@ export default function HomePage() {
                   />
                 </div>
 
-                {/* 메인 포스터 (원밝기, 배지 표시) */}
                 <div
                   role="button"
                   tabIndex={0}
@@ -252,7 +250,6 @@ export default function HomePage() {
                     style={{ borderRadius: "var(--radius-card)" }}
                   />
                   <Badge dDay={main.dDay} isNew={main.isNew} />
-                  {/* 메인 포스터 아래: 제목, 서브제목, 공연자 - 가운데 정렬 세로 나열 */}
                   <div className="mt-2 flex flex-col items-center text-center">
                     <p
                       className="font-bold leading-tight"
@@ -286,7 +283,6 @@ export default function HomePage() {
                   </div>
                 </div>
 
-                {/* 오른쪽 서브 포스터 (어둡게, 배지 없음) */}
                 <div
                   role="button"
                   tabIndex={0}
@@ -312,7 +308,6 @@ export default function HomePage() {
               </div>
             </section>
 
-            {/* ===== 공연장 정보 (이미지 150*150, 배지 이미지 내) ===== */}
             <section className="px-4 mt-10">
               <h2
                 className="mb-4 font-semibold text-left"
@@ -338,7 +333,7 @@ export default function HomePage() {
                     }}
                     className="shrink-0 cursor-pointer hover:opacity-90 transition-opacity"
                   >
-                    {/* 공연장 이미지 150*150, 배지 모두 이미지 내에 위치 */}
+
                     <div
                       className="relative overflow-hidden"
                       style={{

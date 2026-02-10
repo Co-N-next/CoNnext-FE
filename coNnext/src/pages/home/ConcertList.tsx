@@ -48,12 +48,12 @@ export default function UpcomingConcertPage() {
   const [filter, setFilter] = useState<FilterType>("dday");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  /* ===== 필터 적용 ===== */
   const filteredConcerts = [...concerts].sort((a, b) => {
-    if (filter === "views") return b.views - a.views;
-    if (a.dDay !== b.dDay) return a.dDay - b.dDay;
-    return a.title.localeCompare(b.title, "ko");
-  });
+  if (filter === "views") return (b.views ?? 0) - (a.views ?? 0);
+  if (a.dDay !== b.dDay) return a.dDay - b.dDay;
+  return a.title.localeCompare(b.title, "ko");
+});
+
 
   const handleFilterChange = (newFilter: FilterType) => {
     setFilter(newFilter);

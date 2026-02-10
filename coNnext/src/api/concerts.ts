@@ -1,32 +1,16 @@
-export interface Concert {
-  id: string;
-  title: string;
-  subtitle: string;
-  artist: string;
-  date: string;
-  time: string;
-  venue: string;
-  seat: string;
-  imageUrl: string;
-}
-export type ConcertData = {
-  title: string;
-  artist: string;
-  place: string;
-  date: string;
-  time: string;
-  seat: string;
-  poster: string;
-};
+// src/api/concerts.ts
+import { api } from "./api";
+
+/* ===== Types ===== */
 
 export interface ConcertSchedule {
   detailId: number;
-  startAt: string;       // ISO string
+  startAt: string;
   round: number;
-  runningTime: number;  // minutes
+  runningTime: number;
 }
 
-export interface ConcertItem {
+export interface RecentConcert {
   id: number;
   name: string;
   posterImage: string;
@@ -51,3 +35,13 @@ export interface ApiResponse<T> {
   pageInfo: PageInfo;
   payload: T;
 }
+
+/* ===== API ===== */
+
+/** 최신 공연 10개 조회 */
+export const getRecentConcerts = async () => {
+  const res = await api.get<ApiResponse<RecentConcert[]>>(
+    "/concerts/recent"
+  );
+  return res.data;
+};

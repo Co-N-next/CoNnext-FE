@@ -20,6 +20,9 @@ import Reserve from "./pages/reserve/ReserveList";
 import AddDetail from "./pages/reserve/AddDetail";
 
 function App() {
+   if (import.meta.env.DEV) {
+    localStorage.setItem("accessToken", "temp-dev-token");
+  }
   return (
     <>
         <Routes>
