@@ -2,11 +2,11 @@ import { useQuery } from "@tanstack/react-query";
 import { searchVenues } from "../../api/venue";
 
 /**
- * 공연장 검색 전용 hook
+ * 공연장 검색 전용 hook(venue/search)
  * - 검색어 있을 때만 API 호출
  * - 서버 응답 전체 반환 (payload + pageInfo)
  */
-export function useGetList(params?: { search?: string; page?: number }) {
+export function useVenuesearch(params?: { search?: string; page?: number }) {
   const search = params?.search?.trim();
 
   return useQuery({

@@ -34,21 +34,69 @@ export interface SearchVenuesResponse {
 }
 
 //근처공연장 타입정의
+//mockdata일떄
+// //요청
+// export interface GetNearestVenueRequest {
+//   latitude: number;
+//   longitude: number;
+//   radius?: number; // meter 단위, default = 500
+// }
+// //응답값
+// export interface NearestVenuePayload {
+//   id: number;
+//   name: string;
+// }
 
-//요청
+// export interface GetNearestVenueResponse {
+//   statusCode: number;
+//   message: string;
+//   payload: NearestVenuePayload;
+// }
+
+// ===============================
+// 근처 공연장 (Nearby / Nearest)
+// ===============================
+
+// 요청
 export interface GetNearestVenueRequest {
-  latitude: number;
-  longitude: number;
+  lat: number;
+  lng: number;
   radius?: number; // meter 단위, default = 500
 }
-//응답값
+
+// 응답 payload (단일 공연장)
 export interface NearestVenuePayload {
   id: number;
   name: string;
 }
 
+// 근처 공연장 응답
 export interface GetNearestVenueResponse {
   statusCode: number;
   message: string;
+  pageInfo: PageInfo;
   payload: NearestVenuePayload;
+}
+//===============================
+// /venue/favorites
+// ===============================
+
+export interface FavoriteVenue {
+  id: number;
+  name: string;
+  city: string;
+  imageUrl: string;
+}
+export interface PageInfo {
+  page: number;
+  size: number;
+  hasNext: boolean;
+  totalElements: number;
+  totalPages: number;
+}
+export interface GetFavoriteVenuesResponse {
+  statusCode: number;
+  message: string;
+  pageInfo: PageInfo;
+  payload: FavoriteVenue[];
 }

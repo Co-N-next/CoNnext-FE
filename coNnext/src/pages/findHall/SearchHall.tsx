@@ -1,19 +1,20 @@
+//api정리 (venuesearch - 검색시 나오는 카드리스트)
+//(trend-search가 위엘 롤링되는거 )
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Search from "../../components/common/Search";
 import before from "../../assets/logo/before.svg";
 import PopularVenueTicker from "../../components/PopularVenueTicker";
-import type { Venue } from "../../types/venue";
+import { useVenuesearch } from "../../hooks/queries/useVenuesearch";
 import {
   getSearchHistory,
   postSearchHistory,
   deleteSearchHistory,
   deleteAllSearchHistory,
 } from "../../api/SearchHistory";
-
-import { useGetList } from "../../hooks/queries/useGetList";
-import useDebounce from "../../hooks/queries/useDebounce";
 import VenueCard from "../../components/VenueCard";
+
+import useDebounce from "../../hooks/queries/useDebounce";
 
 const popularVenueMock = [
   { id: 1, name: "KSPO DOME" },
@@ -35,14 +36,13 @@ const SearchHall = () => {
   const [recentKeywords, setRecentKeywords] = useState<
     { id: number; keyword: string }[]
   >([]);
-  const debouncedValue = useDebounce(search, 1000);
 
-  const { data } = useGetList({
+  const debouncedValue = useDebounce(search, 1000);
+  const { data, isLoading } = useVenuesearch({
     search: debouncedValue,
+    page: 0,
   });
 
-  const items: Venue[] = data?.payload ?? [];
-  const totalCount = data?.pageInfo?.totalElements ?? 0;
   /* 최근 검색어 초기 로딩 */
   useEffect(() => {
     const fetchRecentKeywords = async () => {
@@ -67,7 +67,6 @@ const SearchHall = () => {
   useEffect(() => {
     if (!debouncedValue.trim()) return;
 
-    // 🔒 이미 최근 검색어에 있으면 저장 안 함
     const exists = recentKeywords.some(
       (item) => item.keyword === debouncedValue,
     );
@@ -80,7 +79,6 @@ const SearchHall = () => {
           searchType: "VENUE",
         });
 
-        // 다시 조회해서 최신 상태 동기화
         const res = await getSearchHistory("VENUE");
         setRecentKeywords(
           res.payload.map((item) => ({
@@ -95,11 +93,11 @@ const SearchHall = () => {
 
     saveKeyword();
   }, [debouncedValue, recentKeywords]);
+
   /* 개별 삭제 */
   const handleRemoveKeyword = async (id: number) => {
     try {
       await deleteSearchHistory(id);
-
       setRecentKeywords((prev) => prev.filter((item) => item.id !== id));
     } catch (e) {
       console.error(e);
@@ -125,17 +123,17 @@ const SearchHall = () => {
         </button>
         <h1 className="text-lg font-semibold">공연장 찾기</h1>
       </div>
-
       {/* 인기 공연장 */}
       <div className="mt-8">
         <PopularVenueTicker list={popularVenueMock} />
       </div>
-
-      {/* 검색창 */}
+      {/* 검색창
+   - Search 컴포넌트에는 API를 직접 연결하지 않음
+   - 입력값(search)이 디바운스 → 값 변경 시 useVenuesearch 쿼리 실행
+*/}
       <div className="flex items-center gap-3 mb-4">
         <Search value={search} onChange={(e) => setSearch(e.target.value)} />
       </div>
-
       {/* 최근 검색어 */}
       {search === "" && recentKeywords.length > 0 && (
         <section>
@@ -164,37 +162,26 @@ const SearchHall = () => {
           </ul>
         </section>
       )}
-
       {/* 검색 결과 */}
       {/* 검색 결과 */}
-      {debouncedValue && (
-        <section className="mt-6">
-          {/* 결과 개수 */}
-          <div className="mb-3 ml-3 text-sm text-gray-400">
-            검색 결과
-            <span className="text-white font-medium">{totalCount}</span>건
-          </div>
-
-          {items.length === 0 ? (
-            <div className="mt-10 text-center text-gray-400">
-              검색 결과가 없습니다.
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 gap-3">
-              {items.map((item) => (
-                <div key={item.id} className="scale-[0.95]">
-                  <VenueCard
-                    id={item.id}
-                    name={item.name}
-                    city={item.city}
-                    imageUrl={item.imageUrl}
-                    isToday={false}
-                    isNew={false}
-                  />
-                </div>
-              ))}
-            </div>
+      {search && (
+        <section className="mt-6 grid grid-cols-2 gap-3">
+          {isLoading && (
+            <p className="col-span-2 text-sm text-gray-400">검색 중...</p>
           )}
+
+          {data?.payload.map((item) => (
+            <div key={item.id} className="scale-[0.95]">
+              <VenueCard
+                id={item.id}
+                name={item.name}
+                city={item.city}
+                imageUrl={item.imageUrl}
+                isToday={true}
+                isNew={false}
+              />
+            </div>
+          ))}
         </section>
       )}
     </div>

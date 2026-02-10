@@ -1,4 +1,4 @@
-// 공연장 찾기 - 즐겨찾기용 쿼리
+//인기 검색 공연장 조회(venue/trend-srarch)
 
 import { useQuery } from "@tanstack/react-query";
 import { getTrendingVenues } from "../../api/venue";
