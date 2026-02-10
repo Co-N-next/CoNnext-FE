@@ -56,7 +56,6 @@ const TABS = [
 
 type TabKey = (typeof TABS)[number]["key"];
 
-/* ================= 공연 포스터 배지: isNew일 때 NEW만, 아니면 D-day/Today ================= */
 const Badge = ({ dDay, isNew }: { dDay: number; isNew: boolean }) => {
   if (isNew) {
     return (
@@ -84,12 +83,9 @@ const Badge = ({ dDay, isNew }: { dDay: number; isNew: boolean }) => {
     </span>
   );
 };
-
-/* ================= 공연장 배지: 상단 D-day/Today, 하단 New ================= */
 const VenueBadge = ({ dDay, isNew }: { dDay: number; isNew: boolean }) => {
   return (
     <>
-      {/* 상단: D-day 또는 Today */}
       {dDay === 0 ? (
         <span
           className="absolute top-2 left-2 rounded-full px-2 py-1 text-xs font-semibold text-white"
@@ -105,7 +101,6 @@ const VenueBadge = ({ dDay, isNew }: { dDay: number; isNew: boolean }) => {
           D-{dDay}
         </span>
       )}
-      {/* 하단: New */}
       {isNew && (
         <span
           className="absolute bottom-2 left-2 rounded px-2 py-1 text-xs font-semibold text-white"

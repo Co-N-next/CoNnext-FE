@@ -21,11 +21,10 @@ export type ConcertData = {
 
 export interface ConcertSchedule {
   detailId: number;
-  startAt: string;       // ISO string
+  startAt: string;
   round: number;
-  runningTime: number;  // minutes
+  runningTime: number;
 }
-
 export interface ConcertItem {
   id: number;
   name: string;

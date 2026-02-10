@@ -37,23 +37,16 @@ export default function ConcertInfo() {
   return (
     <div className="min-h-screen bg-[#0a0f1e] text-white">
       <div className="w-full max-w-[450px] mx-auto">
-        {/* ===== 메인 이벤트 이미지 섹션 ===== */}
         <div className="relative">
-          {/* 큰 메인 이미지 */}
           <div className="relative h-[500px] w-full overflow-hidden">
             <img
               src={concertData.poster}
               alt={concertData.title}
               className="w-full h-full object-cover"
             />
-
-            {/* 오버레이 그라데이션 - 아래로 갈수록 어둡게 */}
             <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/30 to-black/90" />
-
-            {/* 왼쪽 하단: 썸네일과 콘서트 정보 (세로 배치) */}
             <div className="absolute bottom-6 left-4 flex flex-col gap-3">
 
-              {/* 작은 썸네일 */}
               <div className="w-24 h-32 rounded-lg overflow-hidden border-2 border-white/50 shadow-lg">
                 <img
                   src={concertData.poster}
@@ -62,9 +55,7 @@ export default function ConcertInfo() {
                 />
               </div>
 
-              {/* 콘서트 정보 (썸네일 아래) - 글자 시작점 정렬 */}
               <div className="space-y-2">
-                {/* 제목 */}
                 <div>
                   <h2 className="text-lg font-semibold leading-tight text-[18px]">
                     {concertData.title} {concertData.subtitle}
@@ -72,7 +63,6 @@ export default function ConcertInfo() {
                   <p className="text-sm mt-1 text-[16px]">{concertData.artist}</p>
                 </div>
 
-                {/* 일시 - 라벨 너비 고정으로 값 정렬 */}
                 <div className="flex  items-center text-sm text-[13px]">
                   <span className="font-medium text-[#A1A1A1] w-16">일시</span>
                   <span className="font-normal">{concertData.date} {concertData.time}</span>
