@@ -1,4 +1,4 @@
-// src/components/modals/WithdrawalModal.tsx
+
 import React, { useState } from 'react';
 import CheckedCircle from '../../assets/Icons/checked_circle.svg';
 import UncheckedCircle from '../../assets/Icons/unchecked_circle.svg';
