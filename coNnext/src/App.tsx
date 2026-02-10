@@ -3,8 +3,8 @@ import { Routes, Route} from "react-router-dom";
 import Layout from "./components/layout/Layout";
 
 // import Splash from "./pages/login/Splash";
-// import Login from "./pages/login/Login";
-// import SignUp from "./pages/login/SignUp";
+import Login from "./pages/login/Login";
+import SignUp from "./pages/login/SignUp";
 import Home from "./pages/home/HomePage";
 import ConcertList from "./pages/home/ConcertList";
 import ConcertDetail from "./pages/home/ConcertDetail";
@@ -30,10 +30,10 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/concert" element={<ConcertList />} />
           <Route path="/concert/:id" element={<ConcertDetail />} />
-            <Route path="/find" element={<FindHall />} />
-            {/* <Route path="/start" element={<Splash />} />
+          <Route path="/find" element={<FindHall />} />
           <Route path="login" element={<Login />} />
           <Route path="signUp" element={<SignUp />} />
+            {/* <Route path="/start" element={<Splash />} />
           <Route path="/mynews" element={<MyNews />} />
           <Route path="/notices" element={<Notices />} />
           <Route path="/find" element={<FindHall />} />

@@ -5,8 +5,8 @@ export type Concert = {
   poster: string;
   dDay: number;
   isNew: boolean;
-  subtitle?: string;  // optional
-  views?: number;     // optional
+  subtitle?: string;  
+  views?: number;    
 };
 
 
