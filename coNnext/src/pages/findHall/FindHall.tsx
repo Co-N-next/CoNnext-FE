@@ -4,7 +4,7 @@ import { useTrendingVenues } from "../../hooks/queries/useTrendingVenues";
 import { useGetNearestVenue } from "../../hooks/queries/useGetNearestVenue";
 import { NearbyBanner } from "../../components/NearbyBanner";
 import VenueCard from "../../components/VenueCard";
-import PopularVenueTicker from "../../components/PopularVenueTicker";
+// import PopularVenueTicker from "../../components/PopularVenueTicker";
 import type { Venue } from "../../types/venue";
 
 // ⭐ NEW
@@ -53,25 +53,14 @@ const FindHall = () => {
       radius,
     });
 
-  // ⭐ NEW: 즐겨찾기 공연장 쿼리
-  const { data: favoriteData, isPending: isFavoritePending } =
-    useFavoriteVenues();
+  // // ⭐ NEW: 즐겨찾기 공연장 쿼리
+  // const { data: favoriteData, isPending: isFavoritePending } =
+  //   useFavoriteVenues();
 
   const venues: Venue[] = trendingData?.payload ?? [];
 
-  // ⭐ NEW: 즐겨찾기용 데이터
-  const favoriteVenues: Venue[] = favoriteData?.payload ?? [];
-
-  /* =========================
-   * loading / error
-   * ========================= */
-  if (isTrendingPending) {
-    return <div className="mt-14 text-center text-white">Loading...</div>;
-  }
-
-  if (isTrendingError) {
-    return <div className="mt-14 text-center text-white">Error</div>;
-  }
+  // // ⭐ NEW: 즐겨찾기용 데이터
+  // const favoriteVenues: Venue[] = favoriteData?.payload ?? [];
 
   /* =========================
    * render
@@ -83,7 +72,19 @@ const FindHall = () => {
          * Header
          * ========================= */}
         <h1 className="text-[18px] font-semibold">공연장 찾기</h1>
-
+        {/* 🔍 화면 렌더링 확인용 (임시) */}
+        {/* 🔴 디버그용 */}
+        <div className="text-red-400 text-sm">FindHall 렌더링 중</div>
+        {/* ⏳ 로딩 */}
+        {isTrendingPending && (
+          <div className="mt-6 text-center text-gray-400">불러오는 중…</div>
+        )}
+        {/* ❌ 에러 */}
+        {isTrendingError && (
+          <div className="mt-6 text-center text-red-400">
+            데이터를 불러오지 못했어요
+          </div>
+        )}{" "}
         {/* =========================
          * Popular Rolling
          * ========================= */}
@@ -93,7 +94,6 @@ const FindHall = () => {
             name: item.name,
           }))}
         /> */}
-
         {/* =========================
          * Nearby Venue (실데이터)
          * ========================= */}
@@ -105,7 +105,6 @@ const FindHall = () => {
             />
           </div>
         )}
-
         {/* =========================
          * Today Venue
          * ========================= */}
@@ -130,26 +129,57 @@ const FindHall = () => {
             </div>
           </section>
         )} */}
-
         {/* =========================
          * Search
          * ========================= */}
         <Search readOnly onClick={() => navigate("/search")} />
+        {/*
+=========================
+ Favorite Venues
+=========================
+<section>
+  <h2 className="mb-1 text-[15px] font-semibold">즐겨찾기</h2>
 
+  <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hover">
+    {isFavoritePending && (
+      <div className="text-sm text-gray-400">불러오는 중…</div>
+    )}
+
+    {favoriteVenues.map((item) => (
+      <div key={item.id} className="min-w-[110px]">
+        <VenueCard
+          id={item.id}
+          name={item.name}
+          city={item.city}
+          imageUrl={item.imageUrl}
+          isToday={true}
+          isNew={false}
+        />
+      </div>
+    ))}
+
+    {!isFavoritePending && favoriteVenues.length === 0 && (
+      <div className="text-sm text-gray-500">
+        즐겨찾기한 공연장이 없어요
+      </div>
+    )}
+  </div>
+</section>
+*/}
         {/* =========================
-         * Favorite Venues
+         * Popular Venues
          * ========================= */}
         <section>
-          <h2 className="mb-1 text-[15px] font-semibold">즐겨찾기</h2>
+          <h2 className="mb-1 text-[15px] font-semibold">인기 검색 공연장</h2>
 
           <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hover">
-            {/* ⭐ NEW: 즐겨찾기 로딩 처리 */}
-            {isFavoritePending && (
+            {/* ⏳ 로딩 메시지 (리스트 위에 얹기) */}
+            {isTrendingPending && (
               <div className="text-sm text-gray-400">불러오는 중…</div>
             )}
 
-            {/* ⭐ NEW: 즐겨찾기 데이터 사용 */}
-            {favoriteVenues.map((item) => (
+            {/* ✅ 리스트는 항상 렌더 */}
+            {venues.map((item) => (
               <div key={item.id} className="min-w-[110px]">
                 <VenueCard
                   id={item.id}
@@ -162,43 +192,7 @@ const FindHall = () => {
               </div>
             ))}
 
-            {/* ⭐ NEW: 즐겨찾기 비어있을 때 */}
-            {!isFavoritePending && favoriteVenues.length === 0 && (
-              <div className="text-sm text-gray-500">
-                즐겨찾기한 공연장이 없어요
-              </div>
-            )}
-          </div>
-        </section>
-
-        {/* =========================
-         * Popular Venues
-         * ========================= */}
-        <section>
-          <h2 className="mb-1 text-[15px] font-semibold">인기 검색 공연장</h2>
-
-          <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hover">
-            {/* ⭐ NEW: 인기 검색 로딩 상태 */}
-            {isTrendingPending && (
-              <div className="text-sm text-gray-400">불러오는 중…</div>
-            )}
-
-            {/* ⭐ NEW: 인기 검색 데이터 */}
-            {!isTrendingPending &&
-              venues.map((item) => (
-                <div key={item.id} className="min-w-[110px]">
-                  <VenueCard
-                    id={item.id}
-                    name={item.name}
-                    city={item.city}
-                    imageUrl={item.imageUrl}
-                    isToday={true}
-                    isNew={false}
-                  />
-                </div>
-              ))}
-
-            {/* ⭐ NEW: 인기 검색 결과 없음 */}
+            {/* 📭 결과 없음 (로딩 끝난 뒤에만) */}
             {!isTrendingPending && venues.length === 0 && (
               <div className="text-sm text-gray-500">
                 아직 인기 공연장이 없어요

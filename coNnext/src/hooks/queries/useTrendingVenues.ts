@@ -9,5 +9,7 @@ export function useTrendingVenues() {
     queryFn: getTrendingVenues,
     staleTime: 1000 * 60 * 5,
     gcTime: 1000 * 60 * 10,
+    // ⭐ v5에서 keepPreviousData 대체
+    placeholderData: (prev) => prev,
   });
 }

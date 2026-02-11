@@ -19,16 +19,15 @@ export const getTrendingVenues = async (): Promise<VenueListResponse> => {
 
 //공연장검색(venue/search)
 export const searchVenues = async (
-  query: string,
+  keyword: string,
   page: number = 0,
 ): Promise<SearchVenuesResponse> => {
   const { data } = await axiosInstance.get<SearchVenuesResponse>(
     "/venues/search",
     {
-      params: { query, page },
+      params: { keyword, page },
     },
   );
-
   return data;
 };
 
@@ -37,16 +36,15 @@ export const getNearestVenue = async (
   params: GetNearestVenueRequest,
 ): Promise<GetNearestVenueResponse> => {
   const { data } = await axiosInstance.get<GetNearestVenueResponse>(
-    "/venues/nearest",
+    "/venues/nearby",
     {
       params: {
         lat: params.lat,
         lng: params.lng,
-        radius: params.radius ?? 500, // 기본값 보정
+        radius: params.radius ?? 500,
       },
     },
   );
-
   return data;
 };
 

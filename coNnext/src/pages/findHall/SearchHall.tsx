@@ -13,21 +13,9 @@ import {
   deleteAllSearchHistory,
 } from "../../api/SearchHistory";
 import VenueCard from "../../components/VenueCard";
+import { useTrendingVenues } from "../../hooks/queries/useTrendingVenues";
 
 import useDebounce from "../../hooks/queries/useDebounce";
-
-const popularVenueMock = [
-  { id: 1, name: "KSPO DOME" },
-  { id: 2, name: "잠실 주경기장" },
-  { id: 3, name: "고척 스카이돔" },
-  { id: 4, name: "서울 월드컵 경기장" },
-  { id: 5, name: "KSPO DOME" },
-  { id: 6, name: "잠실 주경기장" },
-  { id: 7, name: "고척 스카이돔" },
-  { id: 8, name: "서울 월드컵 경기장" },
-  { id: 9, name: "고척 스카이돔" },
-  { id: 10, name: "서울 월드컵 경기장" },
-];
 
 const SearchHall = () => {
   const navigate = useNavigate();
@@ -42,6 +30,8 @@ const SearchHall = () => {
     search: debouncedValue,
     page: 0,
   });
+  const { data: trendingData, isLoading: isTrendingLoading } =
+    useTrendingVenues();
 
   /* 최근 검색어 초기 로딩 */
   useEffect(() => {
@@ -125,8 +115,20 @@ const SearchHall = () => {
       </div>
       {/* 인기 공연장 */}
       <div className="mt-8">
-        <PopularVenueTicker list={popularVenueMock} />
+        {isTrendingLoading ? (
+          <p className="text-sm text-gray-400">인기 공연장 불러오는 중...</p>
+        ) : (
+          <PopularVenueTicker
+            list={
+              trendingData?.payload.map((venue) => ({
+                id: venue.id,
+                name: venue.name,
+              })) ?? []
+            }
+          />
+        )}
       </div>
+
       {/* 검색창
    - Search 컴포넌트에는 API를 직접 연결하지 않음
    - 입력값(search)이 디바운스 → 값 변경 시 useVenuesearch 쿼리 실행

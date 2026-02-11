@@ -2,7 +2,11 @@ import { Share2 } from "lucide-react";
 import { useState } from "react";
 import MyNewsCard from "../../components/MyNewsCard";
 
-/* ================= 더미 데이터 ================= */
+// ✅ 추가
+import { useMyNotifications } from "../../hooks/queries/notifications/useMyNotificationsnews";
+import type { Notification } from "../../types/notifications";
+
+/* ================= 더미 데이터 (유지) ================= */
 export const mockTodayConcert = {
   id: 1,
   type: "CONCERT" as const,
@@ -20,46 +24,6 @@ export const mockTodayConcert = {
     "https://ticketimage.interpark.com/Play/image/large/25/25015843_p.gif",
   mapLink: "https://map.naver.com",
 };
-
-const newsList = [
-  {
-    id: 1,
-    profileImg:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSMj2bBcTXs6SlM7nHeA6W9obR-bgneSj_UCp6__zSkhHYQmrzLHjjbxkflD3xS-Lc8a6oOua9kMxslsue_JFiWOipDIF0KGM_-lJleKg&s=10",
-    name: "구용미",
-    type: "LOCATION" as const,
-    createdAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(), // 30분 전
-  },
-  {
-    id: 2,
-    profileImg:
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRRs-9NRaCfycNXjgS3jRPSM6a4qwz8xbk5VZrkshVvqlHR6k3rCDfdUNOhwEC8IcyP84EVAyM-iSk_E9BpoiWN-GOOtSWasM5YQxMzO8E&s=10",
-    name: "미피",
-    type: "FRIEND" as const,
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(), // 2시간 전
-  },
-  {
-    id: 3,
-    profileImg: "/images/miffy.png",
-    name: "콘서트홀 A",
-    type: "LOCATION" as const,
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2).toISOString(), // 2일 전
-  },
-  {
-    id: 4,
-    profileImg: "/images/miffy.png",
-    name: "토끼왕",
-    type: "FRIEND" as const,
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5).toISOString(), // 5일 전
-  },
-  {
-    id: 5,
-    profileImg: "/images/miffy.png",
-    name: "하얀미피",
-    type: "FRIEND" as const,
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7).toISOString(), // 7일 전
-  },
-];
 
 /* ================= 유틸 ================= */
 const isToday = (date: string) => {
@@ -88,48 +52,46 @@ function getTimeInfo(createdAt: string) {
   const diffHours = Math.floor(diffMinutes / 60);
   const diffDays = Math.floor(diffHours / 24);
 
-  // ✅ 오늘 (24시간 이내)
   if (diffHours < 24) {
     if (diffMinutes < 1)
       return { section: "TODAY" as const, timeText: "방금 전" };
     if (diffMinutes < 60)
-      return {
-        section: "TODAY" as const,
-        timeText: `${diffMinutes}분 전`,
-      };
-    return {
-      section: "TODAY" as const,
-      timeText: `${diffHours}시간 전`,
-    };
+      return { section: "TODAY" as const, timeText: `${diffMinutes}분 전` };
+    return { section: "TODAY" as const, timeText: `${diffHours}시간 전` };
   }
 
-  // ✅ 일주일 전 (1일 초과 ~ 7일 이내)
   if (diffDays <= 7) {
-    return {
-      section: "WEEK_AGO" as const,
-      timeText: `${diffDays}일 전`,
-    };
+    return { section: "WEEK_AGO" as const, timeText: `${diffDays}일 전` };
   }
 
-  // ❌ 그보다 오래된 건 이번 화면에서는 제외
-  return {
-    section: "OLD" as const,
-    timeText: `${diffDays}일 전`,
-  };
+  return { section: "OLD" as const, timeText: `${diffDays}일 전` };
 }
 
 /* ================= 컴포넌트 ================= */
 export default function MyNews() {
+  // ✅ 추가
+  const { data, isLoading } = useMyNotifications(0);
+
+  // ✅ 변경: 더미 newsList → API 기반
+  const newsList =
+    data?.payload.news.map((n: Notification) => ({
+      id: n.id,
+      profileImg: n.sender_profile_img,
+      name: n.title,
+      type: n.category === "MATE" ? ("FRIEND" as const) : ("LOCATION" as const),
+      createdAt: n.createdAt,
+    })) ?? [];
+
   const parsedNews = newsList
     .map((news) => {
       const { section, timeText } = getTimeInfo(news.createdAt);
       return { ...news, section, timeText };
     })
     .filter((news) => news.section !== "OLD");
+
   const todayList = parsedNews.filter((n) => n.section === "TODAY");
   const weekAgoList = parsedNews.filter((n) => n.section === "WEEK_AGO");
 
-  // ✅ 전체 더보기/닫기
   const allCount = parsedNews.length;
   const INITIAL_COUNT = 3;
 
@@ -149,15 +111,19 @@ export default function MyNews() {
     return false;
   };
 
+  // ✅ 추가
+  if (isLoading) {
+    return <div className="mx-4 mt-4 text-gray-400">불러오는 중...</div>;
+  }
+
   if (!isToday(mockTodayConcert.concertDate)) {
     return (
       <div className="mx-4 mt-4 text-gray-400">오늘 예정된 공연이 없어요</div>
     );
   }
-  const handleShare = async () => {
-    console.log("공유 버튼 눌림"); // 👈 이거부터 찍어
 
-    const shareUrl = `${window.location.origin}/concert/${concertId}`;
+  const handleShare = async () => {
+    const shareUrl = `${window.location.origin}/concert/${mockTodayConcert.id}`;
 
     if (navigator.share) {
       await navigator.share({
@@ -166,7 +132,6 @@ export default function MyNews() {
         url: shareUrl,
       });
     } else {
-      // PC / 지원 안 되는 환경
       await navigator.clipboard.writeText(shareUrl);
       alert("링크가 복사됐어요!");
     }
@@ -190,6 +155,7 @@ export default function MyNews() {
           >
             <Share2 size={18} className="text-white" />
           </button>
+
           <h2 className="absolute top-4 left-4 z-20 translate-x-2 translate-y-2 font-ydestreetB text-[20px] leading-[1.2] text-white">
             오늘의 공연이에요!
           </h2>
@@ -206,6 +172,7 @@ export default function MyNews() {
             </p>
           </div>
         </section>
+
         <button
           onClick={() => window.open(mockTodayConcert.mapLink)}
           className="mx-4 mt-3 w-[calc(100%-2rem)] rounded-xl bg-[#7f5aff] py-2 text-sm font-semibold text-white"
@@ -216,7 +183,7 @@ export default function MyNews() {
 
       {/* ================= 오늘 ================= */}
       <section className="w-full mt-6">
-        <h2 className="px-4 font-pretendard font-semibold text-[18px] leading-[130%] tracking-[-0.025em] text-gray-300 mb-2">
+        <h2 className="px-4 font-pretendard font-semibold text-[18px] text-gray-300 mb-2">
           오늘
         </h2>
         <div className="flex flex-col">
@@ -237,7 +204,7 @@ export default function MyNews() {
 
       {/* ================= 일주일 전 ================= */}
       <section className="w-full mt-6">
-        <h2 className="px-4 font-pretendard font-semibold text-[18px] leading-[130%] tracking-[-0.025em] text-gray-300 mb-2">
+        <h2 className="px-4 font-pretendard font-semibold text-[18px] text-gray-300 mb-2">
           일주일 전
         </h2>
         <div className="flex flex-col">
@@ -259,24 +226,20 @@ export default function MyNews() {
       {/* ================= 전체 더보기 / 닫기 ================= */}
       {allCount > INITIAL_COUNT && (
         <button
-          className={`mt-6 flex w-full items-center justify-center gap-2 text-sm text-gray-400 transition-colors hover:text-gray-300 ${
+          className={`mt-6 flex w-full items-center justify-center gap-2 text-sm text-gray-400 ${
             isExpanded ? "mb-2" : "mb-10"
           }`}
           onClick={handleToggle}
         >
-          <span className="mb-10 flex items-center gap-2">
-            {/* 화살표 */}
+          <span className="flex items-center gap-2">
             <span
-              className={`flex h-6 w-6 items-center justify-center transition-transform duration-200 ${
+              className={`flex h-6 w-6 items-center justify-center transition-transform ${
                 isExpanded ? "rotate-180" : ""
               }`}
             >
-              {/* 기본이 ▼ */}
-              <span className="h-3 w-3 translate-y-[-2px] rotate-45 border-b-2 border-r-2 border-current" />
+              <span className="h-3 w-3 rotate-45 border-b-2 border-r-2 border-current" />
             </span>
-
-            {/* 텍스트 */}
-            <span className="font-pretendard text-[16px] font-medium leading-[1.2]">
+            <span className="font-pretendard text-[16px] font-medium">
               {isExpanded ? "줄이기" : "더보기"}
             </span>
           </span>
