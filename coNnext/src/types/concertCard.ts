@@ -1,4 +1,4 @@
-export interface ConcertCard {
+export interface concertCard {
   id: number;
   title: string;
   subtitle: string;
