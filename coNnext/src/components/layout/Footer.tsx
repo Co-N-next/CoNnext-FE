@@ -12,9 +12,9 @@ const Footer: React.FC = () => {
   const location = useLocation();
 
    const navItems = [
-   { id: 1, label: '홈', path: '/', icon: HomeIcon },
+   { id: 1, label: '홈', path: '/home', icon: HomeIcon },
     { id: 2, label: '예매 내역', path: '/reserve', icon: ReserveIcon },
-    { id: 3, label: '공연장', path: '/findhall', icon: FindHallIcon },
+    { id: 3, label: '공연장', path: '/find', icon: FindHallIcon },
     { id: 4, label: '메이트', path: '/mate', icon: MateIcon },
     { id: 5, label: '마이페이지', path: '/mypage', icon: MyPageIcon },
   ];

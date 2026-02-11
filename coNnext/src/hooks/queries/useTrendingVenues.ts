@@ -1,0 +1,15 @@
+//인기 검색 공연장 조회(venue/trend-srarch)
+
+import { useQuery } from "@tanstack/react-query";
+import { getTrendingVenues } from "../../api/venueSearch";
+
+export function useTrendingVenues() {
+  return useQuery({
+    queryKey: ["venues-trending"],
+    queryFn: getTrendingVenues,
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 10,
+    // ⭐ v5에서 keepPreviousData 대체
+    placeholderData: (prev) => prev,
+  });
+}

@@ -8,11 +8,13 @@ import Layout from "./components/layout/Layout";
 import Login from "./pages/login/Login";
 import SignUp from "./pages/login/SignUp";
 import Home from "./pages/home/HomePage";
+import Onboarding from "./pages/onboarding/Onboarding";
 import ConcertDetail from "./pages/home/ConcertDetail";
-// import MyNews from "./pages/alarm/MyNews";
-// import Notices from "./pages/alarm/Notices";
-// import FindHall from "./pages/findHall/FindHall";
-// import SerchHall from "./pages/findHall/SearchHall";
+import ConcertList from "./pages/home/ConcertList";
+import MyNews from "./pages/alarm/MyNews";
+import Notices from "./pages/alarm/Notices";
+import FindHall from "./pages/findHall/FindHall";
+import SerchHall from "./pages/findHall/SearchHall";
 import HallMap from "./pages/hallMap/HallMap";
 import Mate from "./pages/mate/Mate";
 import MateMap from "./pages/mate/MateMap";
@@ -45,14 +47,16 @@ function App() {
         <Routes>
           <Route element={<Layout />}>
             {/* <Route path="/start" element={<Splash />} /> */}
+            
             <Route path="login" element={<Login />} />
             <Route path="signUp" element={<SignUp />} />
-            <Route path="/" element={<Home />} />
-             <Route path="/concert" element={<ConcertDetail />} />
-            {/* <Route path="/mynews" element={<MyNews />} />
+            <Route path="/home" element={<Home />} />
+             <Route path="/concert" element={<ConcertList />} />
+             <Route path="/concert/:id" element={<ConcertDetail />} />
+            <Route path="/mynews" element={<MyNews />} />
             <Route path="/notices" element={<Notices />} />
             <Route path="/find" element={<FindHall />} />
-            <Route path="/serch" element={<SerchHall />} /> */}
+            <Route path="/search" element={<SerchHall />} />
             <Route path="/map/:venueId" element={<HallMap />} />
             <Route path="/mypage" element={<MyPage />} />
             <Route path="/mate" element={<Mate />} />
@@ -63,6 +67,7 @@ function App() {
             <Route path="/more-info" element={<MoreInform />} />
             <Route path="/add-detail" element={<AddDetail />} />
           </Route>
+          <Route path="/" element={<Onboarding />} />
           <Route element={<FooterLayout />}>
             <Route path="/mate/map" element={<MateMap />} />
           </Route>
@@ -71,6 +76,7 @@ function App() {
       </BrowserRouter>
       {/* React Query Devtools - 개발 환경에서만 표시 */}
       <ReactQueryDevtools initialIsOpen={false} />
+      
     </QueryClientProvider>
   );
 }
