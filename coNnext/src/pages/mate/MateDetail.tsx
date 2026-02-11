@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { ChevronLeft, Star } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 import ConcertCard from "../../components/ConcertCard";
 import type { Concert } from "../../types/concert";
+import star_off from "../../assets/Icons/star_off.svg";
+import star_on from "../../assets/Icons/star_on.svg";
 
 interface MateInfo {
   id: string;
@@ -106,9 +108,9 @@ const MateDetail = () => {
               onClick={() => setIsFavorite(!isFavorite)}
               className="transition"
             >
-              <Star
-                size={20}
-                className={isFavorite ? "fill-yellow-400 text-yellow-400" : "text-gray-400"}
+              <img
+                src={isFavorite ? star_off : star_on}
+                alt="star"
               />
             </button>
           </div>
@@ -140,12 +142,11 @@ const MateDetail = () => {
 
         {/* Concert Card Section */}
         <section className="px-4">
-          <div className="mb-4">
+   
             <div className="flex items-center gap-2 mb-3">
-              <div className="w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[8px] border-t-[#7F5AFF]" />
-              <span className="text-[14px] font-semibold text-white">concert card</span>
+              <span className="text-[14px] font-semibold text-white px-4">다가오는 공연</span>
             </div>
-          </div>
+          
 
           {/* Concert List */}
           <div className="space-y-4">
@@ -158,6 +159,7 @@ const MateDetail = () => {
                 <ConcertCard
                   key={concert.id}
                   concert={concert}
+                  showMateButtons={false}
                 />
               ))
             )}
