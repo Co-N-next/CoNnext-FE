@@ -2,27 +2,37 @@ import { apiClient } from "../config/api";
 import type { Concert } from "../types/concert";
 import axios from "axios";
 
-// ✅ 1. 백엔드에서 내려주는 JSON 데이터의 모양을 정의합니다.
-// (보여주신 JSON 예시를 바탕으로 만들었습니다)
+// ✅ 1. 공연 기본 조회 응답 타입
 interface ConcertResponse {
   id: number;
   name: string;
   posterImage: string;
   ageRating?: string;
+  noticeUrl?: string;
   price?: string;
-  // JSON에는 없었지만 코드가 안 깨지게 선택적(?)으로 둡니다.
-  artist?: string;     
-  artistName?: string; 
-  venueName?: string;
-  venue?: string;
+  reservationLink?: string;
   
   // 스케줄 정보 (배열)
   schedules: {
     detailId: number;
-    startAt: string; // "2026-02-07T19:21:24.568Z"
+    startAt: string; // "2026-02-11T08:49:27.096Z"
     round?: number;
     runningTime?: number;
   }[];
+}
+
+// ✅ 2. 공연 상세 회차 조회 응답 타입
+interface ConcertDetailResponse {
+  concertId: number;
+  name: string;
+  posterImage: string;
+  ageRating?: string;
+  noticeUrl?: string;
+  detailId: number;
+  startAt: string; // "2026-02-11T08:49:27.105Z"
+  runningTime?: number;
+  intermission?: number; // 인터미션 시간 (분)
+  round?: number;
 }
 
 // --- [Helper] 유틸 함수 ---
@@ -37,33 +47,25 @@ const parseDateTime = (isoString: string) => {
 };
 
 // --- [Helper] 데이터 변환 함수 ---
-// item의 타입을 any가 아니라 위에서 만든 ConcertResponse로 지정!
 const transformConcertData = (item: ConcertResponse): Concert => {
   // 1. 날짜/시간 추출
-  // schedules가 없거나 비어있을 수 있으므로 안전하게 접근 (?.)`
   const firstSchedule = item.schedules?.[0];
   const { date, time } = parseDateTime(firstSchedule?.startAt || "");
 
   return {
-    id: String(item.id),           // 숫자 id를 문자열로 변환
-    title: item.name,              // JSON: name -> Frontend: title
-    
-    // API에 아티스트/장소 정보가 없을 경우 대비
-    artist: item.artist || item.artistName || "",     
-    venue: item.venueName || item.venue || "",   
-    
-    imageUrl: item.posterImage,    // JSON: posterImage -> Frontend: imageUrl
-    
-    // 날짜/시간 포맷팅
+    id: String(item.id),
+    title: item.name,
+    artist: "", // 기본 조회에는 artist 정보가 없음
+    venue: "",  // 기본 조회에는 venue 정보가 없음
+    imageUrl: item.posterImage,
     date,
     time,
-    
-    // 프론트엔드 필수값 채우기 (빈 문자열)
     subtitle: "",
     seat: "" 
   };
 };
 
+<<<<<<< HEAD
 export interface ConcertSchedule {
   detailId: number;
   startAt: string;
@@ -96,6 +98,24 @@ export interface ApiResponse<T> {
   pageInfo: PageInfo;
   payload: T;
 }
+=======
+// 공연 상세 회차 데이터 변환
+// const transformConcertDetailData = (item: ConcertDetailResponse): Concert => {
+//   const { date, time } = parseDateTime(item.startAt || "");
+
+//   return {
+//     id: String(item.concertId),
+//     title: item.name,
+//     artist: "", // 상세 조회에도 artist 정보가 없으므로 빈값
+//     venue: "",  // 상세 조회에도 venue 정보가 없으므로 빈값
+//     imageUrl: item.posterImage,
+//     date,
+//     time,
+//     subtitle: `${item.round || 1}회차`,
+//     seat: ""
+//   };
+// };
+>>>>>>> last-sang/backup
 
 // --- API 함수들 ---
 
@@ -123,7 +143,9 @@ export const fetchConcertInfo = async (concertId: string) => {
 };
 
 // 3. 공연 상세 회차(스케줄) 조회
+// GET /concerts/details/{detailId}
 export const fetchConcertDetail = async (detailId: string) => {
+<<<<<<< HEAD
     const response = await apiClient.get<{ payload: ConcertResponse }>(`/concerts/details/${detailId}`);
     
     // 백엔드 데이터를 우리가 쓰기 편한 형태로 가공
@@ -140,4 +162,25 @@ export const getRecentConcerts = async () => {
     "/concerts/recent"
   );
   return res.data;
+=======
+  const response = await apiClient.get<{ payload: ConcertDetailResponse }>(`/concerts/details/${detailId}`);
+  
+  const data = response.data.payload;
+  const { date, time } = parseDateTime(data.startAt);
+  
+  return {
+    concertId: data.concertId,
+    detailId: data.detailId,
+    name: data.name,
+    posterImage: data.posterImage,
+    ageRating: data.ageRating,
+    noticeUrl: data.noticeUrl,
+    round: data.round,
+    runningTime: data.runningTime,
+    intermission: data.intermission,
+    date,
+    time,
+    startAt: data.startAt
+  };
+>>>>>>> last-sang/backup
 };

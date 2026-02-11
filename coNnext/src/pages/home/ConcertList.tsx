@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
-import FilterIcon from "../../assets/logo/FilterIcon.svg";
-import type {RecentConcert } from "../../api/concert";
-import { getRecentConcerts } from "../../api/concert";
+import FilterIcon from "../../assets/Icons/Align.svg";
+import type { RecentConcert } from "../../api/concertItem";
+import { getConcertById, getRecentConcerts } from "../../api/concertItem";
 
 type UIConcert = {
   id: number;
+  detailId: number | null;
   title: string;
   subtitle: string;
   artist: string;
@@ -23,7 +24,6 @@ export default function UpcomingConcertPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [concerts, setConcerts] = useState<UIConcert[]>([]);
 
-  /* ===== API 연동 ===== */
   useEffect(() => {
     const fetchConcerts = async () => {
       try {
@@ -41,12 +41,13 @@ export default function UpcomingConcertPage() {
 
           return {
             id: c.id,
+            detailId: c.schedules?.[0]?.detailId ?? null,
             title: c.name,
-            subtitle: "", // API에 없음
-            artist: "",   // API에 없음
+            subtitle: "",
+            artist: "",
             poster: c.posterImage,
             dDay: dDay < 0 ? 0 : dDay,
-            views: 0, // API에 없음 (조회순 유지용)
+            views: 0,
           };
         });
 
@@ -59,7 +60,6 @@ export default function UpcomingConcertPage() {
     fetchConcerts();
   }, []);
 
-  /* ===== 필터 적용 ===== */
   const filteredConcerts = [...concerts].sort((a, b) => {
     if (filter === "views") return (b.views ?? 0) - (a.views ?? 0);
     if (a.dDay !== b.dDay) return a.dDay - b.dDay;
@@ -71,10 +71,30 @@ export default function UpcomingConcertPage() {
     setIsMenuOpen(false);
   };
 
+  const handleConcertClick = async (concert: UIConcert) => {
+    try {
+      if (concert.detailId) {
+        navigate(`/concert/${concert.detailId}`);
+        return;
+      }
+
+      const concertInfo = await getConcertById(concert.id);
+      const fallbackDetailId = concertInfo.payload.schedules?.[0]?.detailId;
+
+      if (!fallbackDetailId) {
+        alert("해당 공연의 회차 정보가 아직 없습니다.");
+        return;
+      }
+
+      navigate(`/concert/${fallbackDetailId}`);
+    } catch {
+      alert("공연 상세 정보를 찾지 못했습니다.");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#0a0f1e] text-white flex justify-center relative">
       <div className="w-full max-w-[450px] px-4 pb-6">
-        {/* ===== 헤더 ===== */}
         <div className="flex items-center justify-between gap-3 py-4 relative">
           <div className="flex items-center gap-3">
             <button onClick={() => navigate(-1)} className="text-lg">
@@ -91,24 +111,22 @@ export default function UpcomingConcertPage() {
           </button>
         </div>
 
-        {/* ===== 공연 리스트 ===== */}
         <ul className="space-y-4">
           {filteredConcerts.map((concert) => (
             <li
               key={concert.id}
-              onClick={() => navigate(`/concert/${concert.id}`)}
+              onClick={() => {
+                void handleConcertClick(concert);
+              }}
               className="flex items-center gap-4 rounded-xl bg-[#0f1729] p-3 cursor-pointer hover:bg-[#16203a] transition"
             >
-              {/* 포스터 */}
               <img
                 src={concert.poster}
                 alt={concert.title}
                 className="h-[96px] w-[72px] rounded-lg object-cover shrink-0"
               />
 
-              {/* 텍스트 */}
               <div className="flex-1">
-                {/* D-Day */}
                 <p className="mb-1 text-xs font-semibold text-[#8B7CFF]">
                   {concert.dDay === 0 ? "Today" : `D-${concert.dDay}`}
                 </p>
@@ -136,7 +154,6 @@ export default function UpcomingConcertPage() {
         </ul>
       </div>
 
-      {/* ===== 필터 드롭다운 ===== */}
       {isMenuOpen && (
         <div className="absolute right-4 top-[64px] w-[180px] z-50">
           <div className="bg-[#1e293b] rounded-xl shadow-2xl overflow-hidden border border-white/10">
@@ -159,7 +176,7 @@ export default function UpcomingConcertPage() {
                   : "text-gray-400 hover:bg-[#0f1729]/50"
               }`}
             >
-              조회순
+              조회수 순
             </button>
           </div>
         </div>

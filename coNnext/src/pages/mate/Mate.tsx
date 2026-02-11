@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, ChevronRight, PlusCircle } from "lucide-react";
 import jinah from "../../assets/images/jinah.svg";
@@ -7,6 +7,9 @@ import star from "../../assets/Icons/star_on.svg";
 import setting from "../../assets/Icons/Settings.svg";
 import userplus from "../../assets/Icons/User Plus.svg";
 import kakao from "../../assets/Variables/kakao.svg";
+import { useDebounce } from "../../hooks/useDebounce";
+import { useMates } from "../../hooks/useMates";
+import MateSkeleton from "../../components/skeleton/MateSkeleton";
 
 interface Mate {
   id: string;
@@ -23,6 +26,41 @@ const Mate = () => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [nicknameInput, setNicknameInput] = useState("");
   const [selectedMates, setSelectedMates] = useState<string[]>([]);
+
+  // ✅ 검색어 debouncing (300ms)
+  const debouncedSearchQuery = useDebounce(searchQuery, 300);
+
+  // ✅ Infinite Scroll을 위한 React Query 훅
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+  } = useMates(debouncedSearchQuery);
+
+  // Infinite Scroll을 위한 Intersection Observer
+  const observerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      },
+      { threshold: 0.5 }
+    );
+
+    if (observerRef.current) {
+      observer.observe(observerRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
+
+  // ✅ API에서 받아온 데이터 (페이지별로 합치기)
+  const apiMates = data?.pages.flatMap((page) => page.mates) || [];
 
   const featuredMate: Mate = {
     id: "1",
@@ -298,47 +336,67 @@ const Mate = () => {
         {/* Section 4: 전체 메이트 */}
         <section className="">
           <h2 className="text-[18px] font-bold mb-4 px-4">전체 메이트</h2>
-          <div className="bg-[#252D3F] p-[8px] pt-[12px] m-[12px] rounded-[12px]">
-            <div className="grid grid-cols-4 gap-4">
-            {allMates.map((mate) => (
-              <div key={mate.id} className="flex flex-col items-center">
-                <button
-                  onClick={() => {
-                    if (!isEditMode) {
-                      navigate('/mate/detail', { state: { mate } });
-                    }
-                  }}
-                  className="flex flex-col items-center"
-                >
-                  <div className="w-[60px] h-[60px] bg-gray-700 rounded-full overflow-hidden mb-1">
-                    <img
-                      src={mate.imageUrl}
-                      alt={mate.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <span className="text-[12px] text-[#F2EFFF] mb-2">{mate.name}</span>
-                </button>
-                {isEditMode && (
-                  <button
-                    onClick={() => {
-                      setSelectedMates(prev => 
-                        prev.includes(mate.id)
-                          ? prev.filter(id => id !== mate.id)
-                          : [...prev, mate.id]
-                      );
-                    }}
-                    className="w-4 h-4 rounded-full border-1 border-white flex items-center justify-center"
-                  >
-                    {selectedMates.includes(mate.id) && (
-                      <div className="w-2 h-2 rounded-full bg-[#7F5AFF]" />
-                    )}
-                  </button>
-                )}
+          
+          {/* 로딩 상태 */}
+          {isLoading ? (
+            <MateSkeleton />
+          ) : (
+            <>
+              <div className="bg-[#252D3F] p-[8px] pt-[12px] m-[12px] rounded-[12px]">
+                <div className="grid grid-cols-4 gap-4">
+                  {/* ✅ API 데이터가 있으면 사용, 없으면 Mock 데이터 사용 */}
+                  {(apiMates.length > 0 ? apiMates : allMates).map((mate) => (
+                    <div key={mate.id} className="flex flex-col items-center">
+                      <button
+                        onClick={() => {
+                          if (!isEditMode) {
+                            navigate('/mate/detail', { state: { mate } });
+                          }
+                        }}
+                        className="flex flex-col items-center"
+                      >
+                        <div className="w-[60px] h-[60px] bg-gray-700 rounded-full overflow-hidden mb-1">
+                          <img
+                            src={mate.imageUrl}
+                            alt={mate.name}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <span className="text-[12px] text-[#F2EFFF] mb-2">{mate.name}</span>
+                      </button>
+                      {isEditMode && (
+                        <button
+                          onClick={() => {
+                            setSelectedMates(prev => 
+                              prev.includes(mate.id)
+                                ? prev.filter(id => id !== mate.id)
+                                : [...prev, mate.id]
+                            );
+                          }}
+                          className="w-4 h-4 rounded-full border-1 border-white flex items-center justify-center"
+                        >
+                          {selectedMates.includes(mate.id) && (
+                            <div className="w-2 h-2 rounded-full bg-[#7F5AFF]" />
+                          )}
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
-            ))}
-          </div>
-          </div>
+
+              {/* ✅ Infinite Scroll - 더 불러오기 트리거 */}
+              {hasNextPage && (
+                <div ref={observerRef} className="flex justify-center py-4">
+                  {isFetchingNextPage ? (
+                    <div className="text-gray-400 text-sm">더 불러오는 중...</div>
+                  ) : (
+                    <div className="h-4" /> 
+                  )}
+                </div>
+              )}
+            </>
+          )}
           
         </section>
 

@@ -4,9 +4,10 @@ import { useNavigate } from "react-router-dom";
 
 interface ConcertCardProps {
   concert: Concert;
+  showMateButtons?: boolean; // 메이트 찾기/지도 보기 버튼 표시 여부 (기본값: true)
 }
 
-const ConcertCard = ({ concert }: ConcertCardProps) => {
+const ConcertCard = ({ concert, showMateButtons = true }: ConcertCardProps) => {
   const navigate = useNavigate();
 
   return (
@@ -65,14 +66,16 @@ const ConcertCard = ({ concert }: ConcertCardProps) => {
         >
           정보 더보기
         </button>
-        <div className="flex gap-2">
-          <button className="flex-1 bg-[#7F5AFF] hover:bg-indigo-700 text-white p-[10px] rounded-[10px] font-medium text-[12px] transition">
-            메이트 찾기
-          </button>
-          <button className="flex-1 bg-[#7F5AFF] hover:bg-indigo-700 text-white p-[10px] rounded-[10px] font-medium text-[12px] transition">
-            지도 보기
-          </button>
-        </div>
+        {showMateButtons && (
+          <div className="flex gap-2">
+            <button className="flex-1 bg-[#7F5AFF] hover:bg-indigo-700 text-white p-[10px] rounded-[10px] font-medium text-[12px] transition">
+              메이트 찾기
+            </button>
+            <button className="flex-1 bg-[#7F5AFF] hover:bg-indigo-700 text-white p-[10px] rounded-[10px] font-medium text-[12px] transition">
+              지도 보기
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

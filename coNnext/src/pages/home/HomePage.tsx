@@ -2,10 +2,9 @@ import { useRef, useState } from "react";
 import SelectBar from "../../components/common/SelectBar";
 import type { Concert, Venue } from "../../types/tickets";
 import { useNavigate } from "react-router-dom";
-
 import Revel from "../../assets/dumy/Revel.svg";
 import BTS from "../../assets/dumy/BTS.svg";
-import Revel1 from "../../assets/dumy/Revel1.png";
+import Revel1 from "../../assets/dumy/Revel1.svg";
 
 /* ================= 더미 데이터 (가로 무한스크롤 테스트용) ================= */
 const concerts: Concert[] = [
