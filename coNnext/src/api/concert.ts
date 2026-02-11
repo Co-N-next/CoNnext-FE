@@ -1,5 +1,6 @@
 import { apiClient } from "../config/api";
 import type { Concert } from "../types/concert";
+import axios from "axios";
 
 // ✅ 1. 백엔드에서 내려주는 JSON 데이터의 모양을 정의합니다.
 // (보여주신 JSON 예시를 바탕으로 만들었습니다)
@@ -63,6 +64,39 @@ const transformConcertData = (item: ConcertResponse): Concert => {
   };
 };
 
+export interface ConcertSchedule {
+  detailId: number;
+  startAt: string;
+  round: number;
+  runningTime: number;
+}
+
+export interface RecentConcert {
+  id: number;
+  name: string;
+  posterImage: string;
+  ageRating: string;
+  noticeUrl: string;
+  price: string;
+  reservationLink: string;
+  schedules: ConcertSchedule[];
+}
+
+export interface PageInfo {
+  page: number;
+  size: number;
+  hasNext: boolean;
+  totalElements: number;
+  totalPages: number;
+}
+
+export interface ApiResponse<T> {
+  statusCode: number;
+  message: string;
+  pageInfo: PageInfo;
+  payload: T;
+}
+
 // --- API 함수들 ---
 
 // 1. 공연 검색
@@ -99,4 +133,11 @@ export const fetchConcertDetail = async (detailId: string) => {
             detailId: sch.detailId
         }))
     };
+};
+
+export const getRecentConcerts = async () => {
+  const res = await axios.get<ApiResponse<RecentConcert[]>>(
+    "/concerts/recent"
+  );
+  return res.data;
 };
