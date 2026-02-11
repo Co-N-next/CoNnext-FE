@@ -86,70 +86,76 @@ const AddTicket = ({ onBack }: AddTicketProps = {}) => {
         <div className="max-w-2xl mx-auto w-full flex-1 flex flex-col">
           <SelectBar activeTab={activeTab} onTabChange={setActiveTab} />
           
-          {/* 헤더 */}
-          <div className="flex items-center gap-2 px-4 py-4 mb-4">
-            <button onClick={handleBack} className="p-1">
-              <ChevronLeft size={24} className="text-white" />
-            </button>
-            <h1 className="text-lg font-bold">예매 내역 추가하기</h1>
-          </div>
-
           {/* 안내 멘트 */}
-          <div className="px-6 mb-10">
-            <p className="text-[17px] leading-relaxed text-gray-200">
+          <div className="px-6 mb-6 mt-6">
+            <p className="text-[13px] leading-relaxed text-gray-200">
               이 공연을 예매한 것으로 보여요.
-              <br />이 공연을 예매한 것이 맞다면{" "}
-              <span className="text-[#8e7aff] font-bold">맞아요</span>를
-              눌러주세요!
+              <br />
+              이 공연을 예매한 것이 맞다면{" "}
+              <span className="text-[#8e7aff] font-bold">맞아요</span>를 눌러주세요.
             </p>
           </div>
 
-          {/* 공연 카드 */}
-          <div className="px-6 flex gap-5">
-            <div className="w-[120px] h-[160px] rounded-[12px] shadow-lg flex-shrink-0 overflow-hidden bg-gray-800">
-              <img
-                src={selectedConcert.imageUrl}
-                alt={selectedConcert.title}
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <div className="flex flex-col py-1">
-              <h2 className="text-[18px] font-bold leading-tight mb-1">
+          {/* 공연 카드 - 중앙 정렬, 세로 배치 */}
+          <div className="px-6 mb-4">
+            <div className="bg-[#293A5D] rounded-[18px] px-[46px] py-[24px] flex flex-col items-center">
+              {/* 포스터 이미지 - 크게 중앙 배치 */}
+              <div className="w-[140px] h-[196px] rounded-[10px] shadow-xl overflow-hidden bg-gray-800 mb-4">
+                <img
+                  src={selectedConcert.imageUrl}
+                  alt={selectedConcert.title}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+
+              {/* 공연 제목 - 중앙 정렬 */}
+              <h2 className="text-[18px] font-bold text-white text-center leading-tight mb-2 px-6">
                 {selectedConcert.title}
               </h2>
-              <p className="text-[16px] font-medium text-white mb-4">
-                {selectedConcert.artist}
-              </p>
-              <div className="space-y-1 text-[14px]">
-                <div className="flex">
-                  <span className="w-10 text-gray-400 flex-shrink-0">일시</span>
-                  <div className="text-gray-200 block">
-                    {selectedConcert.date} {selectedConcert.time}
-                  </div>
+
+              {/* 아티스트 이름 + T 뱃지 */}
+              <div className="flex items-center gap-2 mb-4">
+                <p className="text-[16px] font-medium text-gray-200">
+                  {selectedConcert.artist}
+                </p>
+              </div>
+
+              {/* 공연 정보 */}
+              <div className="w-full space-y-2 text-[14px] px-4">
+                {/* 일시 - 파란색 테두리 박스 */}
+                <div className="flex items-start">
+                  <span className="w-12 text-gray-400 flex-shrink-0">일시</span>
+                  
+                    <p className="text-white leading-relaxed">
+                      {selectedConcert.date} {selectedConcert.time}
+                    </p>
+                
                 </div>
-                <div className="flex">
-                  <span className="w-10 text-gray-400 flex-shrink-0">장소</span>
-                  <span className="text-gray-200">{selectedConcert.venue}</span>
+
+                {/* 장소 */}
+                <div className="flex items-start">
+                  <span className="w-12 text-gray-400 flex-shrink-0">장소</span>
+                  <span className="flex-1 text-gray-200">{selectedConcert.venue}</span>
                 </div>
               </div>
             </div>
           </div>
 
           {/* 하단 버튼 영역 */}
-          <div className="mt-auto px-5 pb-8 pt-4 w-full flex gap-3">
+          <div className="px-5 pb-8 w-full flex gap-2">
+            <button
+              onClick={() => setSelectedConcert(null)}
+              className="flex-1 h-[44px] rounded-[12px] bg-[#414141] hover:bg-[#5A6678] text-white font-bold text-[13px]"
+            >
+              아니에요
+            </button>
             <button
               onClick={() =>
                 navigate("/add-detail", { state: { concert: selectedConcert } })
               }
-              className="flex-1 h-[40px] rounded-[12px] bg-[#7F5AFF] hover:bg-[#6B4DE6] text-white font-bold text-[13px]"
+              className="flex-1 h-[44px] rounded-[12px] bg-[#7F5AFF] hover:bg-[#6B4DE6] text-white font-bold text-[13px]"
             >
               맞아요
-            </button>
-            <button
-              onClick={() => setSelectedConcert(null)}
-              className="flex-1 h-[40px] rounded-[12px] bg-[#3C3E4F] hover:bg-[#343644] text-white font-medium text-[13px]"
-            >
-              아니에요
             </button>
           </div>
         </div>

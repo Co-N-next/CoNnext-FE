@@ -297,7 +297,7 @@ const AddDetail = () => {
               onChange={(e) =>
                 setSeatInfo({ ...seatInfo, floor: e.target.value })
               }
-              className="w-[50px] px-[8px] py-[13px] flex items-center justify-end gap-[10px] rounded-[8px] border-[0.5px] border-[#A1A1A1] bg-[#222222]/50 text-white text-right placeholder-[#E8E8E8] outline-none focus:border-[#7F5AFF] focus:ring-1 focus:ring-[#7F5AFF]"
+              className="w-[55px] px-[8px] py-[13px] flex items-center justify-end gap-[10px] rounded-[8px] border-[0.5px] border-[#A1A1A1] bg-[#1E293B] text-white text-right placeholder-[#E8E8E8] outline-none focus:border-[#7F5AFF] focus:ring-1 focus:ring-[#7F5AFF]"
             />
             {/* 구역 */}
             <input
@@ -307,7 +307,7 @@ const AddDetail = () => {
               onChange={(e) =>
                 setSeatInfo({ ...seatInfo, section: e.target.value })
               }
-              className="w-[73px] px-[8px] py-[13px] flex items-center justify-end gap-[10px] rounded-[8px] border-[0.5px] border-[#A1A1A1] bg-[#222222]/50 text-white text-right placeholder-[#E8E8E8] outline-none focus:border-[#7F5AFF] focus:ring-1 focus:ring-[#7F5AFF]"
+              className="w-[80px] px-[8px] py-[13px] flex items-center justify-end gap-[10px] rounded-[8px] border-[0.5px] border-[#A1A1A1] bg-[#1E293B] text-white text-right placeholder-[#E8E8E8] outline-none focus:border-[#7F5AFF] focus:ring-1 focus:ring-[#7F5AFF]"
             />
             {/* 열 */}
             <input
@@ -317,7 +317,7 @@ const AddDetail = () => {
               onChange={(e) =>
                 setSeatInfo({ ...seatInfo, row: e.target.value })
               }
-              className="w-[84px] px-[8px] py-[13px] flex items-center justify-end gap-[10px] rounded-[8px] border-[0.5px] border-[#A1A1A1] bg-[#222222]/50 text-white text-right placeholder-[#E8E8E8] outline-none focus:border-[#7F5AFF] focus:ring-1 focus:ring-[#7F5AFF]"
+              className="w-[90px] px-[8px] py-[13px] flex items-center justify-end gap-[10px] rounded-[8px] border-[0.5px] border-[#A1A1A1] bg-[#1E293B] text-white text-right placeholder-[#E8E8E8] outline-none focus:border-[#7F5AFF] focus:ring-1 focus:ring-[#7F5AFF]"
             />
             {/* 번 */}
             <input
@@ -327,7 +327,7 @@ const AddDetail = () => {
               onChange={(e) =>
                 setSeatInfo({ ...seatInfo, number: e.target.value })
               }
-              className="w-[114px] px-[8px] py-[13px] flex items-center justify-end gap-[10px] rounded-[8px] border-[0.5px] border-[#A1A1A1] bg-[#222222]/50 text-white text-right placeholder-[#E8E8E8] outline-none focus:border-[#7F5AFF] focus:ring-1 focus:ring-[#7F5AFF]"
+              className="w-full px-[8px] py-[13px] flex items-center justify-end gap-[10px] rounded-[8px] border-[0.5px] border-[#A1A1A1] bg-[#1E293B] text-white text-right placeholder-[#E8E8E8] outline-none focus:border-[#7F5AFF] focus:ring-1 focus:ring-[#7F5AFF]"
             />
           </div>
           

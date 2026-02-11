@@ -1,7 +1,7 @@
 import axios from "axios";
 
 // API 기본 URL 설정
-export const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
+export const API_BASE_URL = import.meta.env.VITE_API_URL || "https://api.con-next.xyz";
 
 // axios 인스턴스 생성
 export const apiClient = axios.create({

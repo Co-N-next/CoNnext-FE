@@ -166,23 +166,25 @@ const ReservationList = () => {
           </div>
         )}
 
-        {/* Fixed Footer */}
-        <div className="fixed bottom-0 left-0 right-0 px-5 py-6 bg-[#07132D] z-50">
-          <div className="max-w-2xl mx-auto flex gap-3">
-            <button
-              onClick={() => navigate("/")}
-              className="w-[28%] bg-white text-[#07132D] p-[14px] rounded-[12px] font-bold text-[16px] leading-[1.2] transition flex items-center justify-center"
-            >
-              닫기
-            </button>
-            <button
-              onClick={() => navigate("/add")}
-              className="flex-1 bg-[#7F5AFF] text-white p-[14px] rounded-[12px] font-bold text-[16px] leading-[1.2] transition flex items-center justify-center gap-1"
-            >
-              + 예매 내역 추가하기
-            </button>
+        {/* Fixed Footer - 데이터가 있을 때만 표시 */}
+        {!isEmpty && (
+          <div className="bottom-0 left-0 right-0 px-5 py-6 bg-[#07132D] z-50">
+            <div className="max-w-2xl mx-auto flex gap-3">
+              <button
+                onClick={() => navigate("/")}
+                className="w-[28%] bg-white text-[#07132D] p-[14px] rounded-[12px] font-bold text-[16px] leading-[1.2] transition flex items-center justify-center"
+              >
+                닫기
+              </button>
+              <button
+                onClick={() => navigate("/add")}
+                className="flex-1 bg-[#7F5AFF] text-white p-[14px] rounded-[12px] font-bold text-[16px] leading-[1.2] transition flex items-center justify-center gap-1"
+              >
+                + 예매 내역 추가하기
+              </button>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
