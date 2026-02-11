@@ -5,7 +5,7 @@ import jinah from "../../assets/images/jinah.svg";
 import mate from "../../assets/images/mate.svg";
 import star from "../../assets/Icons/star_on.svg";
 import setting from "../../assets/Icons/Settings.svg";
-import userplus from "../../assets/Icons/User Plus.svg";
+import userplus from "../../assets/Icons/UserPlus.svg";
 import kakao from "../../assets/Variables/kakao.svg";
 import { useDebounce } from "../../hooks/useDebounce";
 import { useMates } from "../../hooks/useMates";
@@ -178,7 +178,7 @@ const Mate = () => {
               {/* 제목 */}
               <div className="flex justify-between">
                 <p className="text-[16px] font-semibold">{featuredMate.name}</p>
-                <div 
+                <div
                   className="flex items-center gap-0.5 cursor-pointer hover:opacity-80 transition"
                   onClick={() => navigate("/mate/more")}
                 >
@@ -225,118 +225,118 @@ const Mate = () => {
 
           <div className="flex justify-end gap-2.5 mt-4 px-2">
 
-              <button 
-                className="text-gray-400 hover:text-white transition"
-                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              >
-                <img src={userplus} alt="" className="w-[24px] h-[24px]"/>
-              </button>
+            <button
+              className="text-gray-400 hover:text-white transition"
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+            >
+              <img src={userplus} alt="" className="w-[24px] h-[24px]" />
+            </button>
 
-              {/* Friend Request Popup */}
-              {isDropdownOpen && (
-                <div className="absolute left-1/2 -translate-x-1/2 w-[220px] bg-[#2E364A] rounded-[16px] shadow-xl overflow-hidden z-50 border border-[#364057]">
-                  <button className="w-full flex items-center justify-between px-[20px] py-[16px] hover:bg-[#364057] transition group">
-                    <span className="text-[15px] font-medium text-white group-hover:text-white/90">카카오톡으로 친구 신청</span>
-                    <div className="rounded-full p-1">
-                      <img src={kakao} alt="" className="w-[24px] h-[24px]"/>
-                    </div>
-                  </button>
-                  <div className="h-[1px] bg-[#3B455D] mx-[20px]"></div>
-                  <button 
-                    onClick={() => {
-                      setIsDropdownOpen(false);
-                      setIsNicknameModalOpen(true);
-                    }}
-                    className="w-full flex items-center justify-between px-[20px] py-[16px] hover:bg-[#364057] transition group"
-                  >
-                    <span className="text-[15px] font-medium text-white group-hover:text-white/90">닉네임으로 친구 신청</span>
-                    <PlusCircle className="w-6 h-6 text-white" />
-                  </button>
-                </div>
-              )}
-              <button 
-                onClick={() => setIsSettingsDropdownOpen(!isSettingsDropdownOpen)}
-                className="text-gray-400 hover:text-white transition"
-              >
-                <img src={setting} alt="" className="w-[24px] h-[24px]"/>
-              </button>
+            {/* Friend Request Popup */}
+            {isDropdownOpen && (
+              <div className="absolute left-1/2 -translate-x-1/2 w-[220px] bg-[#2E364A] rounded-[16px] shadow-xl overflow-hidden z-50 border border-[#364057]">
+                <button className="w-full flex items-center justify-between px-[20px] py-[16px] hover:bg-[#364057] transition group">
+                  <span className="text-[15px] font-medium text-white group-hover:text-white/90">카카오톡으로 친구 신청</span>
+                  <div className="rounded-full p-1">
+                    <img src={kakao} alt="" className="w-[24px] h-[24px]" />
+                  </div>
+                </button>
+                <div className="h-[1px] bg-[#3B455D] mx-[20px]"></div>
+                <button
+                  onClick={() => {
+                    setIsDropdownOpen(false);
+                    setIsNicknameModalOpen(true);
+                  }}
+                  className="w-full flex items-center justify-between px-[20px] py-[16px] hover:bg-[#364057] transition group"
+                >
+                  <span className="text-[15px] font-medium text-white group-hover:text-white/90">닉네임으로 친구 신청</span>
+                  <PlusCircle className="w-6 h-6 text-white" />
+                </button>
+              </div>
+            )}
+            <button
+              onClick={() => setIsSettingsDropdownOpen(!isSettingsDropdownOpen)}
+              className="text-gray-400 hover:text-white transition"
+            >
+              <img src={setting} alt="" className="w-[24px] h-[24px]" />
+            </button>
 
-              {/* Settings Dropdown */}
-              {isSettingsDropdownOpen && (
-                <div className="absolute left-1/2 -translate-x-1/2 w-[220px] bg-[#2E364A] rounded-[16px] shadow-xl overflow-hidden z-50 border border-[#364057]">
-                  <button 
-                    onClick={() => {
-                      setIsSettingsDropdownOpen(false);
-                      setIsEditMode(true);
-                    }}
-                    className="w-full flex items-center justify-between px-[20px] py-[16px] hover:bg-[#364057] transition group"
-                  >
-                    <span className="text-[15px] font-medium text-white group-hover:text-white/90">전체 메이트 편집하기</span>
-                   
-                  </button>
-                </div>
-              )}
+            {/* Settings Dropdown */}
+            {isSettingsDropdownOpen && (
+              <div className="absolute left-1/2 -translate-x-1/2 w-[220px] bg-[#2E364A] rounded-[16px] shadow-xl overflow-hidden z-50 border border-[#364057]">
+                <button
+                  onClick={() => {
+                    setIsSettingsDropdownOpen(false);
+                    setIsEditMode(true);
+                  }}
+                  className="w-full flex items-center justify-between px-[20px] py-[16px] hover:bg-[#364057] transition group"
+                >
+                  <span className="text-[15px] font-medium text-white group-hover:text-white/90">전체 메이트 편집하기</span>
 
-            
+                </button>
+              </div>
+            )}
+
+
           </div>
         </section>
 
         {/* Section 3: 자주 찾는 메이트 */}
         {!isEditMode && (
           <section className="px-3 mb-[24px]">
-          <div className="flex items-center gap-1 mb-4">
-           <img src={star} alt="" className="w-[20px] h-[20px]"/>
-            <h2 className="text-[18px] font-bold">자주 찾는 메이트</h2>
-          </div>
-          <div className="bg-[#252D3F] rounded-[12px] p-[12px] pt-[16px]">
-            <div className="grid grid-cols-4 gap-[32px]">
-            {frequentMates.map((mate) => (
-              <div key={mate.id} className="flex flex-col items-center">
-                <button
-                  onClick={() => {
-                    if (!isEditMode) {
-                      navigate('/mate/detail', { state: { mate } });
-                    }
-                  }}
-                  className="flex flex-col items-center"
-                >
-                  <div className="w-[60px] h-[60px] bg-gray-700 rounded-full overflow-hidden mb-1">
-                    <img
-                      src={mate.imageUrl}
-                      alt={mate.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <span className="text-[12px] text-[#F2EFFF] mb-2">{mate.name}</span>
-                </button>
-                {isEditMode && (
-                  <button
-                    onClick={() => {
-                      setSelectedMates(prev => 
-                        prev.includes(mate.id)
-                          ? prev.filter(id => id !== mate.id)
-                          : [...prev, mate.id]
-                      );
-                    }}
-                    className="w-5 h-5 rounded-full border-2 border-white flex items-center justify-center"
-                  >
-                    {selectedMates.includes(mate.id) && (
-                      <div className="w-2.5 h-2.5 rounded-full bg-[#7F5AFF]" />
+            <div className="flex items-center gap-1 mb-4">
+              <img src={star} alt="" className="w-[20px] h-[20px]" />
+              <h2 className="text-[18px] font-bold">자주 찾는 메이트</h2>
+            </div>
+            <div className="bg-[#252D3F] rounded-[12px] p-[12px] pt-[16px]">
+              <div className="grid grid-cols-4 gap-[32px]">
+                {frequentMates.map((mate) => (
+                  <div key={mate.id} className="flex flex-col items-center">
+                    <button
+                      onClick={() => {
+                        if (!isEditMode) {
+                          navigate('/mate/detail', { state: { mate } });
+                        }
+                      }}
+                      className="flex flex-col items-center"
+                    >
+                      <div className="w-[60px] h-[60px] bg-gray-700 rounded-full overflow-hidden mb-1">
+                        <img
+                          src={mate.imageUrl}
+                          alt={mate.name}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <span className="text-[12px] text-[#F2EFFF] mb-2">{mate.name}</span>
+                    </button>
+                    {isEditMode && (
+                      <button
+                        onClick={() => {
+                          setSelectedMates(prev =>
+                            prev.includes(mate.id)
+                              ? prev.filter(id => id !== mate.id)
+                              : [...prev, mate.id]
+                          );
+                        }}
+                        className="w-5 h-5 rounded-full border-2 border-white flex items-center justify-center"
+                      >
+                        {selectedMates.includes(mate.id) && (
+                          <div className="w-2.5 h-2.5 rounded-full bg-[#7F5AFF]" />
+                        )}
+                      </button>
                     )}
-                  </button>
-                )}
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-          </div>
-          
-        </section>
+            </div>
+
+          </section>
         )}
 
         {/* Section 4: 전체 메이트 */}
         <section className="">
           <h2 className="text-[18px] font-bold mb-4 px-4">전체 메이트</h2>
-          
+
           {/* 로딩 상태 */}
           {isLoading ? (
             <MateSkeleton />
@@ -367,7 +367,7 @@ const Mate = () => {
                       {isEditMode && (
                         <button
                           onClick={() => {
-                            setSelectedMates(prev => 
+                            setSelectedMates(prev =>
                               prev.includes(mate.id)
                                 ? prev.filter(id => id !== mate.id)
                                 : [...prev, mate.id]
@@ -391,13 +391,13 @@ const Mate = () => {
                   {isFetchingNextPage ? (
                     <div className="text-gray-400 text-sm">더 불러오는 중...</div>
                   ) : (
-                    <div className="h-4" /> 
+                    <div className="h-4" />
                   )}
                 </div>
               )}
             </>
           )}
-          
+
         </section>
 
         {/* 설정 모드일 때 하단 버튼 */}
@@ -430,14 +430,14 @@ const Mate = () => {
       {isNicknameModalOpen && (
         <>
           {/* 오버레이 */}
-          <div 
+          <div
             className="fixed inset-0 bg-black/60 z-40"
             onClick={() => {
               setIsNicknameModalOpen(false);
               setNicknameInput("");
             }}
           />
-          
+
           {/* 모달 컨텐츠 */}
           <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[70%] max-w-[400px] bg-[#1E293B] rounded-[12px] z-50 overflow-hidden">
             {/* 헤더 */}
