@@ -1,6 +1,5 @@
 import { apiClient } from "../config/api";
 import type { Concert } from "../types/concert";
-import axios from "axios";
 
 // ✅ 1. 공연 기본 조회 응답 타입
 interface ConcertResponse {
@@ -65,40 +64,6 @@ const transformConcertData = (item: ConcertResponse): Concert => {
   };
 };
 
-<<<<<<< HEAD
-export interface ConcertSchedule {
-  detailId: number;
-  startAt: string;
-  round: number;
-  runningTime: number;
-}
-
-export interface RecentConcert {
-  id: number;
-  name: string;
-  posterImage: string;
-  ageRating: string;
-  noticeUrl: string;
-  price: string;
-  reservationLink: string;
-  schedules: ConcertSchedule[];
-}
-
-export interface PageInfo {
-  page: number;
-  size: number;
-  hasNext: boolean;
-  totalElements: number;
-  totalPages: number;
-}
-
-export interface ApiResponse<T> {
-  statusCode: number;
-  message: string;
-  pageInfo: PageInfo;
-  payload: T;
-}
-=======
 // 공연 상세 회차 데이터 변환
 // const transformConcertDetailData = (item: ConcertDetailResponse): Concert => {
 //   const { date, time } = parseDateTime(item.startAt || "");
@@ -115,7 +80,6 @@ export interface ApiResponse<T> {
 //     seat: ""
 //   };
 // };
->>>>>>> last-sang/backup
 
 // --- API 함수들 ---
 
@@ -145,24 +109,6 @@ export const fetchConcertInfo = async (concertId: string) => {
 // 3. 공연 상세 회차(스케줄) 조회
 // GET /concerts/details/{detailId}
 export const fetchConcertDetail = async (detailId: string) => {
-<<<<<<< HEAD
-    const response = await apiClient.get<{ payload: ConcertResponse }>(`/concerts/details/${detailId}`);
-    
-    // 백엔드 데이터를 우리가 쓰기 편한 형태로 가공
-    return {
-        schedules: (response.data.payload.schedules || []).map((sch: ConcertResponse['schedules'][number]) => ({
-            ...parseDateTime(sch.startAt),
-            detailId: sch.detailId
-        }))
-    };
-};
-
-export const getRecentConcerts = async () => {
-  const res = await axios.get<ApiResponse<RecentConcert[]>>(
-    "/concerts/recent"
-  );
-  return res.data;
-=======
   const response = await apiClient.get<{ payload: ConcertDetailResponse }>(`/concerts/details/${detailId}`);
   
   const data = response.data.payload;
@@ -182,5 +128,4 @@ export const getRecentConcerts = async () => {
     time,
     startAt: data.startAt
   };
->>>>>>> last-sang/backup
 };
