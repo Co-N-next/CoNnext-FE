@@ -1,18 +1,18 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
-import HomeIcon from '../../assets/Icons/footer/Home.svg';
-import ReserveIcon from '../../assets/Icons/footer/ReserveList.svg';
-import FindHallIcon from '../../assets/Icons/footer/FindHall.svg';
-import MateIcon from '../../assets/Icons/footer/Mate.svg';
-import MyPageIcon from '../../assets/Icons/footer/MyPage.svg';
+import HomeIcon from '../../assets/footer/Home.svg';
+import ReserveIcon from '../../assets/footer/ReserveList.svg';
+import FindHallIcon from '../../assets/footer/FindHall.svg';
+import MateIcon from '../../assets/footer/Mate.svg';
+import MyPageIcon from '../../assets/footer/MyPage.svg';
 
 const Footer: React.FC = () => {
   const navigate = useNavigate(); 
   const location = useLocation();
 
    const navItems = [
-   { id: 1, label: '홈', path: '/', icon: HomeIcon },
+   { id: 1, label: '홈', path: '/home', icon: HomeIcon },
     { id: 2, label: '예매 내역', path: '/reserve', icon: ReserveIcon },
     { id: 3, label: '공연장', path: '/findhall', icon: FindHallIcon },
     { id: 4, label: '메이트', path: '/mate', icon: MateIcon },
