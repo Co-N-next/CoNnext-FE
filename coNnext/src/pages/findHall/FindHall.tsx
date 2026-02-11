@@ -54,13 +54,13 @@ const FindHall = () => {
     });
 
   // // ⭐ NEW: 즐겨찾기 공연장 쿼리
-  // const { data: favoriteData, isPending: isFavoritePending } =
-  //   useFavoriteVenues();
+  const { data: favoriteData, isPending: isFavoritePending } =
+    useFavoriteVenues();
 
   const venues: Venue[] = trendingData?.payload ?? [];
 
   // // ⭐ NEW: 즐겨찾기용 데이터
-  // const favoriteVenues: Venue[] = favoriteData?.payload ?? [];
+  const favoriteVenues: Venue[] = favoriteData?.payload ?? [];
 
   /* =========================
    * render
@@ -133,39 +133,35 @@ const FindHall = () => {
          * Search
          * ========================= */}
         <Search readOnly onClick={() => navigate("/search")} />
-        {/*
-=========================
- Favorite Venues
-=========================
-<section>
-  <h2 className="mb-1 text-[15px] font-semibold">즐겨찾기</h2>
+        {/* ========================= Favorite Venues =========================// */}
+        <section>
+          <h2 className="mb-1 text-[15px] font-semibold">즐겨찾기</h2>
 
-  <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hover">
-    {isFavoritePending && (
-      <div className="text-sm text-gray-400">불러오는 중…</div>
-    )}
+          <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hover">
+            {isFavoritePending && (
+              <div className="text-sm text-gray-400">불러오는 중…</div>
+            )}
 
-    {favoriteVenues.map((item) => (
-      <div key={item.id} className="min-w-[110px]">
-        <VenueCard
-          id={item.id}
-          name={item.name}
-          city={item.city}
-          imageUrl={item.imageUrl}
-          isToday={true}
-          isNew={false}
-        />
-      </div>
-    ))}
+            {favoriteVenues.map((item) => (
+              <div key={item.id} className="min-w-[110px]">
+                <VenueCard
+                  id={item.id}
+                  name={item.name}
+                  city={item.city}
+                  imageUrl={item.imageUrl}
+                  isToday={true}
+                  isNew={false}
+                />
+              </div>
+            ))}
 
-    {!isFavoritePending && favoriteVenues.length === 0 && (
-      <div className="text-sm text-gray-500">
-        즐겨찾기한 공연장이 없어요
-      </div>
-    )}
-  </div>
-</section>
-*/}
+            {!isFavoritePending && favoriteVenues.length === 0 && (
+              <div className="text-sm text-gray-500">
+                즐겨찾기한 공연장이 없어요
+              </div>
+            )}
+          </div>
+        </section>
         {/* =========================
          * Popular Venues
          * ========================= */}

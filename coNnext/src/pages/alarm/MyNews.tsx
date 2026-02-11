@@ -2,28 +2,8 @@ import { Share2 } from "lucide-react";
 import { useState } from "react";
 import MyNewsCard from "../../components/MyNewsCard";
 
-// ✅ 추가
 import { useMyNotifications } from "../../hooks/queries/notifications/useMyNotificationsnews";
 import type { Notification } from "../../types/notifications";
-
-/* ================= 더미 데이터 (유지) ================= */
-export const mockTodayConcert = {
-  id: 1,
-  type: "CONCERT" as const,
-  concertTitle: "불빨간사춘기 첫 팬미팅 [Wild and Free]",
-  concertDate: new Date().toISOString().slice(0, 10),
-  place: "KSPO DOME",
-  seatnumber: {
-    floor: 1,
-    section: "A",
-    row: 3,
-    seat: 2,
-  },
-  concertTime: "18:31",
-  imageUrl:
-    "https://ticketimage.interpark.com/Play/image/large/25/25015843_p.gif",
-  mapLink: "https://map.naver.com",
-};
 
 /* ================= 유틸 ================= */
 const isToday = (date: string) => {
@@ -69,18 +49,25 @@ function getTimeInfo(createdAt: string) {
 
 /* ================= 컴포넌트 ================= */
 export default function MyNews() {
-  // ✅ 추가
   const { data, isLoading } = useMyNotifications(0);
 
-  // ✅ 변경: 더미 newsList → API 기반
+  /* ================= 오늘의 공연 추출 ================= */
+  const todayConcertNotification = data?.payload.news.find(
+    (n: Notification) => n.action_type === "NONE" && isToday(n.createdAt), // 오늘 생성된 NONE 알림만
+  );
+
+  /* ================= 기존 news 로직 ================= */
   const newsList =
-    data?.payload.news.map((n: Notification) => ({
-      id: n.id,
-      profileImg: n.sender_profile_img,
-      name: n.title,
-      type: n.category === "MATE" ? ("FRIEND" as const) : ("LOCATION" as const),
-      createdAt: n.createdAt,
-    })) ?? [];
+    data?.payload.news
+      .filter((n: Notification) => n.action_type !== "NONE") // 공연 알림 제외
+      .map((n: Notification) => ({
+        id: n.id,
+        profileImg: n.sender_profile_img,
+        name: n.title,
+        type:
+          n.category === "MATE" ? ("FRIEND" as const) : ("LOCATION" as const),
+        createdAt: n.createdAt,
+      })) ?? [];
 
   const parsedNews = newsList
     .map((news) => {
@@ -111,24 +98,18 @@ export default function MyNews() {
     return false;
   };
 
-  // ✅ 추가
   if (isLoading) {
     return <div className="mx-4 mt-4 text-gray-400">불러오는 중...</div>;
   }
 
-  if (!isToday(mockTodayConcert.concertDate)) {
-    return (
-      <div className="mx-4 mt-4 text-gray-400">오늘 예정된 공연이 없어요</div>
-    );
-  }
-
   const handleShare = async () => {
-    const shareUrl = `${window.location.origin}/concert/${mockTodayConcert.id}`;
+    if (!todayConcertNotification) return;
+    const shareUrl = `${window.location.origin}/concert/${todayConcertNotification.id}`;
 
     if (navigator.share) {
       await navigator.share({
-        title: "오늘의 공연 공유하기",
-        text: "오늘 이 공연 같이 가요!",
+        title: todayConcertNotification.title,
+        text: todayConcertNotification.content,
         url: shareUrl,
       });
     } else {
@@ -140,46 +121,38 @@ export default function MyNews() {
   return (
     <>
       {/* ================= 오늘의 공연 ================= */}
-      <div className="w-full">
-        <section className="relative mx-4 mt-4 aspect-[16/9] overflow-hidden rounded-2xl">
-          <img
-            src={mockTodayConcert.imageUrl}
-            alt={mockTodayConcert.concertTitle}
-            className="absolute inset-0 h-full w-full object-cover opacity-80"
-          />
-          <div className="absolute inset-0 bg-black/50" />
+      {todayConcertNotification ? (
+        <div className="w-full">
+          <section className="relative mx-4 mt-4 aspect-[16/9] overflow-hidden rounded-2xl">
+            <img
+              src={todayConcertNotification.img}
+              alt={todayConcertNotification.title}
+              className="absolute inset-0 h-full w-full object-cover opacity-80"
+            />
+            <div className="absolute inset-0 bg-black/50" />
 
-          <button
-            onClick={handleShare}
-            className="absolute top-4 right-4 z-20 flex h-9 w-9 items-center justify-center rounded-full border border-white/30 hover:bg-gray-500"
-          >
-            <Share2 size={18} className="text-white" />
-          </button>
+            <button
+              onClick={handleShare}
+              className="absolute top-4 right-4 z-20 flex h-9 w-9 items-center justify-center rounded-full border border-white/30 hover:bg-gray-500"
+            >
+              <Share2 size={18} className="text-white" />
+            </button>
 
-          <h2 className="absolute top-4 left-4 z-20 translate-x-2 translate-y-2 font-ydestreetB text-[20px] leading-[1.2] text-white">
-            오늘의 공연이에요!
-          </h2>
-
-          <div className="absolute bottom-4 left-4 right-4 text-gray-200 text-sm">
-            <h2 className="text-base font-bold">
-              {mockTodayConcert.concertTitle}
+            <h2 className="absolute top-4 left-4 z-20 translate-x-2 translate-y-2 font-ydestreetB text-[20px] leading-[1.2] text-white">
+              오늘의 공연이에요!
             </h2>
-            <p className="mt-1">
-              오늘 {formatConcertTime(mockTodayConcert.concertTime)}에 공연이
-              예매 되어 있어요!
-              <br />
-              {mockTodayConcert.place}으로 떠나요!
-            </p>
-          </div>
-        </section>
 
-        <button
-          onClick={() => window.open(mockTodayConcert.mapLink)}
-          className="mx-4 mt-3 w-[calc(100%-2rem)] rounded-xl bg-[#7f5aff] py-2 text-sm font-semibold text-white"
-        >
-          지도 바로가기
-        </button>
-      </div>
+            <div className="absolute bottom-4 left-4 right-4 text-gray-200 text-sm">
+              <h2 className="text-base font-bold">
+                {todayConcertNotification.title}
+              </h2>
+              <p className="mt-1">{todayConcertNotification.content}</p>
+            </div>
+          </section>
+        </div>
+      ) : (
+        <div className="mx-4 mt-4 text-gray-400">오늘 예정된 공연이 없어요</div>
+      )}
 
       {/* ================= 오늘 ================= */}
       <section className="w-full mt-6">
@@ -223,7 +196,7 @@ export default function MyNews() {
         </div>
       </section>
 
-      {/* ================= 전체 더보기 / 닫기 ================= */}
+      {/* ================= 더보기 ================= */}
       {allCount > INITIAL_COUNT && (
         <button
           className={`mt-6 flex w-full items-center justify-center gap-2 text-sm text-gray-400 ${

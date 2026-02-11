@@ -19,13 +19,13 @@ export const getTrendingVenues = async (): Promise<VenueListResponse> => {
 
 //공연장검색(venue/search)
 export const searchVenues = async (
-  keyword: string,
+  query: string,
   page: number = 0,
 ): Promise<SearchVenuesResponse> => {
   const { data } = await axiosInstance.get<SearchVenuesResponse>(
     "/venues/search",
     {
-      params: { keyword, page },
+      params: { query, page },
     },
   );
   return data;

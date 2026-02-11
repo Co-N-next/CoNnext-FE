@@ -11,8 +11,8 @@ import type {
 } from "../types/venue";
 
 type NearbyBannerProps = {
-  venue: NearestVenuePayload;
-  radiusMeter: NonNullable<GetNearestVenueRequest["radius"]>;
+  venue?: NearestVenuePayload;
+  radiusMeter?: NonNullable<GetNearestVenueRequest["radius"]>;
 };
 
 export function NearbyBanner({ venue, radiusMeter }: NearbyBannerProps) {
@@ -24,7 +24,7 @@ export function NearbyBanner({ venue, radiusMeter }: NearbyBannerProps) {
 
       <p className="mt-1 text-[16px] font-semibold leading-[1.2]">
         {radiusMeter}m 반경 내&nbsp;
-        <span className="text-[#FFA0EA]">{venue.name}</span>
+        <span className="text-[#FFA0EA]">{venue?.name}</span>
         &nbsp;근처에 계신가요?
       </p>
 

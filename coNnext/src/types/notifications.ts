@@ -36,4 +36,28 @@ export interface NotificationListResponse {
   };
 }
 
-//notifications/news: 내소식 전체 조회 응답값(반응값 없음)
+//notifications/news/share-location
+// 위치 공유 수락 요청
+export interface AcceptLocationRequest {
+  user_id: number;
+  sender_id: number;
+}
+
+// 위치 공유 수락 응답
+export interface AcceptLocationResponse {
+  statusCode: number;
+  message: string;
+}
+
+//notifications/news/share-mate
+// types/mate.ts
+//친구 수락 요청
+export interface AcceptMateRequest {
+  user_id: number; // 현재 로그인한 사용자 (수락하는 사람)
+  sender_id: number; // 요청을 보낸 사람
+}
+//친구 수락 응답
+export interface AcceptMateResponse {
+  statusCode: number;
+  message: string;
+}
