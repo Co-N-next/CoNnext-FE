@@ -1,6 +1,6 @@
 // src/components/layout/Layout.tsx
-import React, { useState } from "react";
-import { Outlet } from "react-router-dom";
+import React, { useEffect, useRef, useState } from "react";
+import { Outlet, useLocation } from "react-router-dom";
 import Header from "./Header";
 import Footer from "./Footer";
 
@@ -11,14 +11,21 @@ import { useShake } from "../../hooks/useShake";
 const Layout: React.FC = () => {
   const ticketData = useUpcomingConcert();
   const [isTicketOpen, setIsTicketOpen] = useState(false);
+  const location = useLocation();
+  const mainRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    mainRef.current?.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, [location.pathname]);
 
   useShake(() => {
     if (ticketData) setIsTicketOpen(true);
   });
 
   return (
-    <div className="min-h-screen flex justify-center">
-      <div className="w-full max-w-[450px] min-h-screen flex flex-col relative">
+    <div className="min-h-screen flex justify-center bg-[#0a0f1e]">
+      <div className="w-full max-w-[450px] min-h-screen flex flex-col relative bg-[#0a0f1e]">
         {/* Header 클릭 시 modal 열림 */}
         <Header
           onTicketClick={() => {
@@ -26,7 +33,10 @@ const Layout: React.FC = () => {
           }}
         />
 
-        <main className="flex-1 w-full overflow-y-auto pt-20 pb-[66px]">
+        <main
+          ref={mainRef}
+          className="flex-1 w-full overflow-y-auto bg-[#0a0f1e] pt-20 pb-[66px]"
+        >
           <Outlet />
         </main>
 
