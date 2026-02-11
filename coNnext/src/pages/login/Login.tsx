@@ -296,8 +296,8 @@ const LoginScreen: React.FC = () => {
           src={kakaoSymbol} 
           alt="Kakao" 
           style={{ 
-            width: '24px', 
-            height: '24px'
+            width: '30px', 
+            height: '30px'
           }} 
         />
       </button>
@@ -315,8 +315,8 @@ const LoginScreen: React.FC = () => {
           src={naverSymbol} 
           alt="Naver" 
           style={{ 
-            width: '24px', 
-            height: '24px'
+            width: '20px', 
+            height: '20px'
           }} 
         />
       </button>
@@ -347,7 +347,7 @@ const LoginScreen: React.FC = () => {
               
 {/* 회원가입 버튼 - 수정됨 */}
       <div 
-      className="flex justify-center" 
+      className="flex justify-center mt-2" 
       style={{ 
         position: 'absolute',
         top: '774px',

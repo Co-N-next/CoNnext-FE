@@ -7,6 +7,7 @@ import ConcertCard from "../../components/ConcertCard";
 import SelectBar from "../../components/SelectBar";
 import TodayConcert from "../../components/TodayConcert";
 import EmptyTicketState from "./components/EmptyTicketState";
+import ReservationSkeleton from "../../components/skeleton/ReserveSkeleton";
 import { fetchMyReservations, deleteReservation } from "../../api/reservation"; // ✅ API 함수 임포트
 
 const ReservationList = () => {
@@ -104,9 +105,7 @@ const ReservationList = () => {
 
         {/* 로딩 중일 때 */}
         {isLoading ? (
-          <div className="flex h-[50vh] items-center justify-center text-gray-400">
-            예매 내역을 불러오는 중...
-          </div>
+          <ReservationSkeleton />
         ) : isEmpty ? (
           // 데이터가 없을 때
           <EmptyTicketState />

@@ -89,8 +89,8 @@ export const fetchConcertInfo = async (concertId: string) => {
 };
 
 // 3. 공연 상세 회차(스케줄) 조회
-export const fetchConcertDetail = async (concertId: string) => {
-    const response = await apiClient.get<{ payload: ConcertResponse }>(`/concerts/${concertId}`);
+export const fetchConcertDetail = async (detailId: string) => {
+    const response = await apiClient.get<{ payload: ConcertResponse }>(`/concerts/details/${detailId}`);
     
     // 백엔드 데이터를 우리가 쓰기 편한 형태로 가공
     return {

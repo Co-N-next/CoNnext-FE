@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import Connext from '../../assets/Icons/Con-next.svg';
 import Ticket from '../../assets/Icons/TicketLogo.svg';
-import Bell from '../../assets/Icons/Bell.svg';
+import Bell from '../../assets/Icons/BellLogo.svg';
 
 type HeaderProps = {
   onTicketClick?: () => void;

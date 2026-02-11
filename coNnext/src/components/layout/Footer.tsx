@@ -1,11 +1,11 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
-import HomeIcon from '../../assets/logo/footer/Home.svg';
-import ReserveIcon from '../../assets/logo/footer/ReserveList.svg';
-import FindHallIcon from '../../assets/logo/footer/FindHall.svg';
-import MateIcon from '../../assets/logo/footer/Mate.svg';
-import MyPageIcon from '../../assets/logo/footer/MyPage.svg';
+import HomeIcon from '../../assets/footer/Home.svg';
+import ReserveIcon from '../../assets/footer/ReserveList.svg';
+import FindHallIcon from '../../assets/footer/FindHall.svg';
+import MateIcon from '../../assets/footer/Mate.svg';
+import MyPageIcon from '../../assets/footer/MyPage.svg';
 
 const Footer: React.FC = () => {
   const navigate = useNavigate(); 

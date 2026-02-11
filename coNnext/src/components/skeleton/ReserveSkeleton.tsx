@@ -1,35 +1,55 @@
-import React from 'react';
-
 const ReservationSkeleton = () => {
-  // 스켈레톤 아이템을 몇 개 보여줄지 결정 (기본 4개)
-  const skeletonItems = new Array(4).fill(0);
-
   return (
-    <div className="flex flex-col gap-4 w-full px-[20px]">
-      {skeletonItems.map((_, index) => (
-        <div
-          key={index}
-          className="flex w-full items-center gap-4 p-4 bg-[#2E364A] rounded-[16px] border border-[#364057] animate-pulse"
-        >
-          {/* 포스터 이미지 영역 (왼쪽) */}
-          <div className="w-[80px] h-[100px] bg-gray-600/50 rounded-[10px] flex-shrink-0" />
-
-          {/* 텍스트 정보 영역 (오른쪽) */}
-          <div className="flex flex-col flex-1 gap-2">
-            {/* 상태 뱃지 (예: 예매완료) */}
-            <div className="h-5 w-16 bg-gray-600/50 rounded-full mb-1" />
-            
-            {/* 공연 제목 (긴 막대) */}
-            <div className="h-6 w-3/4 bg-gray-600/50 rounded-md" />
-            
-            {/* 날짜/시간 (중간 막대) */}
-            <div className="h-4 w-1/2 bg-gray-600/50 rounded-md mt-1" />
-            
-            {/* 장소 (짧은 막대) */}
-            <div className="h-4 w-1/3 bg-gray-600/50 rounded-md" />
+    <div className="animate-pulse px-4 pb-24">
+      
+      {/* 1. 오늘의 공연 섹션 (큰 카드 스타일) */}
+      <section className="pt-5 space-y-4 mb-8">
+        {/* 섹션 제목 (Skeleton) */}
+        <div className="h-6 w-24 bg-white/10 rounded-md ml-2" />
+        
+        {/* TodayConcert 카드 모양 */}
+        <div className="relative w-full aspect-[320/420] rounded-[24px] bg-[#1E293B] overflow-hidden border border-white/5">
+          {/* 이미지 영역 흉내 */}
+          <div className="absolute inset-0 bg-white/5" />
+          
+          {/* 텍스트 영역 흉내 (하단) */}
+          <div className="absolute bottom-0 left-0 right-0 p-6 space-y-3 bg-gradient-to-t from-black/80 to-transparent">
+            <div className="h-7 w-3/4 bg-white/20 rounded-md" />
+            <div className="h-4 w-1/2 bg-white/10 rounded-md" />
           </div>
         </div>
-      ))}
+      </section>
+
+      {/* 2. 다가오는 공연 섹션 (가로형 리스트 스타일) */}
+      <section className="space-y-4">
+        {/* 섹션 제목 */}
+        <div className="h-5 w-28 bg-white/10 rounded-md ml-2" />
+
+        {/* 리스트 아이템 (3개 반복) */}
+        {[1, 2, 3].map((index) => (
+          <div 
+            key={index} 
+            className="flex p-3 gap-4 bg-[#1E293B] rounded-[16px] h-[120px] border border-white/5"
+          >
+            {/* 포스터 이미지 */}
+            <div className="w-[80px] h-[100px] bg-white/10 rounded-[12px] flex-shrink-0" />
+
+            {/* 텍스트 정보 */}
+            <div className="flex-1 flex flex-col justify-center space-y-2.5">
+              {/* 제목 */}
+              <div className="h-5 w-4/5 bg-white/10 rounded-md" />
+              {/* 아티스트 */}
+              <div className="h-4 w-1/2 bg-white/5 rounded-md" />
+              
+              <div className="flex gap-2 mt-1">
+                {/* 날짜/장소 */}
+                <div className="h-3 w-16 bg-white/5 rounded-md" />
+                <div className="h-3 w-16 bg-white/5 rounded-md" />
+              </div>
+            </div>
+          </div>
+        ))}
+      </section>
     </div>
   );
 };

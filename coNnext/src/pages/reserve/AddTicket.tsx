@@ -4,6 +4,7 @@ import axios from "axios";
 import SelectBar from "../../components/SelectBar";
 import { Search, ChevronLeft, Check } from "lucide-react";
 import type { Concert } from "../../types/concert";
+import SearchSkeleton from "../../components/skeleton/SearchSkeleton";
 import { searchConcerts } from "../../api/concert"; // API 함수 임포트
 
 interface AddTicketProps {
@@ -219,9 +220,7 @@ const AddTicket = ({ onBack }: AddTicketProps = {}) => {
           <div className="space-y-0 pb-10">
             {/* 1. 로딩 중일 때 */}
             {isLoading && (
-              <div className="py-20 text-center text-gray-400">
-                검색 중입니다...
-              </div>
+              <SearchSkeleton />
             )}
 
             {/* 2. 검색 결과가 없을 때 (로딩 끝남 + 검색함 + 결과 0개) */}
