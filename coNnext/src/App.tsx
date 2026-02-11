@@ -7,6 +7,7 @@ import Login from "./pages/login/Login";
 import SignUp from "./pages/login/SignUp";
 import Home from "./pages/home/HomePage";
 import ConcertDetail from "./pages/home/ConcertDetail";
+import ConcertList from "./pages/home/ConcertList";
 // import MyNews from "./pages/alarm/MyNews";
 // import Notices from "./pages/alarm/Notices";
 // import FindHall from "./pages/findHall/FindHall";
@@ -33,7 +34,8 @@ function App() {
             <Route path="login" element={<Login />} />
             <Route path="signUp" element={<SignUp />} />
             <Route path="/" element={<Home />} />
-             <Route path="/concert" element={<ConcertDetail />} />
+             <Route path="/concert" element={<ConcertList />} />
+             <Route path="/concert/:id" element={<ConcertDetail />} />  
             {/* <Route path="/mynews" element={<MyNews />} />
             <Route path="/notices" element={<Notices />} />
             <Route path="/find" element={<FindHall />} />
