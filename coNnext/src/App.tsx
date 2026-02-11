@@ -14,6 +14,7 @@ import ConcertDetail from "./pages/home/ConcertDetail";
 // import HallMap from "./pages/hallMap/HallMap";
 import Mate from "./pages/mate/Mate";
 import MateMap from "./pages/mate/MateMap";
+import MateDetail from "./pages/mate/MateDetail";
 import MyPage from "./pages/myPage/MyPage";
 import AddTicket from "./pages/reserve/AddTicket";
 import ReserveList from "./pages/reserve/ReserveList";
@@ -42,6 +43,7 @@ function App() {
             <Route path="/mypage" element={<MyPage />} />
             <Route path="/mate" element={<Mate />} />
             <Route path="/mate/more" element={<MateMore />} />
+            <Route path="/mate/detail" element={<MateDetail />} />
             <Route path="/add" element={<AddTicket />} />
             <Route path="/reserve" element={<ReserveList />} />
             <Route path="/more-info" element={<MoreInform />} />
