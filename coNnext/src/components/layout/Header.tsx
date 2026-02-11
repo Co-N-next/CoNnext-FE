@@ -18,7 +18,8 @@ const Header: React.FC<HeaderProps> = ({ onTicketClick }) => {
       <div className="flex items-center justify-between w-full">
         {/* 로고 */}
         <div className="flex items-center">
-          <button className="hover:opacity-80 transition-opacity w-12 h-12 shrink-0">
+          <button className="hover:opacity-80 transition-opacity w-12 h-12 shrink-0"
+          onClick={() => navigate('/home')}>
             <img src={Connext} alt="Connext Logo" className="h-6" />
           </button>
         </div>
