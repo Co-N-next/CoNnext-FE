@@ -19,15 +19,13 @@ export interface ConcertByIdPayload {
   schedules: ConcertSchedule[];
 }
 
-export interface RecentConcert {
-  id: number;
-  name: string;
+export interface UpcomingConcert {
+  concertId: number;
+  detailId: number;
+  concertName: string;
   posterImage: string;
-  ageRating: string;
-  noticeUrl: string;
-  price: string;
-  reservationLink: string;
-  schedules: ConcertSchedule[];
+  startAt: string;
+  dday: string;
 }
 
 export interface PageInfo {
@@ -61,9 +59,10 @@ export interface ConcertDetailPayload {
 /* ===== API ===== */
 
 /** 최신 공연 10개 조회 */
-export const getRecentConcerts = async () => {
-  const res = await api.get<ApiResponse<RecentConcert[]>>(
-    "/concerts/recent"
+export const getUpcomingConcerts = async (page: number = 0, size: number = 20) => {
+  const res = await api.get<ApiResponse<UpcomingConcert[]>>(
+    "/concerts/upcoming",
+    { params: { page, size } }
   );
   return res.data;
 };
