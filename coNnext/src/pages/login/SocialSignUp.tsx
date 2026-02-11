@@ -3,8 +3,6 @@ import { useNavigate } from 'react-router-dom';
 
 import BackButton from '../../assets/logo/BackButton.svg';
 import EmailDelete from '../../assets/logo/EmailDelete.svg';
-import EyeOn from '../../assets/logo/EyeOn.svg';
-import EyeOff from '../../assets/logo/EyeOff.svg';
 import CheckboxOn from '../../assets/logo/CheckboxOn.svg';
 import CheckboxOff from '../../assets/logo/CheckboxOff.svg';
 
@@ -12,16 +10,9 @@ const SignUpScreen: React.FC = () => {
   const navigate = useNavigate();
 
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [passwordConfirm, setPasswordConfirm] = useState('');
-  
-  const [showPassword, setShowPassword] = useState(false);
-  const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
-  
+
   const [isEmailDuplicate, setIsEmailDuplicate] = useState(false); // 이메일 중복 여부
   
-  const isPasswordDiff = passwordConfirm.length > 0 && password !== passwordConfirm;
-
   const [agreements, setAgreements] = useState({
     all: false,
     service: false,
@@ -62,15 +53,13 @@ const SignUpScreen: React.FC = () => {
   useEffect(() => {
     const isValid = 
       email.length > 0 &&
-      password.length >= 8 &&
-      password === passwordConfirm && // 비밀번호 일치 확인
       agreements.service &&
       agreements.privacy &&
       agreements.marketing &&
       !isEmailDuplicate;
     
     setIsFormValid(isValid);
-  }, [email, password, passwordConfirm, agreements, isEmailDuplicate]);
+  }, [email, agreements, isEmailDuplicate]);
 
   // 이메일 중복 체크 (임시 - 추후 백엔드 연동)
   const checkEmailDuplicate = (emailValue: string) => {
@@ -97,6 +86,7 @@ const SignUpScreen: React.FC = () => {
     color: '#FFFFFF',
     paddingLeft: '16px',
     paddingRight: '16px',
+    marginBottom: '32px',
     fontSize: '13px',
     fontFamily: 'PretendardMedium',
     fontWeight: 500,
@@ -222,94 +212,6 @@ const SignUpScreen: React.FC = () => {
           )}
         </div>
 
-        {/* Password Input */}
-        <div className="mb-4">
-          <label 
-            style={{
-              fontFamily: 'Pretendard',
-              fontWeight: 400,
-              fontSize: '14px',
-              color: '#E8E8E8',
-              marginBottom: '8px',
-              display: 'block'
-            }}
-          >
-            비밀번호
-          </label>
-          <div style={inputContainerStyle}>
-            <input
-              type={showPassword ? 'text' : 'password'}
-              placeholder="8자 이상의 영문, 숫자로 입력해주세요."
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              style={inputStyle}
-              className="placeholder-[#A1A1A1]"
-            />
-            {password && (
-              <button
-                onClick={() => setShowPassword(!showPassword)}
-                style={iconButtonStyle}
-              >
-                <img 
-                  src={showPassword ? EyeOn : EyeOff} 
-                  alt="비밀번호 표시" 
-                  style={{ width: '16px', height: '16px' }} 
-                />
-              </button>
-            )}
-          </div>
-        </div>
-
-        {/* Password Confirm Input */}
-        <div className="mb-8">
-          <label 
-            style={{
-              fontFamily: 'Pretendard',
-              fontWeight: 400,
-              fontSize: '14px',
-              color: '#E8E8E8',
-              marginBottom: '8px',
-              display: 'block'
-            }}
-          >
-            비밀번호 확인
-          </label>
-          <div style={inputContainerStyle}>
-            <input
-              type={showPasswordConfirm ? 'text' : 'password'}
-              placeholder="동일한 비밀번호를 입력해주세요."
-              value={passwordConfirm}
-              onChange={(e) => setPasswordConfirm(e.target.value)}
-              style={isPasswordDiff ? inputErrorStyle : inputStyle}
-              className="placeholder-[#A1A1A1]"
-            />
-            {passwordConfirm && (
-              <button
-                onClick={() => setShowPasswordConfirm(!showPasswordConfirm)}
-                style={iconButtonStyle}
-              >
-                <img 
-                  src={showPasswordConfirm ? EyeOn : EyeOff} 
-                  alt="비밀번호 표시" 
-                  style={{ width: '16px', height: '16px' }} 
-                />
-              </button>
-            )}
-          </div>
-          {/* 비밀번호 불일치 안내 문구 추가 */}
-          {isPasswordDiff && (
-            <p style={{
-              fontFamily: 'PretendardRegular',
-              fontSize: '10px',
-              color: '#FF4848',
-              marginTop: '8px',
-              marginLeft: '4px'
-            }}>
-              비밀번호가 일치하지 않습니다. 다시 작성해주세요.
-            </p>
-          )}
-        </div>
-        
 
         {/* Agreements */}
         <div className="mb-8">
