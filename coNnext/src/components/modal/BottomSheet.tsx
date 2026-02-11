@@ -1,4 +1,3 @@
-import { motion, useDragControls } from "framer-motion";
 import { useRef, useState } from "react";
 import { Colors } from "../../styles/tokens/colors";
 import Revel from "../../assets/dumy/Revel.svg";
@@ -15,7 +14,6 @@ type Props = {
 };
 
 export default function BottomSheet({ open, onClose }: Props) {
-  const controls = useDragControls();
   const sheetRef = useRef<HTMLDivElement>(null);
 
   /* 모드 */
@@ -37,25 +35,19 @@ export default function BottomSheet({ open, onClose }: Props) {
         />
       )}
 
-      <motion.div
+      <div
         ref={sheetRef}
-        drag="y"
-        dragControls={controls}
-        dragListener={false}
-        dragConstraints={{ top: 0, bottom: 0 }}
-        initial={{ y: SHEET_HEIGHT }}
-        animate={{ y: open ? 0 : SHEET_HEIGHT }}
-        transition={{ type: "spring", stiffness: 320, damping: 32 }}
         className="absolute left-0 right-0 z-50 bg-[#0B1220] rounded-t-3xl shadow-xl"
         style={{
           bottom: FOOTER_HEIGHT,
           height: SHEET_HEIGHT,
+          transform: open ? "translateY(0)" : `translateY(${SHEET_HEIGHT}px)`,
+          transition: "transform 250ms ease",
         }}
       >
         {/* Drag Handle */}
         <div style={{ backgroundColor: Colors.gray.G500 }}
           className="w-full flex justify-center py-3 cursor-pointer"
-          onPointerDown={(e) => controls.start(e)}
         >
           <div className="w-12 h-1.5 rounded-full bg-gray-500/40" />
         </div>
@@ -236,7 +228,7 @@ export default function BottomSheet({ open, onClose }: Props) {
             </div>
           )}
         </div>
-      </motion.div>
+      </div>
     </>
   );
 }

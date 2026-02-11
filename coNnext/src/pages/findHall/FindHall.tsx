@@ -5,18 +5,11 @@ import { useGetNearestVenue } from "../../hooks/queries/useGetNearestVenue";
 import { NearbyBanner } from "../../components/NearByBanner";
 import VenueCard from "../../components/VenueCard";
 // import PopularVenueTicker from "../../components/PopularVenueTicker";
-import type { Venue } from "../../types/venue";
+import type { Venue } from "../../types/venueSearch";
 
 // ⭐ NEW
-import { useFavoriteVenues } from "../../hooks/queries/useFavoriteVenues";
+// import { useFavoriteVenues } from "../../hooks/queries/useFavoriteVenues";
 
-/* =========================
- * utils
- * ========================= */
-const isToday = (date: string) => {
-  const today = new Date().toISOString().slice(0, 10);
-  return date === today;
-};
 // const todayVenueSummary = {
 //   hasTodayVenue: true,
 //   venue: {

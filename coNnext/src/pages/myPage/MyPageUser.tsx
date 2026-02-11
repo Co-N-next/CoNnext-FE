@@ -12,13 +12,11 @@ export interface MyPageUserProps {
     friendMates: number;
   };
   onLogout: () => void;
-  onAddAccount: () => void;
 }
 
 const MyPageUser: React.FC<MyPageUserProps> = ({ 
   user, 
-  onLogout, 
-  onAddAccount 
+  onLogout
 }) => {
   const navigate = useNavigate();
   const [showWithdrawalModal, setShowWithdrawalModal] = useState(false);

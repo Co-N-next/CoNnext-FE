@@ -1,4 +1,6 @@
 // components/modal/TicketModal.tsx
+import { useTicketModalStore } from "../../store/TicketModal";
+
 export default function TicketModal() {
   const { isOpen, close } = useTicketModalStore();
 
