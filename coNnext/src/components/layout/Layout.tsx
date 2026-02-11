@@ -3,12 +3,18 @@ import React, { useState } from "react";
 import { Outlet } from "react-router-dom";
 import Header from "./Header";
 import Footer from "./Footer";
+
 import ConcertDetailModal from "../modal/ConcertDetailModal";
 import { useUpcomingConcert } from "../../hooks/useUpcomingConcert";
+import { useShake } from "../../hooks/useShake";
 
 const Layout: React.FC = () => {
   const ticketData = useUpcomingConcert();
   const [isTicketOpen, setIsTicketOpen] = useState(false);
+
+  useShake(() => {
+    if (ticketData) setIsTicketOpen(true);
+  });
 
   return (
     <div className="min-h-screen flex justify-center">
