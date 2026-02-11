@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import BackButton from '../../assets/logo/BackButton.svg';
-import EmailDelete from '../../assets/logo/EmailDelete.svg';
-import EyeOn from '../../assets/logo/EyeOn.svg';
-import EyeOff from '../../assets/logo/EyeOff.svg';
-import CheckboxOn from '../../assets/logo/CheckboxOn.svg';
-import CheckboxOff from '../../assets/logo/CheckboxOff.svg';
+import BackButton from '../../assets/Icons/back.svg';
+import EmailDelete from '../../assets/Icons/x.svg';
+import EyeOn from '../../assets/Icons/Eye.svg';
+import EyeOff from '../../assets/Icons/Eye_off.svg';
+import CheckboxOn from '../../assets/Icons/Checked.svg';
+import CheckboxOff from '../../assets/Icons/Unchecked.svg';
 
 const SignUpScreen: React.FC = () => {
   const navigate = useNavigate();

@@ -2,10 +2,10 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ChevronRight} from "lucide-react";
 import type{ Concert } from "../../types/tickets";
-import RV from "../../assets/dumy/ReVel.svg";
-import RV1 from "../../assets/dumy/ReVel1.svg";
+import RV from "../../assets/dumy/Revel.svg";
+import RV1 from "../../assets/dumy/Revel1.svg";
 import BTS from "../../assets/dumy/BTS.svg";
-import FilterIcon from "../../assets/logo/FilterIcon.svg";
+import FilterIcon from "../../assets/Icons/Align.svg";
 
 /* ===== 더미 데이터 ===== */
 const concerts: Concert[] = [

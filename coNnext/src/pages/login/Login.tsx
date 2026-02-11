@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom'
 import api from "../../api/axios.ts";
 
-import BackButton from '../../assets/logo/BackButton.svg';
-import kakaoSymbol from '../../assets/logo/kakaotalkSymbol.svg';
-import naverSymbol from '../../assets/logo/naverSymbol.svg';
-import googleSymbol from '../../assets/logo/googleSymbol.svg';
+import BackButton from '../../assets/Icons/back.svg';
+import kakaoSymbol from '../../assets/Variables/kakao.svg';
+import naverSymbol from '../../assets/Variables/naver.svg';
+import googleSymbol from '../../assets/Variables/google.svg';
 
 
 const LoginScreen: React.FC = () => {

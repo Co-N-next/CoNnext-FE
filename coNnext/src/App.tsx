@@ -3,8 +3,8 @@ import { Routes, Route, BrowserRouter } from "react-router-dom";
 import Layout from "./components/layout/Layout";
 
 // import Splash from "./pages/login/Splash";
-// import Login from "./pages/login/Login";
-// import SignUp from "./pages/login/SignUp";
+import Login from "./pages/login/Login";
+import SignUp from "./pages/login/SignUp";
 import Home from "./pages/home/HomePage";
 import ConcertDetail from "./pages/home/ConcertDetail";
 // import MyNews from "./pages/alarm/MyNews";
@@ -14,7 +14,7 @@ import ConcertDetail from "./pages/home/ConcertDetail";
 // import HallMap from "./pages/hallMap/HallMap";
 import Mate from "./pages/mate/Mate";
 import MateMap from "./pages/mate/MateMap";
-// import MyPage from "./pages/myPage/MyPage";
+import MyPage from "./pages/myPage/MyPage";
 import AddTicket from "./pages/reserve/AddTicket";
 import ReserveList from "./pages/reserve/ReserveList";
 import AddDetail from "./pages/reserve/AddDetail";
@@ -29,17 +29,17 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route element={<Layout />}>
-            {/* <Route path="/start" element={<Splash />} />
+            {/* <Route path="/start" element={<Splash />} /> */}
             <Route path="login" element={<Login />} />
-            <Route path="signUp" element={<SignUp />} /> */}
+            <Route path="signUp" element={<SignUp />} />
             <Route path="/" element={<Home />} />
              <Route path="/concert" element={<ConcertDetail />} />
-            {/*<Route path="/mynews" element={<MyNews />} />
+            {/* <Route path="/mynews" element={<MyNews />} />
             <Route path="/notices" element={<Notices />} />
             <Route path="/find" element={<FindHall />} />
             <Route path="/serch" element={<SerchHall />} />
-            <Route path="/map" element={<HallMap />} />
-            <Route path="/mypage" element={<MyPage />} /> */}
+            <Route path="/map" element={<HallMap />} /> */}
+            <Route path="/mypage" element={<MyPage />} />
             <Route path="/mate" element={<Mate />} />
             <Route path="/mate/more" element={<MateMore />} />
             <Route path="/add" element={<AddTicket />} />
