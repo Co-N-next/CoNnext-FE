@@ -1,4 +1,4 @@
-import Searchlogo from "../../assets/logo/Searchlogo.svg";
+import Searchlogo from "../../assets/logo/searchlogo.svg";
 
 interface SearchProps {
   value?: string;
