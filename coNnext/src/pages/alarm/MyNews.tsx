@@ -52,17 +52,14 @@ export default function MyNews() {
   const { data, isLoading } = useMyNotifications(0);
 
   /* ================= 오늘의 공연 추출 ================= */
-  const todayConcertNotification = data?.payload.news.find(
-    (n: Notification) => n.action_type === "NONE" && isToday(n.createdAt), // 오늘 생성된 NONE 알림만
+  const todayConcertNotification = data?.payload.payload.news.find(
+    (n: Notification) => n.actionType === "NONE" && isToday(n.createdAt), // 오늘 생성된 NONE 알림만
   );
 
-  /* ================= 기존 news 로직 ================= */
-  // TODO: 실제 로그인 유저 ID로 교체 필요
-  const currentUserId = 1;
 
   const actionNewsList =
-    data?.payload.news.filter(
-      (n: Notification) => n.action_type !== "NONE",
+    data?.payload.payload.news.filter(
+      (n: Notification) => n.actionType !== "NONE",
     ) ?? [];
 
   const parsedNews = actionNewsList
@@ -162,7 +159,6 @@ export default function MyNews() {
                 <MyNewsCard
                   key={item.notification.id}
                   notification={item.notification}
-                  currentUserId={currentUserId}
                 />
               ),
           )}
@@ -181,7 +177,6 @@ export default function MyNews() {
                 <MyNewsCard
                   key={item.notification.id}
                   notification={item.notification}
-                  currentUserId={currentUserId}
                 />
               ),
           )}

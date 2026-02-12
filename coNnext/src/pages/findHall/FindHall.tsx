@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Search from "../../components/common/Search";
 import { useTrendingVenues } from "../../hooks/queries/useTrendingVenues";
 import { useGetNearestVenue } from "../../hooks/queries/useGetNearestVenue";
-import { NearbyBanner } from "../../components/NearbyBanner";
+import { NearbyBanner } from "../../components/NearByBanner";
 import VenueCard from "../../components/VenueCard";
 // import PopularVenueTicker from "../../components/PopularVenueTicker";
 import type { VenueListItem } from "../../types/venue";
@@ -14,10 +14,7 @@ import { useFavoriteVenues } from "../../hooks/queries/useFavoriteVenues";
 /* =========================
  * utils
  * ========================= */
-const isToday = (date: string) => {
-  const today = new Date().toISOString().slice(0, 10);
-  return date === today;
-};
+
 
 // 오늘의 공연장 목데이터 (API 명세 미정)
 const todayVenueSummary = {
@@ -117,6 +114,7 @@ const FindHall = () => {
           <div className="flex justify-center">
             <NearbyBanner
               venue={nearestVenueData.payload}
+              radiusMeter={500}
             />
           </div>
         )}

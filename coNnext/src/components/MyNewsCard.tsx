@@ -3,38 +3,38 @@ import Friend from "../assets/logo/Friend.svg";
 import type { Notification } from "../types/notifications";
 import { useAcceptLocation } from "../hooks/mutations/useAcceptLocation";
 import { useAcceptMate } from "../hooks/mutations/useAcceptMate";
+
 interface MyNewsCardProps {
   notification: Notification;
-  currentUserId: number; // 로그인 유저 id
 }
 
-const MyNewsCard = ({ notification, currentUserId }: MyNewsCardProps) => {
+const MyNewsCard = ({ notification }: MyNewsCardProps) => {
   const { mutate: acceptLocation } = useAcceptLocation();
   const { mutate: acceptMate } = useAcceptMate();
   const {
-    sender_id,
-    sender_profile_img,
+    id,
+    senderProfileImg,
     title,
     createdAt,
     category,
-    action_status,
+    actionStatus,
   } = notification;
 
-  const isPending = action_status === "PENDING";
+  const isPending = actionStatus === "PENDING";
 
   const actionText = category === "LOCATION" ? "위치 공유 요청" : "친구 요청";
 
   const contentText =
-    action_status === "PENDING"
+    actionStatus === "PENDING"
       ? `${title}님이 ${actionText}을 보냈습니다.`
-      : action_status === "ACCEPTED"
+      : actionStatus === "ACCEPTED"
         ? `${title}님의 ${actionText}이 수락되었습니다.`
         : `${title}님의 ${actionText}이 거절되었습니다.`;
 
   const badgeBg =
-    action_status === "ACCEPTED"
+    actionStatus === "ACCEPTED"
       ? "bg-[#9576FF]"
-      : action_status === "REJECTED"
+      : actionStatus === "REJECTED"
         ? "bg-[#414141]"
         : "bg-[#7f5aff]";
 
@@ -42,36 +42,16 @@ const MyNewsCard = ({ notification, currentUserId }: MyNewsCardProps) => {
 
   const handleAccept = () => {
     if (category === "LOCATION") {
-      acceptLocation({
-        user_id: currentUserId,
-        sender_id: sender_id,
-      });
+      acceptLocation({ notificationId: id });
     }
-
     if (category === "MATE") {
-      acceptMate({
-        user_id: currentUserId,
-        sender_id: sender_id,
-      });
+      acceptMate({ notificationId: id });
     }
   };
 
   const handleReject = () => {
-    if (category === "LOCATION") {
-      acceptLocation({
-        user_id: currentUserId,
-        sender_id: sender_id,
-        action: "REJECT",
-      });
-    }
-
-    if (category === "MATE") {
-      acceptMate({
-        user_id: currentUserId,
-        sender_id: sender_id,
-        action: "REJECT",
-      });
-    }
+    // TODO: 스웨거에 거절 API 별도 엔드포인트가 있는지 확인 필요
+    // 현재 스웨거에는 수락만 있음
   };
 
   return (
@@ -84,7 +64,7 @@ const MyNewsCard = ({ notification, currentUserId }: MyNewsCardProps) => {
           {/* 프로필 */}
           <div className="relative shrink-0">
             <img
-              src={sender_profile_img}
+              src={senderProfileImg}
               alt="profile"
               className={`rounded-full object-cover transition-all duration-300
                 ${isPending ? "h-24 w-24" : "h-16 w-16"}`}

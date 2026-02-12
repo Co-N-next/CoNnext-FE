@@ -1,10 +1,21 @@
-import type { NearestVenuePayload } from "../types/venue";
+//목서버 시절 타입
+
+// type NearbyBannerProps = {
+//   place: string;
+//   radiusMeter: number;
+// };
+
+import type {
+  GetNearestVenueRequest,
+  NearestVenuePayload,
+} from "../types/venueSearch";
 
 type NearbyBannerProps = {
-  venue?: NearestVenuePayload;
+  venue: NearestVenuePayload;
+  radiusMeter: NonNullable<GetNearestVenueRequest["radius"]>;
 };
 
-export function NearbyBanner({ venue }: NearbyBannerProps) {
+export function NearbyBanner({ venue, radiusMeter }: NearbyBannerProps) {
   return (
     <div className="w-[400px] h-[112px] bg-[#745AFF] rounded-xl p-4 text-white flex flex-col">
       <span className="inline-block w-fit bg-[#9576ff] text-xs font-medium px-3 py-1 rounded-full">
@@ -12,7 +23,7 @@ export function NearbyBanner({ venue }: NearbyBannerProps) {
       </span>
 
       <p className="mt-1 text-[16px] font-semibold leading-[1.2]">
-        현재&nbsp;
+        {radiusMeter}m 반경 내&nbsp;
         <span className="text-[#FFA0EA]">{venue?.name}</span>
         &nbsp;근처에 계신가요?
       </p>
