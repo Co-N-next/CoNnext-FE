@@ -336,11 +336,11 @@ const Mate = () => {
                           >
                             <div className="w-[60px] h-[60px] bg-gray-700 rounded-full overflow-hidden mb-1">
                               <img
-                                src={mate.imageUrl || mate}
+                                src={mate.imageUrl || jinah}
                                 alt={mate.name}
                                 className="w-full h-full object-cover"
                                 onError={(e) => {
-                                    (e.target as HTMLImageElement).src = mate; // fallback
+                                    (e.target as HTMLImageElement).src = jinah;
                                 }}
                               />
                             </div>

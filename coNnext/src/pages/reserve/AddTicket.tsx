@@ -1,15 +1,15 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import SelectBar from "../../components/SelectBar";
-import { Search, ChevronLeft, Check, X } from "lucide-react";
+import { Search, ChevronLeft, Check } from "lucide-react";
 import type { Concert } from "../../types/concert";
 import SearchSkeleton from "../../components/skeleton/SearchSkeleton";
 import { 
   searchConcerts, 
   fetchSearchHistory, 
   saveSearchHistory, 
-  deleteSearchHistory, 
+  //deleteSearchHistory, 
   deleteAllSearchHistory 
 } from "../../api/concert"; 
 
@@ -100,7 +100,7 @@ const AddTicket = ({ onBack }: AddTicketProps = {}) => {
     }
   };
 
-  // 최근 검색어 삭제
+  /* 최근 검색어 삭제
   const handleDeleteHistory = async (id: number) => { // API가 id를 받는데 index인지 DB ID인지 확인 필요. 
       // 만약 string 배열만 받는다면 index로 지워야 하는지, value로 지워야 하는지?
       // API 정의상 deleteSearchHistory(id: number) 이므로 id가 필요함.
@@ -126,7 +126,7 @@ const AddTicket = ({ onBack }: AddTicketProps = {}) => {
            // setDisplayHistory(...)
       } catch(e) {}
   };
-  
+  */
   // 전체 삭제
   const handleClearAllHistory = async () => {
       try {
