@@ -12,7 +12,7 @@ export const TABS = [
 
 export default function AlarmPage() {
   const [activeTab, setActiveTab] = useState<AlarmTab>("mynews");
-  type TabKey = (typeof TABS)[number]["key"];
+
 
   return (
     // HomePage와 완전히 동일한 래퍼(Wrapper) 구성

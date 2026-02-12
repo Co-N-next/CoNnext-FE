@@ -11,17 +11,7 @@ const isToday = (date: string) => {
   return date === today;
 };
 
-function formatConcertTime(time: string) {
-  const [hourStr, minuteStr] = time.split(":");
-  const hour = Number(hourStr);
-  const minute = Number(minuteStr);
 
-  const period = hour < 12 ? "오전" : "오후";
-  const displayHour = hour > 12 ? hour - 12 : hour;
-  const minuteText = minute === 0 ? "" : ` ${minute}분`;
-
-  return `${period} ${displayHour}시${minuteText}`;
-}
 
 function getTimeInfo(createdAt: string) {
   const now = new Date();

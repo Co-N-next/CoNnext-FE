@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import SelectBar from "../../components/common/SelectBar";
 import type { UpcomingConcert } from "../../api/concertItem";
 import { getUpcomingConcerts } from "../../api/concertItem";
-import { getTrendingVenues } from "../../api/venueSearch";
+import { getTrendingVenues } from "../../api/venue";
 
 import { Typography } from "../../styles/tokens/typography";
 import Revel from "../../assets/dumy/Revel.svg";

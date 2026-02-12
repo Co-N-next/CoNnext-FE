@@ -8,7 +8,7 @@
 import type {
   GetNearestVenueRequest,
   NearestVenuePayload,
-} from "../types/venueSearch";
+} from "../types/venue";
 
 type NearbyBannerProps = {
   venue: NearestVenuePayload;
