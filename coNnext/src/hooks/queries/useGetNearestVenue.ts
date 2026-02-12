@@ -1,10 +1,10 @@
 // src/hooks/queries/useGetNearestVenue.ts
 import { useQuery } from "@tanstack/react-query";
-import { getNearestVenue } from "../../api/venueSearch";
+import { getNearestVenue } from "../../api/venue";
 import type {
   GetNearestVenueRequest,
   GetNearestVenueResponse,
-} from "../../types/venueSearch";
+} from "../../types/venue";
 
 export const useGetNearestVenue = (params: GetNearestVenueRequest) => {
   return useQuery<GetNearestVenueResponse>({

@@ -1,113 +1,129 @@
-import Location from "../assets/logo/EyeOn.svg";
-import Friend from "../assets/logo/EyeOff.svg";
-import { useState } from "react";
-
-type NewsType = "LOCATION" | "FRIEND";
-type Status = "PENDING" | "ACCEPTED" | "REJECTED";
-
+import Location from "../assets/logo/Location.svg";
+import Friend from "../assets/logo/Friend.svg";
+import type { Notification } from "../types/notifications";
+import { useAcceptLocation } from "../hooks/mutations/useAcceptLocation";
+import { useAcceptMate } from "../hooks/mutations/useAcceptMate";
 interface MyNewsCardProps {
-  profileImg: string;
-  name: string;
-  type: NewsType;
-  time: string;
+  notification: Notification;
+  currentUserId: number; // 로그인 유저 id
 }
 
-const MyNewsCard = ({ profileImg, name, type, time }: MyNewsCardProps) => {
-  const [status, setStatus] = useState<Status>("PENDING");
+const MyNewsCard = ({ notification, currentUserId }: MyNewsCardProps) => {
+  const { mutate: acceptLocation } = useAcceptLocation();
+  const { mutate: acceptMate } = useAcceptMate();
+  const {
+    sender_id,
+    sender_profile_img,
+    title,
+    createdAt,
+    category,
+    action_status,
+  } = notification;
 
-  const isPending = status === "PENDING";
+  const isPending = action_status === "PENDING";
 
-  const title = type === "LOCATION" ? "위치 공유" : "친구";
-  const actionText = type === "LOCATION" ? "위치 공유 요청" : "친구 요청";
+  const actionText = category === "LOCATION" ? "위치 공유 요청" : "친구 요청";
 
   const contentText =
-    status === "PENDING"
-      ? `${name}님이 ${actionText}을 보냈습니다.`
-      : status === "ACCEPTED"
-        ? `${name}님의 ${actionText}이 수락되었습니다.`
-        : `${name}님의 ${actionText}이 거절되었습니다.`;
+    action_status === "PENDING"
+      ? `${title}님이 ${actionText}을 보냈습니다.`
+      : action_status === "ACCEPTED"
+        ? `${title}님의 ${actionText}이 수락되었습니다.`
+        : `${title}님의 ${actionText}이 거절되었습니다.`;
 
   const badgeBg =
-    status === "ACCEPTED"
+    action_status === "ACCEPTED"
       ? "bg-[#9576FF]"
-      : status === "REJECTED"
+      : action_status === "REJECTED"
         ? "bg-[#414141]"
         : "bg-[#7f5aff]";
 
   const cardBg = isPending ? "bg-[#293A5D]" : "bg-[#0E172A]";
 
+  const handleAccept = () => {
+    if (category === "LOCATION") {
+      acceptLocation({
+        user_id: currentUserId,
+        sender_id: sender_id,
+      });
+    }
+
+    if (category === "MATE") {
+      acceptMate({
+        user_id: currentUserId,
+        sender_id: sender_id,
+      });
+    }
+  };
+
+  const handleReject = () => {
+    if (category === "LOCATION") {
+      acceptLocation({
+        user_id: currentUserId,
+        sender_id: sender_id,
+        action: "REJECT",
+      });
+    }
+
+    if (category === "MATE") {
+      acceptMate({
+        user_id: currentUserId,
+        sender_id: sender_id,
+        action: "REJECT",
+      });
+    }
+  };
+
   return (
     <div
       className={`${cardBg} -mx-4 px-4 transition-all duration-300
-        ${isPending ? "py-4" : "py-3"}
-      `}
+        ${isPending ? "py-4" : "py-3"}`}
     >
       <div className="px-4">
         <div className="flex gap-3">
           {/* 프로필 */}
           <div className="relative shrink-0">
             <img
-              src={profileImg}
+              src={sender_profile_img}
               alt="profile"
               className={`rounded-full object-cover transition-all duration-300
-                ${isPending ? "h-24 w-24" : "h-16 w-16"}
-              `}
+                ${isPending ? "h-24 w-24" : "h-16 w-16"}`}
             />
 
-            {/* 타입 뱃지 */}
             <div
               className={`absolute bottom-0 right-0 translate-x-[15%] translate-y-[15%]
                 flex items-center justify-center rounded-full transition-all duration-300
                 ${badgeBg}
-                ${isPending ? "h-8 w-8" : "h-6 w-6"}
-              `}
+                ${isPending ? "h-8 w-8" : "h-6 w-6"}`}
             >
               <img
-                src={type === "LOCATION" ? Location : Friend}
+                src={category === "LOCATION" ? Location : Friend}
                 alt=""
                 className={`${isPending ? "h-5 w-5" : "h-4 w-4"}`}
               />
             </div>
           </div>
 
-          {/* 텍스트 영역 */}
-          <div
-            className={`flex-1 transition-all duration-300
-              ${isPending ? "mt-0" : "mt-1"}
-            `}
-          >
-            {/* 상단 */}
+          {/* 텍스트 */}
+          <div className="flex-1">
             <div className="flex justify-between items-center">
-              <span className="text-[10px] font-normal leading-[1.3] tracking-[-0.025em] text-gray-400">
-                {title}
+              <span className="text-[10px] text-gray-400">
+                {category === "LOCATION" ? "위치 공유" : "친구"}
               </span>
-              <span className="text-[11px] text-gray-400 whitespace-nowrap">
-                {time}
-              </span>
+              <span className="text-[11px] text-gray-400">{createdAt}</span>
             </div>
 
-            {/* 메인 메시지 */}
-            <p
-              className={`text-white transition-all duration-300
-                ${isPending ? "mt-1 text-[13px]" : "mt-2 text-[13px]"}
-              `}
-            >
-              {contentText}
-            </p>
+            <p className="mt-2 text-[13px] text-white">{contentText}</p>
 
-            {/* 수락 / 거절 */}
             {isPending && (
-              <div className="mt-5 flex gap-2 transition-all duration-300">
+              <div className="mt-5 flex gap-2">
                 <button
-                  onClick={() => setStatus("ACCEPTED")}
+                  onClick={handleAccept}
                   className="rounded-full bg-[#7f5aff] px-6 py-2.5 text-xs font-medium text-white"
                 >
                   수락
                 </button>
-                <button
-                  onClick={() => setStatus("REJECTED")}
-                  className="rounded-full bg-[#1F2A44] px-6 py-2.5 text-xs text-gray-300"
-                >
+                <button onClick={handleReject} className="rounded-full bg-[#1F2A44] px-6 py-2.5 text-xs text-gray-300">
                   거절
                 </button>
               </div>

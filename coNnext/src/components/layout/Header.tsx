@@ -2,9 +2,10 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import Connext from '../../assets/Icons/Con-next.svg';
-import Ticket from '../../assets/Icons/TicketLogo.svg';
-import Bell from '../../assets/Icons/BellLogo.svg';
+import Connext from "../../assets/logo/Con-next.svg";
+import Ticket from "../../assets/logo/TicketLogo.svg";
+import Bell from "../../assets/Icons/BellLogo.svg";
+import Menu from "../../assets/logo/MenuLogo.svg";
 
 type HeaderProps = {
   onTicketClick?: () => void;

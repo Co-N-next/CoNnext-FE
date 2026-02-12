@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { searchVenues } from "../../api/venueSearch";
+import { searchVenues } from "../../api/venue";
 
 /**
  * 공연장 검색 전용 hook(venue/search)

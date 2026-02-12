@@ -3,15 +3,16 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Search from "../../components/common/Search";
-import before from "../../assets/Icons/back.svg";
-import PopularVenueTicker from "../../components/PopularVenueTicket";
+
+import before from "../../assets/logo/before.svg";
+import PopularVenueTicker from "../../components/PopularVenueTicker";
 import { useVenuesearch } from "../../hooks/queries/useVenuesearch";
 import {
   getSearchHistory,
   postSearchHistory,
   deleteSearchHistory,
   deleteAllSearchHistory,
-} from "../../api/history";
+} from "../../api/SearchHistory";
 import VenueCard from "../../components/VenueCard";
 import { useTrendingVenues } from "../../hooks/queries/useTrendingVenues";
 
@@ -165,26 +166,36 @@ const SearchHall = () => {
         </section>
       )}
       {/* 검색 결과 */}
-      {/* 검색 결과 */}
       {search && (
-        <section className="mt-6 grid grid-cols-2 gap-3">
-          {isLoading && (
-            <p className="col-span-2 text-sm text-gray-400">검색 중...</p>
+        <>
+          {!isLoading && data && (
+            <p className="mt-4 mb-2 text-sm text-gray-400">
+              검색결과{" "}
+              <span className="text-white font-semibold">
+                {data.pageInfo?.totalElements ?? data.payload?.length ?? 0}
+              </span>
+              건
+            </p>
           )}
+          <section className="grid grid-cols-2 gap-3">
+            {isLoading && (
+              <p className="col-span-2 text-sm text-gray-400">검색 중...</p>
+            )}
 
-          {data?.payload.map((item) => (
-            <div key={item.id} className="scale-[0.95]">
-              <VenueCard
-                id={item.id}
-                name={item.name}
-                city={item.city}
-                imageUrl={item.imageUrl}
-                isToday={true}
-                isNew={false}
-              />
-            </div>
-          ))}
-        </section>
+            {data?.payload.map((item) => (
+              <div key={item.id} className="scale-[0.95]">
+                <VenueCard
+                  id={item.id}
+                  name={item.name}
+                  city={item.city}
+                  imageUrl={item.imageUrl}
+                  isToday={true}
+                  isNew={false}
+                />
+              </div>
+            ))}
+          </section>
+        </>
       )}
     </div>
   );

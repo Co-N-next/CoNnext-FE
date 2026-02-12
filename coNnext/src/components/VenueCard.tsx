@@ -5,9 +5,8 @@
 //   isToday?: boolean;
 //   isNew?: boolean;
 // };
-import type { Venue } from "../types/venueSearch";
-
-const VenueCard = ({ name, city, imageUrl, isToday, isNew }: Venue) => {
+import type { VenueListItem } from "../types/venue.ts";
+const VenueCard = ({ id, name, city, imageUrl, isToday, isNew }: VenueListItem) => {
   return (
     <div className="border border-white/20 text-white rounded-xl w-full">
       {/* 이미지 */}
@@ -27,8 +26,8 @@ const VenueCard = ({ name, city, imageUrl, isToday, isNew }: Venue) => {
         )}
       </div>
 
-      <span className="mt-2 ml-2 block text-[10px] text-gray-300">{city}</span>
-      <h3 className="font-semibold text-[16px] mb-2 ml-2">{name}</h3>
+      <span className="mt-2 ml-2 block text-[10px] text-gray-300 truncate">{city}</span>
+      <h3 className="font-semibold text-[16px] mb-2 ml-2 truncate">{name}</h3>
     </div>
   );
 };

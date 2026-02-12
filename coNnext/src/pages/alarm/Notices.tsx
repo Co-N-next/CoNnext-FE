@@ -1,101 +1,85 @@
 import NoticeCard from "../../components/NoticesCard";
 import { useState } from "react";
+import { useNotices } from "../../hooks/queries/notifications/useNotices";
+import type { Notice } from "../../types/notifications";
 
-const notices = [
-  {
-    id: 6,
-    type: "리뉴얼 안내",
-    title: "버전 3.0 업데이트 안내",
-    summary:
-      "앱 리뉴얼로 인해 일부 서비스 이용이 제한되거나 내용 변경이 있을 수 있습니다. 이용에 불편을 드려 죄송합니다. 더나은 서비스 제공을 위해 최선을 다하겠습니다.",
-    time: "1시간 전",
-  },
-  {
-    id: 5,
-    type: "리뉴얼 안내",
-    title: "버전 2.0 업데이트 안내",
-    summary:
-      "앱 리뉴얼로 인해 일부 서비스 이용이 제한되거나 내용 변경이 있을 수 있습니다. 이용에 불편을 드려 죄송합니다. 더나은 서비스 제공을 위해 최선을 다하겠습니다.",
-    time: "1시간 전",
-  },
-  {
-    id: 4,
-    type: "리뉴얼 안내",
-    title: "버전 1.0 업데이트 안내",
-    summary:
-      "앱 리뉴얼로 인해 일부 서비스 이용이 제한되거나 내용 변경이 있을 수 있습니다. 이용에 불편을 드려 죄송합니다. 더나은 서비스 제공을 위해 최선을 다하겠습니다.",
-    time: "1시간 전",
-  },
-  {
-    id: 3,
-    type: "시스템 점검",
-    title: "정기 점검 안내",
-    summary: "서비스 안정화를 위한 정기 점검이 진행될 예정입니다.",
-    time: "2일 전",
-  },
-  {
-    id: 2,
-    type: "서비스 안내",
-    title: "신규 기능 추가 안내",
-    summary: "새로운 기능이 추가되었습니다. 많은 이용 부탁드립니다.",
-    time: "1주일 전",
-  },
-  {
-    id: 1,
-    type: "이벤트",
-    title: "오픈 기념 이벤트",
-    summary: "CoNnext 오픈을 기념하여 특별 이벤트를 진행합니다.",
-    time: "2주일 전",
-  },
-];
+/* ================= 유틸 ================= */
+function getRelativeTime(createdAt: string) {
+  const now = new Date();
+  const created = new Date(createdAt);
+  const diffMs = now.getTime() - created.getTime();
+  const diffMinutes = Math.floor(diffMs / (1000 * 60));
+  const diffHours = Math.floor(diffMinutes / 60);
+  const diffDays = Math.floor(diffHours / 24);
+
+  if (diffMinutes < 1) return "방금 전";
+  if (diffMinutes < 60) return `${diffMinutes}분 전`;
+  if (diffHours < 24) return `${diffHours}시간 전`;
+  if (diffDays <= 7) return `${diffDays}일 전`;
+  if (diffDays <= 14) return "1주일 전";
+  return `${Math.floor(diffDays / 7)}주일 전`;
+}
+
+const INITIAL_COUNT = 3;
 
 const Notices = () => {
-  const [visibleCount, setVisibleCount] = useState(3);
-  const isExpanded = visibleCount >= notices.length;
+  const { data, isLoading } = useNotices(0);
+  const [visibleCount, setVisibleCount] = useState(INITIAL_COUNT);
+
+  const MAX_COUNT = 6;
+
+  const noticeList = data?.payload.notices ?? [];
+  const isExpanded = visibleCount >= MAX_COUNT;
 
   const handleToggle = () => {
     if (isExpanded) {
-      setVisibleCount(3);
+      setVisibleCount(INITIAL_COUNT);
     } else {
-      setVisibleCount((prev) => prev + 3);
+      setVisibleCount(MAX_COUNT);
     }
   };
+
+  if (isLoading) {
+    return <div className="mx-4 mt-4 text-gray-400">불러오는 중...</div>;
+  }
+
+  if (noticeList.length === 0) {
+    return <div className="mx-4 mt-4 text-gray-400">공지사항이 없어요</div>;
+  }
 
   return (
     <div className="pb-6">
       <section className="space-y-4">
-        {notices.slice(0, visibleCount).map((notice) => (
+        {noticeList.slice(0, visibleCount).map((notice: Notice) => (
           <NoticeCard
             key={notice.id}
-            type={notice.type}
+            type={notice.title.split("]")[0]?.replace("[", "") || "공지"}
             title={notice.title}
-            content={notice.summary}
-            time={notice.time}
+            content={notice.content}
+            time={getRelativeTime(notice.createdAt)}
           />
         ))}
       </section>
 
-      <button
-        className="mt-6 flex items-center justify-center gap-2 w-full text-gray-400 text-sm hover:text-gray-300 transition-colors"
-        onClick={handleToggle}
-      >
-        {/* 화살표 + 텍스트 래퍼 */}
-        <span className="flex items-center gap-2">
-          {/* 화살표 (24x24) */}
-          <span
-            className={`w-6 h-6 flex items-center justify-center transition-transform duration-200 ${
-              isExpanded ? "rotate-180" : ""
-            }`}
-          >
-            <span className="w-3 h-3 border-b-2 border-r-2 border-current rotate-45 translate-y-[-2px]" />
+      {noticeList.length > INITIAL_COUNT && (
+        <button
+          className="mt-6 flex items-center justify-center gap-2 w-full text-gray-400 text-sm hover:text-gray-300 transition-colors"
+          onClick={handleToggle}
+        >
+          <span className="flex items-center gap-2">
+            <span
+              className={`w-6 h-6 flex items-center justify-center transition-transform duration-200 ${
+                isExpanded ? "rotate-180" : ""
+              }`}
+            >
+              <span className="w-3 h-3 border-b-2 border-r-2 border-current rotate-45 translate-y-[-2px]" />
+            </span>
+            <span className="font-pretendard text-[16px] font-medium leading-[120%] tracking-[0]">
+              {isExpanded ? "줄이기" : "더보기"}
+            </span>
           </span>
-
-          {/* 텍스트 */}
-          <span className="font-pretendard text-[16px] font-medium leading-[120%] tracking-[0]">
-            {isExpanded ? "줄이기" : "더보기"}
-          </span>
-        </span>
-      </button>
+        </button>
+      )}
     </div>
   );
 };

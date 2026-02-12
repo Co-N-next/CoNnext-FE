@@ -1,3 +1,91 @@
+// ===============================
+// FindHall 관련 타입 (공연장 목록/검색)
+// ===============================
+
+// 공연장 카드 (목록용)
+export interface VenueListItem {
+  id: number;
+  name: string;
+  city: string;
+  imageUrl: string;
+  isToday?: boolean;
+  isNew?: boolean;
+}
+
+// 페이지 정보
+export interface PageInfo {
+  page: number;
+  size: number;
+  hasNext: boolean;
+  totalElements: number;
+  totalPages: number;
+}
+
+// 서버 응답 전체 (인기 공연장)
+export interface VenueListResponse {
+  statusCode: number;
+  message: string;
+  pageInfo: PageInfo;
+  payload: VenueListItem[];
+}
+
+// 공연장 검색 응답
+export interface SearchVenuesResponse {
+  statusCode: number;
+  message: string;
+  pageInfo: PageInfo;
+  payload: VenueListItem[];
+}
+
+//근처공연장 타입정의
+
+// ===============================
+// 근처 공연장 (Nearby / Nearest)
+// ===============================
+
+// 요청
+export interface GetNearestVenueRequest {
+  lat: number;
+  lng: number;
+  radius?: number; // meter 단위, default = 500
+}
+
+// 응답 payload (단일 공연장)
+export interface NearestVenuePayload {
+  id: number;
+  name: string;
+}
+
+// 근처 공연장 응답
+export interface GetNearestVenueResponse {
+  statusCode: number;
+  message: string;
+  pageInfo: PageInfo;
+  payload: NearestVenuePayload;
+}
+
+//===============================
+// /venue/favorites
+// ===============================
+
+export interface FavoriteVenue {
+  id: number;
+  name: string;
+  city: string;
+  imageUrl: string;
+}
+
+export interface GetFavoriteVenuesResponse {
+  statusCode: number;
+  message: string;
+  pageInfo: PageInfo;
+  payload: FavoriteVenue[];
+}
+
+// ===============================
+// 좌석 배치도 관련 타입 (SVG/Floor)
+// ===============================
+
 // 백엔드 API 응답 타입
 export interface VenueResponse {
   venueId: number;
@@ -170,3 +258,17 @@ export const getSectionColor = (type: Section["type"]): string => {
   }
 };
 
+
+// 네 맞아요! 양쪽 다 
+// Venue
+// 라는 이름으로 인터페이스가 정의되어 있어서 이름이 겹쳤거든요:
+
+// HEAD (내 브랜치)의 
+// Venue
+// : { id, name, city, imageUrl } — 공연장 카드/목록용
+// main의 
+// Venue
+// : { id, name, address, totalFloors, svgWidth, floors... } — 좌석 배치도용
+// 하나의 파일에 같은 이름의 interface가 2개 있으면 에러나니까, 목록용을 
+// VenueListItem
+// 으로 이름 변경한 거예요.

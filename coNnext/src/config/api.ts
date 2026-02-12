@@ -9,9 +9,13 @@ export const API_BASE_URL =
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
   timeout: 10000,
+  // headers: {
+  //   'Content-Type': 'application/json',
+  // }
   headers: {
-    'Content-Type': 'application/json',
-  }
+    Authorization:
+      "Bearer eyJhbGciOiJIUzUxMiJ9.eyJjYXRlZ29yeSI6IkFDQ0VTUyIsInJvbGUiOiJVU0VSIiwibWVtYmVySWQiOjEsImlhdCI6MTc3MDg3NTkyMiwiZXhwIjo0OTI0NDc1OTIyfQ.ioSE66SW-EIrHqwfrBS3xBEbxYTcclwcz3la4ICUux-3vDVNqzd7-BT7FbhQSq8qZyiATCgjkCLOu-tYqwVCzw",
+  },
 });
 
 // 요청 인터셉터 (필요시 토큰 추가 등)

@@ -1,4 +1,4 @@
-import Searchlogo from "../../assets/Icons/search.svg";
+import Searchlogo from "../../assets/logo/Searchlogo.svg";
 
 interface SearchProps {
   value?: string;
@@ -39,7 +39,7 @@ const Search = ({
           pointer-events-none
         "
       >
-        <img src={Searchlogo} alt="검색" className="w-[24px] h-[24px]" />
+        <img src={Searchlogo} alt="검색" className="w-[13px] h-[13px]" />
       </div>
     </div>
   );
