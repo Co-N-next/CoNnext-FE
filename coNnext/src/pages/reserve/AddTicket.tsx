@@ -54,7 +54,6 @@ const AddTicket = ({ onBack }: AddTicketProps = {}) => {
     } catch (error) {
       console.error("검색 실패:", error);
       
-      // 더 구체적인 에러 메시지 제공
       if (axios.isAxiosError(error)) {
         if (error.response?.status === 404) {
           alert("검색 결과를 찾을 수 없습니다.");
@@ -66,7 +65,9 @@ const AddTicket = ({ onBack }: AddTicketProps = {}) => {
           alert(`검색 중 오류가 발생했습니다. (${error.message})`);
         }
       } else {
-        alert("알 수 없는 오류가 발생했습니다.");
+        // ✅ 수정된 부분: unknown 타입 안전하게 처리
+        const errorMessage = error instanceof Error ? error.message : "알 수 없는 오류";
+        alert(`알 수 없는 오류가 발생했습니다. (${errorMessage})`);
       }
     } finally {
       setIsLoading(false);

@@ -4,7 +4,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import Layout from "./components/layout/Layout";
 
-// import Splash from "./pages/login/Splash";
 import Login from "./pages/login/Login";
 import SignUp from "./pages/login/SignUp";
 import Home from "./pages/home/HomePage";
@@ -46,7 +45,6 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route element={<Layout />}>
-            {/* <Route path="/start" element={<Splash />} /> */}
             
             <Route path="login" element={<Login />} />
             <Route path="signUp" element={<SignUp />} />
@@ -67,6 +65,7 @@ function App() {
             <Route path="/more-info" element={<MoreInform />} />
             <Route path="/add-detail" element={<AddDetail />} />
           </Route>
+          
           <Route path="/" element={<Onboarding />} />
           <Route element={<FooterLayout />}>
             <Route path="/mate/map" element={<MateMap />} />
