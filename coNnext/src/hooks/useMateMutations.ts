@@ -64,8 +64,4 @@ export function useMateMutations() {
     removeFavoriteMutation,
     deleteMateMutation,
   };
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> mergedmain
