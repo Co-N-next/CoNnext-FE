@@ -1,102 +1,162 @@
 import { apiClient } from "../config/api";
-import type {
-  VenueResponse,
-  Venue,
-  Floor,
-} from "../types/venue";
+import type { Venue, Floor } from "../types/venue";
 import {
   mapFacilityType,
   mapSectionType,
   getSectionColor,
 } from "../types/venue";
 
-// 공연장 지도 데이터 조회
 export const fetchVenueMap = async (venueId: number): Promise<Venue> => {
-  const response = await apiClient.get<{ payload: VenueResponse }>(
-    `/venues/${venueId}/map`
-  );
+  console.log(`🔍 [Debug] API 호출 시작: venueId=${venueId}`);
 
-  const data = response.data.payload;
+  const response = await apiClient.get(`/venues/${venueId}/layout`);
+  const rawData = response.data;
+  const data = rawData.payload || rawData.result || rawData;
 
-  // 백엔드 데이터를 프론트엔드 형식으로 변환
-  const floors: Floor[] = data.floors.map((floorData) => ({
-    floor: floorData.floor,
-    sections: floorData.sections.map((section) => {
+  // 데이터 방어 로직
+  if (!data) {
+    throw new Error("❌ API 응답이 비어있습니다.");
+  }
+
+  // 전체 지도 크기(ViewBox) 계산용 변수
+  let globalMinX = Infinity, globalMinY = Infinity, globalMaxX = -Infinity, globalMaxY = -Infinity;
+
+  // 1. 층(Floor) 목록 정리
+  // venue.totalFloors가 0이어도, sections에 있는 floor 정보를 긁어모읍니다.
+  const floorSet = new Set<number>();
+  
+  // sections에서 층 정보 수집
+  (data.sections || []).forEach((s: any) => {
+    if (s.floor) floorSet.add(Number(s.floor));
+  });
+  
+  // floors 배열에서 층 정보 수집
+  (data.floors || []).forEach((f: any) => {
+    if (f.floor) floorSet.add(Number(f.floor));
+  });
+
+  // 층이 하나도 없으면 기본 1층으로 간주
+  if (floorSet.size === 0) floorSet.add(1);
+  
+  const sortedFloorNums = Array.from(floorSet).sort((a, b) => a - b);
+
+  // 2. 층별 데이터 변환
+  const floors: Floor[] = sortedFloorNums.map((floorNum) => {
+    
+    // 해당 층에 맞는 섹션 찾기 (data.sections가 평탄화된 배열로 올 경우 대비)
+    let rawSections = [];
+    if (data.sections) {
+      rawSections = data.sections.filter((s: any) => Number(s.floor) === floorNum);
+    } else if (data.floors) {
+      const floorData = data.floors.find((f: any) => Number(f.floor) === floorNum);
+      rawSections = floorData ? (floorData.sections || []) : [];
+    }
+
+    // 섹션 변환
+    const sections = rawSections.map((section: any) => {
       const type = mapSectionType(section.type);
+      
+      // ✅ [핵심] 1. svgPath가 있으면 그걸 쓰고, 없으면 vertices를 찾는다.
+      let finalPath = section.svgPath || section.pathData || section.path || "";
+
+      // ✅ [핵심] 2. vertices(점)가 있다면 선으로 이어준다.
+      if (!finalPath && section.vertices && section.vertices.length > 0) {
+        // vertices: [{x:10, y:10}, {x:20, y:20} ...]
+        // 변환: "M 10 10 L 20 20 ... Z"
+        finalPath = section.vertices.map((v: any, i: number) => {
+          const command = i === 0 ? "M" : "L"; // 첫 점은 이동(Move), 나머지는 선(Line)
+          return `${command} ${v.x} ${v.y}`;
+        }).join(" ") + " Z"; // Z는 닫기(마무리)
+      }
+
+      // 3. 좌표 범위 계산 (ViewBox용)
+      let sectionMinX = Infinity, sectionMinY = Infinity, sectionMaxX = -Infinity, sectionMaxY = -Infinity;
+      
+      if (finalPath) {
+        const coords = finalPath.match(/[-]?\d+(\.\d+)?/g)?.map(Number) || [];
+        for (let i = 0; i < coords.length; i += 2) {
+          const x = coords[i];
+          const y = coords[i+1];
+          if (!isNaN(x) && !isNaN(y)) {
+            // 섹션별 범위
+            if (x < sectionMinX) sectionMinX = x;
+            if (y < sectionMinY) sectionMinY = y;
+            if (x > sectionMaxX) sectionMaxX = x;
+            if (y > sectionMaxY) sectionMaxY = y;
+            // 전체 지도 범위
+            if (x < globalMinX) globalMinX = x;
+            if (y < globalMinY) globalMinY = y;
+            if (x > globalMaxX) globalMaxX = x;
+            if (y > globalMaxY) globalMaxY = y;
+          }
+        }
+      }
+
+      // 중앙 좌표 (API가 준 centerX가 있으면 그거 쓰고, 없으면 계산)
+      const centerX = section.centerX ?? ((sectionMinX !== Infinity) ? (sectionMinX + sectionMaxX) / 2 : 0);
+      const centerY = section.centerY ?? ((sectionMinY !== Infinity) ? (sectionMinY + sectionMaxY) / 2 : 0);
+
       return {
-        id: section.sectionId,
-        name: section.sectionId,
-        type,
+        id: String(section.sectionId),
+        name: String(section.sectionId),
+        type: type,
         color: getSectionColor(type),
-        path: section.pathData,
-        // x, y는 pathData에서 중앙 좌표를 계산하거나 백엔드에서 제공해야 함
-        // 일단 undefined로 두면 HallMap에서 레이블을 표시하지 않음
+        path: finalPath, // 만들어진 경로 할당
+        x: centerX,
+        y: centerY,
       };
-    }),
-    facilities: floorData.facilities.map((facility) => ({
-      id: String(facility.facilityId),
+    });
+
+    // 시설물 찾기 (로직 동일)
+    let rawFacilities = [];
+    if (data.facilities) {
+      rawFacilities = data.facilities.filter((f: any) => Number(f.floor) === floorNum);
+    } else if (data.floors) {
+      const floorData = data.floors.find((f: any) => Number(f.floor) === floorNum);
+      rawFacilities = floorData ? (floorData.facilities || []) : [];
+    }
+
+    const facilities = rawFacilities.map((facility: any) => ({
+      id: String(facility.facilityId || facility.id),
       type: mapFacilityType(facility.type, facility.name),
       name: facility.name,
       x: facility.x,
       y: facility.y,
-    })),
-  }));
+    }));
 
-  // 백엔드에서 null 값이 올 경우 기본값 설정
-  // 모든 섹션의 좌표에서 bounding box 계산
-  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-  
-  floors.forEach(floor => {
-    floor.sections.forEach(section => {
-      // SVG path에서 좌표 추출 (음수 포함)
-      const coords = section.path.match(/[-]?[\d.]+/g)?.map(Number) || [];
-      for (let i = 0; i < coords.length; i += 2) {
-        const x = coords[i];
-        const y = coords[i + 1];
-        if (!isNaN(x) && !isNaN(y)) {
-          minX = Math.min(minX, x);
-          minY = Math.min(minY, y);
-          maxX = Math.max(maxX, x);
-          maxY = Math.max(maxY, y);
-        }
-      }
-    });
-    
-    // 시설물 좌표도 포함
-    floor.facilities.forEach(facility => {
-      minX = Math.min(minX, facility.x);
-      minY = Math.min(minY, facility.y);
-      maxX = Math.max(maxX, facility.x);
-      maxY = Math.max(maxY, facility.y);
-    });
+    return {
+      floor: floorNum,
+      sections,
+      facilities,
+    };
   });
 
-  // 여백 추가 (5% + 고정 여백 20px)
-  const paddingPercent = 0.05;
-  const paddingFixed = 20;
-  const paddingX = (maxX - minX) * paddingPercent + paddingFixed;
-  const paddingY = (maxY - minY) * paddingPercent + paddingFixed;
-  
-  const svgWidth = data.svgWidth || (maxX - minX + paddingX * 2);
-  const svgHeight = data.svgHeight || (maxY - minY + paddingY * 2);
-  const svgViewBoxX = minX - paddingX;
-  const svgViewBoxY = minY - paddingY;
-  
-  const totalFloors = data.totalFloors || floors.length;
+  // 3. ViewBox 자동 설정
+  let finalWidth = 1000, finalHeight = 800;
+  let finalViewBoxX = 0, finalViewBoxY = 0;
 
-  // 디버깅: 실제 데이터 확인
-  console.log("📊 Bounding Box:", { minX, minY, maxX, maxY });
-  console.log("📐 SVG 크기:", { svgWidth, svgHeight, svgViewBoxX, svgViewBoxY });
+  // 좌표가 하나라도 있으면 자동 계산값 사용
+  if (globalMinX !== Infinity) {
+    const padding = 100;
+    finalViewBoxX = globalMinX - padding;
+    finalViewBoxY = globalMinY - padding;
+    finalWidth = (globalMaxX - globalMinX) + (padding * 2);
+    finalHeight = (globalMaxY - globalMinY) + (padding * 2);
+    console.log(`✅ [Debug] 지도 크기 자동 계산됨: ${finalWidth}x${finalHeight} (Vertices 기반)`);
+  } else if (data.venue?.svgWidth && data.venue?.svgHeight) {
+    finalWidth = data.venue.svgWidth;
+    finalHeight = data.venue.svgHeight;
+  }
 
   return {
-    id: data.venueId,
-    name: data.name,
-    address: data.address,
-    totalFloors,
-    svgWidth,
-    svgHeight,
-    svgViewBoxX,
-    svgViewBoxY,
-    floors,
+    id: data.venue?.venueId || venueId,
+    name: data.venue?.name || "공연장",
+    address: data.venue?.address || "",
+    totalFloors: floors.length,
+    svgWidth: finalWidth,
+    svgHeight: finalHeight,
+    svgViewBoxX: finalViewBoxX,
+    svgViewBoxY: finalViewBoxY,
+    floors: floors,
   };
 };

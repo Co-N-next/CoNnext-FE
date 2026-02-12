@@ -86,32 +86,32 @@ const transformConcertData = (item: ConcertResponse): Concert => {
 // 1. 공연 검색
 // GET /concerts/search?query=검색어
 export const searchConcerts = async (keyword: string): Promise<Concert[]> => {
-  // 응답 데이터가 { payload: ConcertResponse[] } 형태라고 타입을 지정
-  const response = await apiClient.get<{ payload: ConcertResponse[] }>('/concerts/search', {
+  const response = await apiClient.get<{ result: ConcertResponse[] }>('/concerts/search', {
     params: { 
       query: keyword, 
-      size: 20,       
     } 
   });
-  
-  // payload가 null일 수도 있으므로 빈 배열([])로 처리
-  return (response.data.payload || []).map(transformConcertData);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const data = (response.data as any).result || (response.data as any).payload || [];
+  return data.map(transformConcertData);
 };
 
-// 2. 공연 상세 조회 (필요 시 사용)
+// 2. 상세 정보 조회 (기본)
 // GET /concerts/{concertId}
 export const fetchConcertInfo = async (concertId: string) => {
-  // 단일 객체 반환이므로 { payload: ConcertResponse }
-  const response = await apiClient.get<{ payload: ConcertResponse }>(`/concerts/${concertId}`);
-  return transformConcertData(response.data.payload); 
+  const response = await apiClient.get<{ result: ConcertResponse }>(`/concerts/${concertId}`);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const data = (response.data as any).result || (response.data as any).payload;
+  return transformConcertData(data); 
 };
 
 // 3. 공연 상세 회차(스케줄) 조회
 // GET /concerts/details/{detailId}
 export const fetchConcertDetail = async (detailId: string) => {
-  const response = await apiClient.get<{ payload: ConcertDetailResponse }>(`/concerts/details/${detailId}`);
+  const response = await apiClient.get<{ result: ConcertDetailResponse }>(`/concerts/details/${detailId}`);
   
-  const data = response.data.payload;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const data = (response.data as any).result || (response.data as any).payload;
   const { date, time } = parseDateTime(data.startAt);
   
   return {
@@ -128,4 +128,35 @@ export const fetchConcertDetail = async (detailId: string) => {
     time,
     startAt: data.startAt
   };
+};
+
+// --- [New] 검색 기록 API ---
+
+// 4. 최근 검색어 조회
+// GET /searchHistory
+export const fetchSearchHistory = async () => {
+    const response = await apiClient.get<{ result: string[] }>('/searchHistory');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return (response.data as any).result || (response.data as any).payload || [];
+};
+
+// 5. 최근 검색어 저장
+// POST /searchHistory
+export const saveSearchHistory = async (keyword: string) => {
+    const response = await apiClient.post('/searchHistory', { keyword });
+    return response.data;
+};
+
+// 6. 최근 검색어 단일 삭제
+// DELETE /searchHistory/{id}
+export const deleteSearchHistory = async (id: number) => {
+    const response = await apiClient.delete(`/searchHistory/${id}`);
+    return response.data;
+};
+
+// 7. 최근 검색어 전체 삭제
+// DELETE /searchHistory/all
+export const deleteAllSearchHistory = async () => {
+    const response = await apiClient.delete('/searchHistory/all');
+    return response.data;
 };
