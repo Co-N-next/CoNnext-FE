@@ -267,13 +267,15 @@ const AddDetail = () => {
                     setDisplayDate(concert.date);
                 }
               }}
-              className="w-full h-[52px] bg-[#1E293B] border border-white/10 rounded-[10px] px-4 text-[#A1A1A1] focus:outline-none focus:border-[#7F5AFF] cursor-pointer appearance-none text-[13px]"
+              className={`w-full h-[52px] bg-[#1E293B] border border-white/10 rounded-[10px] pl-4 pr-12 text-[13px] outline-none focus:border-[#7F5AFF] cursor-pointer appearance-none truncate ${
+                selectedScheduleIndex === -1 ? "text-[#A1A1A1]" : "text-white"
+              }`}
             >
-              <option value={-1}>
+              <option value={-1} className="w-full mx-auto text-[#A1A1A1]">
                 {schedules.length > 0 ? "공연 일자를 선택하세요." : "로딩 중이거나 날짜 정보가 없습니다"}
               </option>
               {schedules.map((schedule, index) => (
-                <option key={index} value={index} className="bg-[#1E293B]">
+                <option key={index} value={index} className="bg-[#1E293B] text-white">
                   {schedule.date} {schedule.time}
                 </option>
               ))}
@@ -334,10 +336,17 @@ const AddDetail = () => {
           <button
             onClick={() => {
                 // 선택된 날짜가 있는지 체크 (선택사항)
-                // if (selectedScheduleIndex === -1 && schedules.length > 0) {
-                //    alert("공연 일자를 선택해주세요.");
-                //    return;
-                // }
+                if (selectedScheduleIndex === -1 && schedules.length > 0) {
+                   alert("공연 일자를 선택해주세요.");
+                   return;
+                }
+                
+                // 좌석 정보 필수 입력 체크
+                if (!seatInfo.floor || !seatInfo.section || !seatInfo.row || !seatInfo.number) {
+                    alert("좌석 정보를 모두 입력해주세요.");
+                    return;
+                }
+
                 setIsChecking(true);
             }} 
             className="w-full h-[56px] rounded-[12px] bg-[#7F5AFF] hover:bg-[#6B4DE6] text-white font-bold text-[16px] transition-colors mt-8 mb-8"

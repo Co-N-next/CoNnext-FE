@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, ChevronRight, PlusCircle } from "lucide-react";
 import jinah from "../../assets/images/jinah.svg";
-import mate from "../../assets/images/mate.svg";
 import star from "../../assets/Icons/star_on.svg";
 import setting from "../../assets/Icons/Settings.svg";
 import userplus from "../../assets/Icons/UserPlus.svg";
@@ -273,14 +272,14 @@ const Mate = () => {
                           className="flex flex-col items-center"
                         >
                           <div className="w-[60px] h-[60px] bg-gray-700 rounded-full overflow-hidden mb-1">
-                            <img
+                            {/* <img
                               src={mate.imageUrl || mate} // Fallback image if url missing
                               alt={mate.name}
                               className="w-full h-full object-cover"
                               onError={(e) => {
                                   (e.target as HTMLImageElement).src = mate;
                               }}
-                            />
+                            /> */}
                           </div>
                           <span className="text-[12px] text-[#F2EFFF] mb-2">{mate.name}</span>
                         </button>

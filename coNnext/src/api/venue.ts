@@ -1,5 +1,5 @@
 import { apiClient } from "../config/api";
-import type { Venue, Floor } from "../types/venue";
+import type { Venue, Floor, VenueLayoutApiData, VenueApiSection, VenueApiFacility, VenueApiFloor } from "../types/venue";
 import {
   mapFacilityType,
   mapSectionType,
@@ -9,9 +9,10 @@ import {
 export const fetchVenueMap = async (venueId: number): Promise<Venue> => {
   console.log(`🔍 [Debug] API 호출 시작: venueId=${venueId}`);
 
-  const response = await apiClient.get(`/venues/${venueId}/layout`);
+  const response = await apiClient.get<{ payload?: VenueLayoutApiData; result?: VenueLayoutApiData } & VenueLayoutApiData>(`/venues/${venueId}/layout`);
   const rawData = response.data;
-  const data = rawData.payload || rawData.result || rawData;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const data: VenueLayoutApiData = rawData.payload || rawData.result || rawData;
 
   // 데이터 방어 로직
   if (!data) {
@@ -26,34 +27,34 @@ export const fetchVenueMap = async (venueId: number): Promise<Venue> => {
   const floorSet = new Set<number>();
   
   // sections에서 층 정보 수집
-  (data.sections || []).forEach((s: any) => {
+  (data.sections || []).forEach((s: VenueApiSection) => {
     if (s.floor) floorSet.add(Number(s.floor));
   });
   
   // floors 배열에서 층 정보 수집
-  (data.floors || []).forEach((f: any) => {
+  (data.floors || []).forEach((f: VenueApiFloor) => {
     if (f.floor) floorSet.add(Number(f.floor));
   });
 
   // 층이 하나도 없으면 기본 1층으로 간주
   if (floorSet.size === 0) floorSet.add(1);
   
-  const sortedFloorNums = Array.from(floorSet).sort((a, b) => a - b);
+  const sortedFloorNums = Array.from(floorSet).sort((a: number, b: number) => a - b);
 
   // 2. 층별 데이터 변환
-  const floors: Floor[] = sortedFloorNums.map((floorNum) => {
+  const floors: Floor[] = sortedFloorNums.map((floorNum: number) => {
     
     // 해당 층에 맞는 섹션 찾기 (data.sections가 평탄화된 배열로 올 경우 대비)
-    let rawSections = [];
+    let rawSections: VenueApiSection[] = [];
     if (data.sections) {
-      rawSections = data.sections.filter((s: any) => Number(s.floor) === floorNum);
+      rawSections = data.sections.filter((s) => Number(s.floor) === floorNum);
     } else if (data.floors) {
-      const floorData = data.floors.find((f: any) => Number(f.floor) === floorNum);
+      const floorData = data.floors.find((f) => Number(f.floor) === floorNum);
       rawSections = floorData ? (floorData.sections || []) : [];
     }
 
     // 섹션 변환
-    const sections = rawSections.map((section: any) => {
+    const sections = rawSections.map((section) => {
       const type = mapSectionType(section.type);
       
       // ✅ [핵심] 1. svgPath가 있으면 그걸 쓰고, 없으면 vertices를 찾는다.
@@ -63,7 +64,7 @@ export const fetchVenueMap = async (venueId: number): Promise<Venue> => {
       if (!finalPath && section.vertices && section.vertices.length > 0) {
         // vertices: [{x:10, y:10}, {x:20, y:20} ...]
         // 변환: "M 10 10 L 20 20 ... Z"
-        finalPath = section.vertices.map((v: any, i: number) => {
+        finalPath = section.vertices.map((v, i) => {
           const command = i === 0 ? "M" : "L"; // 첫 점은 이동(Move), 나머지는 선(Line)
           return `${command} ${v.x} ${v.y}`;
         }).join(" ") + " Z"; // Z는 닫기(마무리)
@@ -108,15 +109,15 @@ export const fetchVenueMap = async (venueId: number): Promise<Venue> => {
     });
 
     // 시설물 찾기 (로직 동일)
-    let rawFacilities = [];
+    let rawFacilities: VenueApiFacility[] = [];
     if (data.facilities) {
-      rawFacilities = data.facilities.filter((f: any) => Number(f.floor) === floorNum);
+      rawFacilities = data.facilities.filter((f) => Number(f.floor) === floorNum);
     } else if (data.floors) {
-      const floorData = data.floors.find((f: any) => Number(f.floor) === floorNum);
+      const floorData = data.floors.find((f) => Number(f.floor) === floorNum);
       rawFacilities = floorData ? (floorData.facilities || []) : [];
     }
 
-    const facilities = rawFacilities.map((facility: any) => ({
+    const facilities = rawFacilities.map((facility) => ({
       id: String(facility.facilityId || facility.id),
       type: mapFacilityType(facility.type, facility.name),
       name: facility.name,
