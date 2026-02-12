@@ -1,21 +1,21 @@
 // types/notification.ts
 
-//notifications/news: 내소식 전체 조회 응답값(반응값 없음)
+//notifications/news: 내소식 전체 조회 응답값
 export type NotificationCategory = "MATE" | "NOTICE" | "LOCATION";
 export type NotificationActionType = "ACCEPT_REJECT" | "NONE";
 export type NotificationActionStatus = "PENDING" | "ACCEPTED" | "REJECTED";
 
 export interface Notification {
   id: number;
-  sender_id: number;
-  sender_profile_img: string;
+  senderId: number;
+  senderProfileImg: string;
   title: string;
   content: string;
   createdAt: string;
-  is_read: boolean;
+  read: boolean;
   category: NotificationCategory;
-  action_type: NotificationActionType;
-  action_status: NotificationActionStatus;
+  actionType: NotificationActionType;
+  actionStatus: NotificationActionStatus;
   img?: string;
 }
 
@@ -32,36 +32,27 @@ export interface NotificationListResponse {
   message: string;
   pageInfo: NotificationPageInfo;
   payload: {
-    news: Notification[];
+    pageInfo: NotificationPageInfo;
+    payload: {
+      news: Notification[];
+    };
   };
 }
 
-//notifications/news/share-location
-// 위치 공유 수락 요청
-export interface AcceptLocationRequest {
-  user_id: number;
-  sender_id: number;
-  action?: "REJECT";
+// =============================
+// 위치 공유 수락 / 메이트 수락 공통
+// POST /notifications/news/share-locations
+// POST /notifications/news/share-mates
+// =============================
+export interface AcceptNotificationRequest {
+  notificationId: number;
 }
 
-// 위치 공유 수락 응답
-export interface AcceptLocationResponse {
+export interface AcceptNotificationResponse {
   statusCode: number;
   message: string;
-}
-
-//notifications/news/share-mate
-// types/mate.ts
-//친구 수락 요청
-export interface AcceptMateRequest {
-  user_id: number; // 현재 로그인한 사용자 (수락하는 사람)
-  sender_id: number; // 요청을 보낸 사람
-  action?: "REJECT";
-}
-//친구 수락 응답
-export interface AcceptMateResponse {
-  statusCode: number;
-  message: string;
+  pageInfo: NotificationPageInfo;
+  payload: Record<string, never>; // 빈 객체 {}
 }
 
 //notifications/notices
@@ -70,11 +61,11 @@ export interface AcceptMateResponse {
 // =============================
 export interface Notice {
   id: number;
-  sender_profile_img: string;
+  senderProfileImg: string;
   title: string;
   content: string;
   createdAt: string;
-  is_read: boolean;
+  read: boolean;
 }
 
 // =============================
@@ -83,7 +74,7 @@ export interface Notice {
 export interface NoticeListResponse {
   statusCode: number;
   message: string;
-  pageInfo: NotificationPageInfo; // 이미 정의한 거 재사용
+  pageInfo: NotificationPageInfo;
   payload: {
     notices: Notice[];
   };

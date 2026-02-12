@@ -5,7 +5,6 @@ import { useNavigate } from 'react-router-dom';
 import Connext from "../../assets/logo/Con-next.svg";
 import Ticket from "../../assets/logo/TicketLogo.svg";
 import Bell from "../../assets/Icons/BellLogo.svg";
-import Menu from "../../assets/logo/MenuLogo.svg";
 
 type HeaderProps = {
   onTicketClick?: () => void;
@@ -38,7 +37,7 @@ const Header: React.FC<HeaderProps> = ({ onTicketClick }) => {
           
           <button
             className="w-6 h-6 p-0 hover:opacity-80 transition-opacity shrink-0"
-            onClick={() => navigate('/mynews')}
+            onClick={() => navigate('/alarm')}
           >
             <img src={Bell} alt="Bell" className="w-6 h-6 block" />
           </button>

@@ -14,10 +14,7 @@ import { useFavoriteVenues } from "../../hooks/queries/useFavoriteVenues";
 /* =========================
  * utils
  * ========================= */
-const isToday = (date: string) => {
-  const today = new Date().toISOString().slice(0, 10);
-  return date === today;
-};
+
 
 // 오늘의 공연장 목데이터 (API 명세 미정)
 const todayVenueSummary = {
@@ -117,6 +114,7 @@ const FindHall = () => {
           <div className="flex justify-center">
             <NearbyBanner
               venue={nearestVenueData.payload}
+              radiusMeter={500}
             />
           </div>
         )}

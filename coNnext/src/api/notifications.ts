@@ -1,14 +1,12 @@
+import api from "./axios";
 import type {
-  AcceptLocationRequest,
-  AcceptMateRequest,
+  NotificationListResponse,
   NoticeListResponse,
+  AcceptNotificationRequest,
+  AcceptNotificationResponse,
 } from "../types/notifications";
-// api/notification.ts
 
 // 내소식 전체 조회 : /notifications/news
-import api from "./axios";
-import type { NotificationListResponse } from "../types/notifications";
-
 export const notifications = async (
   page: number = 0,
 ): Promise<NotificationListResponse> => {
@@ -18,14 +16,20 @@ export const notifications = async (
   return data;
 };
 
-//위치공유요청 수락 거절
-export const acceptLocationRequest = async (body: AcceptLocationRequest) => {
-  return api.post("/notifications/news/share-location", body);
+// 위치공유 요청 수락 : /notifications/news/share-locations
+export const acceptLocationRequest = async (
+  body: AcceptNotificationRequest,
+): Promise<AcceptNotificationResponse> => {
+  const { data } = await api.post("/notifications/news/share-locations", body);
+  return data;
 };
 
-//친구 요청 수락 거절
-export const acceptMateRequest = async (body: AcceptMateRequest) => {
-  return api.post("/notifications/news/share-mate", body);
+// 친구 요청 수락 : /notifications/news/share-mates
+export const acceptMateRequest = async (
+  body: AcceptNotificationRequest,
+): Promise<AcceptNotificationResponse> => {
+  const { data } = await api.post("/notifications/news/share-mates", body);
+  return data;
 };
 
 // 공지사항 전체 조회 : /notifications/notices
