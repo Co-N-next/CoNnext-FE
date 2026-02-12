@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import BackButton from '../../assets/Icons/back.svg';
@@ -14,19 +14,19 @@ const SignUpScreen: React.FC = () => {
   const [isEmailDuplicate, setIsEmailDuplicate] = useState(false); // 이메일 중복 여부
   
   const [agreements, setAgreements] = useState({
-    all: false,
     service: false,
     privacy: false,
     marketing: false
   });
 
-  const [isFormValid, setIsFormValid] = useState(false);
+  // ✅ 계산된 값(derived state)으로 변경 - useEffect 불필요
+  const allChecked = agreements.service && agreements.privacy && agreements.marketing;
+  const isFormValid = email.length > 0 && agreements.service && agreements.privacy && agreements.marketing && !isEmailDuplicate;
 
   // 전체 동의 체크박스 핸들러
   const handleAllAgreement = () => {
-    const newValue = !agreements.all;
+    const newValue = !allChecked;
     setAgreements({
-      all: newValue,
       service: newValue,
       privacy: newValue,
       marketing: newValue
@@ -41,25 +41,7 @@ const SignUpScreen: React.FC = () => {
     }));
   };
 
-  // 전체 동의 상태 업데이트
-  useEffect(() => {
-    const allChecked = agreements.service && agreements.privacy && agreements.marketing;
-    if (allChecked !== agreements.all) {
-      setAgreements(prev => ({ ...prev, all: allChecked }));
-    }
-  }, [agreements.service, agreements.privacy, agreements.marketing]);
-
-  // 폼 유효성 검사
-  useEffect(() => {
-    const isValid = 
-      email.length > 0 &&
-      agreements.service &&
-      agreements.privacy &&
-      agreements.marketing &&
-      !isEmailDuplicate;
-    
-    setIsFormValid(isValid);
-  }, [email, agreements, isEmailDuplicate]);
+  // ✅ useEffect 제거 - 위에서 계산된 값으로 처리
 
   // 이메일 중복 체크 (임시 - 추후 백엔드 연동)
   const checkEmailDuplicate = (emailValue: string) => {
@@ -225,7 +207,7 @@ const SignUpScreen: React.FC = () => {
             onClick={handleAllAgreement}
           >
             <img 
-              src={agreements.all ? CheckboxOn : CheckboxOff} 
+              src={allChecked ? CheckboxOn : CheckboxOff} 
               alt="전체 동의" 
               style={{ width: '19px', height: '19px', marginRight: '8px' }} 
             />

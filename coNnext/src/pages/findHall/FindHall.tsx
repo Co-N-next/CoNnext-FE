@@ -6,7 +6,7 @@ import { useGetNearestVenue } from "../../hooks/queries/useGetNearestVenue";
 import { NearbyBanner } from "../../components/NearbyBanner";
 import VenueCard from "../../components/VenueCard";
 // import PopularVenueTicker from "../../components/PopularVenueTicker";
-import type { Venue } from "../../types/venue";
+import type { VenueListItem } from "../../types/venue";
 
 // ⭐ NEW
 import { useFavoriteVenues } from "../../hooks/queries/useFavoriteVenues";
@@ -76,10 +76,10 @@ const FindHall = () => {
   const { data: favoriteData, isPending: isFavoritePending } =
     useFavoriteVenues();
 
-  const venues: Venue[] = trendingData?.payload ?? [];
+  const venues: VenueListItem[] = trendingData?.payload ?? [];
 
   // // ⭐ NEW: 즐겨찾기용 데이터
-  const favoriteVenues: Venue[] = favoriteData?.payload ?? [];
+  const favoriteVenues: VenueListItem[] = favoriteData?.payload ?? [];
 
   /* =========================
    * render

@@ -11,9 +11,11 @@ import FooterLayout from "./components/layout/FooterLayout";
 
 /* 🔽 페이지 imports */
 import Home from "./pages/home/HomePage";
+import Onboarding from "./pages/onboarding/Onboarding";
 import ConcertDetail from "./pages/home/ConcertDetail";
 import FindHall from "./pages/findHall/FindHall";
 import SearchHall from "./pages/findHall/SearchHall";
+import HallMap from "./pages/hallMap/HallMap";
 import AlarmIndex from "./pages/alarm/AlarmIndex";
 import Login from "./pages/login/Login";
 import SignUp from "./pages/login/SignUp";
@@ -43,7 +45,9 @@ function App() {
         <Route element={<Layout />}>
           <Route path="/" element={<Home />} />
           <Route path="/concert" element={<ConcertDetail />} />
+          <Route path="/concert/:id" element={<ConcertDetail />} />
           <Route path="/find" element={<FindHall />} />
+          <Route path="/map/:venueId" element={<HallMap />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signUp" element={<SignUp />} />
           <Route path="/mypage" element={<MyPage />} />

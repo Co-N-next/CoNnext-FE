@@ -4,6 +4,15 @@ import { ChevronLeft, Share2, Pencil } from "lucide-react";
 import type { Concert } from "../../types/concert";
 import bol4 from "../../assets/images/bol4.svg";
 
+// TODO: 백엔드 API가 준비되면 아래와 같이 React Query 훅을 사용하도록 변경
+// import { useQuery } from "@tanstack/react-query";
+// import { fetchConcertMates } from "../../api/mate";
+// 
+// const { data: mates, isLoading } = useQuery({
+//   queryKey: ["concertMates", concertId],
+//   queryFn: () => fetchConcertMates(concertId),
+// });
+
 // Mock Data for "Today's Concert"
 const MOCK_CONCERT: Concert = {
   id: "1",
