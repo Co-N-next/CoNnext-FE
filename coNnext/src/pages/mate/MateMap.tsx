@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ChevronLeft, EyeOff } from "lucide-react";
-import storefront from "../../assets/Variables/shareMate.svg";
-import arrow_circle_up from "../../assets/Icons/share.svg";
-import wc from "../../assets/Variables/toilet_off.svg";
+import storefront from "../../assets/logo/storefront.svg";
+import arrow_circle_up from "../../assets/logo/arrow_circle_up.svg";
+import wc from "../../assets/logo/wc.svg";
 
 // Mock Data for mates on map
 const MATES_ON_MAP = [

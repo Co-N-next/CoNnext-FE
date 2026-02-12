@@ -25,7 +25,7 @@ const EmptyTicketState = () => {
       {/* 버튼 영역 */}
       <div className="w-full max-w-md flex-1 px-2 space-y-2">
         <button
-          onClick={() => navigate("/")}
+          onClick={() => navigate("/home")}
           className="w-full bg-[#4A5568] hover:bg-[#5A6678] text-white p-[14px] rounded-[12px] font-bold text-[14px] leading-[1.2] transition flex items-center justify-center"
         >
           공연 찾기

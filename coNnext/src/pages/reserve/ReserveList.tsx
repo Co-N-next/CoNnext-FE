@@ -6,56 +6,31 @@ import SelectBar from "../../components/SelectBar";
 import TodayConcert from "../../components/TodayConcert";
 import EmptyTicketState from "./components/EmptyTicketState";
 import ReservationSkeleton from "../../components/skeleton/ReserveSkeleton";
-import { useReservations, useDeleteReservation } from "../../hooks/useReservations";
+import { useTodayReservations, useUpcomingReservations, useDeleteReservation } from "../../hooks/useReservations";
 
 const ReservationList = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("public");
 
-  // ✅ React Query 훅으로 데이터 가져오기
-  const { data: allReservations = [], isLoading } = useReservations();
+  // ✅ React Query 훅으로 데이터 가져오기 (각각 호출)
+  const { data: todayConcerts = [], isLoading: isLoadingToday } = useTodayReservations();
+  const { data: futureConcerts = [], isLoading: isLoadingUpcoming } = useUpcomingReservations();
+  
   const deleteReservationMutation = useDeleteReservation();
+  
+  const isLoading = isLoadingToday || isLoadingUpcoming;
+  const isEmpty = todayConcerts.length === 0 && futureConcerts.length === 0;
 
-  // ✅ 삭제 함수 - 낙관적 업데이트 적용
+  // ✅ 삭제 함수
   const handleDelete = async (reservationId: string) => {
     if (!window.confirm("정말 이 예매 내역을 삭제하시겠습니까?")) return;
 
     try {
       await deleteReservationMutation.mutateAsync(reservationId);
-      // 성공 메시지는 낙관적 업데이트로 인해 즉시 UI에서 제거되므로 생략 가능
     } catch {
-      // 에러는 이미 훅에서 처리되지만, 필요시 추가 처리
       alert("삭제에 실패했습니다. 잠시 후 다시 시도해주세요.");
     }
   };
-
-  // ✅ 날짜 비교 및 분류 로직
-  const getTodayString = () => {
-    const today = new Date();
-    const yyyy = today.getFullYear();
-    const mm = String(today.getMonth() + 1).padStart(2, '0');
-    const dd = String(today.getDate()).padStart(2, '0');
-    return `${yyyy}${mm}${dd}`; 
-  };
-
-  const normalizeDate = (dateStr: string) => {
-    // "2025.11.25(월)" -> "20251125" 로 변환하여 비교
-    return dateStr.replace(/[^0-9]/g, "").substring(0, 8);
-  };
-
-  const todayStr = getTodayString();
-
-  // 오늘 공연
-  const todayConcerts = allReservations.filter(
-    (c) => normalizeDate(c.date) === todayStr
-  );
-
-  // 다가오는 공연 (오늘이 아닌 날짜)
-  const futureConcerts = allReservations.filter(
-    (c) => normalizeDate(c.date) !== todayStr
-  );
-
-  const isEmpty = allReservations.length === 0;
 
   // ---------------------------------------------------------
   // 렌더링
@@ -84,7 +59,7 @@ const ReservationList = () => {
                   {todayConcerts.map((concert) => (
                     <div key={concert.id} className="relative">
                       <TodayConcert concert={concert} />
-                      {/* 삭제 버튼 (오늘 공연은 삭제 못하게 할 수도 있음. 필요하면 추가) */}
+                      {/* 오늘 공연은 삭제 못하게 하는 것이 일반적이나, 필요시 추가 */}
                     </div>
                   ))}
                 </div>
@@ -118,9 +93,9 @@ const ReservationList = () => {
                   </div>
                 ))}
 
-                {futureConcerts.length === 0 && todayConcerts.length === 0 && (
+                {futureConcerts.length === 0 && todayConcerts.length > 0 && (
                    <div className="px-6 py-4 text-gray-400 text-center text-sm">
-                     예매된 공연이 없습니다.
+                     다가오는 공연이 없습니다.
                    </div>
                 )}
               </div>
@@ -133,7 +108,7 @@ const ReservationList = () => {
           <div className="bottom-0 left-0 right-0 px-5 py-6 bg-[#07132D] z-50">
             <div className="max-w-2xl mx-auto flex gap-3">
               <button
-                onClick={() => navigate("/")}
+                onClick={() => navigate("/home")}
                 className="w-[28%] bg-white text-[#07132D] p-[14px] rounded-[12px] font-bold text-[16px] leading-[1.2] transition flex items-center justify-center"
               >
                 닫기
