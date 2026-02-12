@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Search from "../../components/common/Search";
-import before from "../../assets/logo/EyeOn.svg";
+import before from "../../assets/Icons/back.svg";
 import PopularVenueTicker from "../../components/PopularVenueTicket";
 import { useVenuesearch } from "../../hooks/queries/useVenuesearch";
 import {
