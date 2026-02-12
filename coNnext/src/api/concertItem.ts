@@ -28,6 +28,16 @@ export interface UpcomingConcert {
   dday: string;
 }
 
+export interface TodayConcert {
+  concertId: number;
+  concertName: string;
+  posterImage: string;
+  startAt: string;
+  round: number;
+  runningTime: number;
+  price: number;
+}
+
 export interface PageInfo {
   page: number;
   size: number;
@@ -64,6 +74,12 @@ export const getUpcomingConcerts = async (page: number = 0, size: number = 20) =
     "/concerts/upcoming",
     { params: { page, size } }
   );
+  return res.data;
+};
+
+/** 오늘 공연 조회 */
+export const getTodayConcerts = async () => {
+  const res = await api.get<ApiResponse<TodayConcert[]>>("/concerts/today");
   return res.data;
 };
 

@@ -92,7 +92,7 @@ export default function UpcomingConcertPage() {
           {filteredConcerts.map((concert) => (
             <li
               key={concert.id}
-              onClick={() => navigate(`/concert/${concert.concertId}`)}
+              onClick={() => navigate(`/concert/${concert.detailId}`)}
               className="flex items-center gap-4 rounded-xl bg-[#0f1729] p-3 cursor-pointer hover:bg-[#16203a] transition"
             >
               <img

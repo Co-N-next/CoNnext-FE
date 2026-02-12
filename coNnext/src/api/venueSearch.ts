@@ -17,6 +17,12 @@ export const getTrendingVenues = async (): Promise<VenueListResponse> => {
   return data;
 };
 
+// 홈 공연장 조회 (/venues)
+export const getHomeVenues = async (): Promise<VenueListResponse> => {
+  const { data } = await api.get<VenueListResponse>("/venues");
+  return data;
+};
+
 //공연장검색(venue/search)
 export const searchVenues = async (
   keyword: string,

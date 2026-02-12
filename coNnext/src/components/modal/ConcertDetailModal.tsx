@@ -51,7 +51,7 @@ const ConcertDetailModal: React.FC<Props> = ({ open, onClose, data }) => {
               <div className="relative z-10 h-full flex flex-col justify-end p-5 text-white">
                 <div className="mb-4">
                   <h2
-                    className="text-[18px] font-bold leading-tight"
+                    className="py-25 text-[18px] font-bold leading-tight"
                     style={{ fontFamily: "YdestreetB" }}
                   >
                     {data.title}
@@ -65,12 +65,13 @@ const ConcertDetailModal: React.FC<Props> = ({ open, onClose, data }) => {
                 </div>
 
                 <div
-                  className="space-y-3 text-sm mb-4"
+                  className="absolute top-50 space-y-3 text-sm mb-4"
                   style={{ fontFamily: "PretendardMedium" }}
                 >
                   <div>
                     <p className="text-white/60 text-[11px]">장소</p>
-                    <p className="font-semibold">{data.place}</p>
+                    <p className="font-semibold">
+                      {data.place}</p>
                   </div>
 
                   <div>
@@ -86,9 +87,9 @@ const ConcertDetailModal: React.FC<Props> = ({ open, onClose, data }) => {
                   </div>
                 </div>
 
-                <div className="flex flex-col gap-2">
+                <div className="py-10 flex flex-col gap-2">
                   <button
-                    className="w-full py-2 rounded-xl bg-white/20 text-sm font-semibold backdrop-blur"
+                    className=" w-full py-2 rounded-xl bg-white/20 text-sm font-medium backdrop-blur"
                     style={{ fontFamily: "PretendardMedium" }}
                     onClick={() => navigate("/concertdetail")}
                   >
@@ -97,14 +98,14 @@ const ConcertDetailModal: React.FC<Props> = ({ open, onClose, data }) => {
 
                   <div className="flex gap-2">
                     <button
-                      className="flex-1 py-2 rounded-xl bg-[#7B5CFF] text-sm font-semibold"
+                      className="flex-1 py-2 rounded-xl bg-[#7B5CFF] text-sm font-medium"
                       style={{ fontFamily: "PretendardMedium" }}
                       onClick={() => navigate("/mate/map")}
                     >
                       메이트 찾기
                     </button>
                     <button
-                      className="flex-1 py-2 rounded-xl bg-white/20 text-sm font-semibold backdrop-blur"
+                      className="flex-1 py-2 rounded-xl bg-[#7B5CFF] text-sm font-medium backdrop-blur"
                       style={{ fontFamily: "PretendardMedium" }}
                       onClick={() => navigate("/map")}
                     >

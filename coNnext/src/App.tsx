@@ -50,7 +50,7 @@ function App() {
             <Route path="signUp" element={<SignUp />} />
             <Route path="/home" element={<Home />} />
              <Route path="/concert" element={<ConcertList />} />
-             <Route path="/concert/:id" element={<ConcertDetail />} />
+             <Route path="/concert/:detailId" element={<ConcertDetail />} />
             <Route path="/mynews" element={<MyNews />} />
             <Route path="/notices" element={<Notices />} />
             <Route path="/find" element={<FindHall />} />
