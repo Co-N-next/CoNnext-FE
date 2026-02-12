@@ -41,6 +41,7 @@ export interface NotificationListResponse {
 export interface AcceptLocationRequest {
   user_id: number;
   sender_id: number;
+  action?: "REJECT";
 }
 
 // 위치 공유 수락 응답
@@ -55,9 +56,35 @@ export interface AcceptLocationResponse {
 export interface AcceptMateRequest {
   user_id: number; // 현재 로그인한 사용자 (수락하는 사람)
   sender_id: number; // 요청을 보낸 사람
+  action?: "REJECT";
 }
 //친구 수락 응답
 export interface AcceptMateResponse {
   statusCode: number;
   message: string;
+}
+
+//notifications/notices
+// =============================
+// 공지사항 하나
+// =============================
+export interface Notice {
+  id: number;
+  sender_profile_img: string;
+  title: string;
+  content: string;
+  createdAt: string;
+  is_read: boolean;
+}
+
+// =============================
+// 공지사항 전체 조회 응답
+// =============================
+export interface NoticeListResponse {
+  statusCode: number;
+  message: string;
+  pageInfo: NotificationPageInfo; // 이미 정의한 거 재사용
+  payload: {
+    notices: Notice[];
+  };
 }

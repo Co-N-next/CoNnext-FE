@@ -1,105 +1,275 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import SelectBar from "../../components/common/SelectBar";
-import { Search } from "lucide-react";
+import axios from "axios";
+import SelectBar from "../../components/SelectBar";
+import { Search, ChevronLeft, Check } from "lucide-react";
+import type { Concert } from "../../types/concert";
+import SearchSkeleton from "../../components/skeleton/SearchSkeleton";
+import { searchConcerts } from "../../api/concert"; // API 함수 임포트
 
 interface AddTicketProps {
   onBack?: () => void;
-  onSubmit?: (reservationText: string) => void;
 }
 
-const TABS = [
-  { key: "public", label: "공연장" },
-  { key: "pharmacy", label: "야구장" },
-] as const;
-
-type AddTicketTab = (typeof TABS)[number]["key"];
-
-const AddTicket = ({ onBack, onSubmit }: AddTicketProps = {}) => {
+const AddTicket = ({ onBack }: AddTicketProps = {}) => {
   const navigate = useNavigate();
-
-  const [activeTab, setActiveTab] = useState<AddTicketTab>("public");
+  const [activeTab, setActiveTab] = useState("public");
+  
+  // 검색어 입력 State
   const [inputText, setInputText] = useState("");
 
-  // 제출 버튼
-  const handleSubmit = () => {
-    if (!inputText.trim()) return;
+  // ✅ 선택된 공연 정보 (이게 있으면 확인 화면, 없으면 검색 리스트 화면)
+  const [selectedConcert, setSelectedConcert] = useState<Concert | null>(null);
 
-    if (onSubmit) {
-      onSubmit(inputText);
-    } else {
-      console.log("입력한 예매 내역:", {
-        type: activeTab,
-        text: inputText,
-      });
+  // ✅ API 연동을 위한 State (검색 결과, 로딩, 검색 여부)
+  const [searchResults, setSearchResults] = useState<Concert[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false); // 검색을 한 적이 있는지 체크
+
+  // 뒤로가기 핸들러
+  const handleBack = () => {
+    // 만약 확인 화면(공연 선택됨) 상태라면 -> 리스트 화면으로 돌아가기
+    if (selectedConcert) {
+      setSelectedConcert(null);
+      return;
     }
 
-    setInputText("");
-
+    // 리스트 화면이라면 -> 아예 이전 페이지로 나가기
     if (onBack) onBack();
     else navigate("/reserve");
   };
 
-  // 취소 버튼
-  const handleCancel = () => {
-    if (onBack) onBack();
-    else navigate("/reserve");
+  // ✅ 검색 핸들러 (API 호출)
+  const handleSearch = async () => {
+    if (!inputText.trim()) return;
+
+    try {
+      setIsLoading(true);
+      setHasSearched(true); // 검색 시도함 표시
+      
+      // API 호출
+      const results = await searchConcerts(inputText);
+      setSearchResults(results);
+      
+    } catch (error) {
+      console.error("검색 실패:", error);
+      
+      // 더 구체적인 에러 메시지 제공
+      if (axios.isAxiosError(error)) {
+        if (error.response?.status === 404) {
+          alert("검색 결과를 찾을 수 없습니다.");
+        } else if (error.response?.status === 500) {
+          alert("서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+        } else if (error.code === 'ECONNABORTED') {
+          alert("요청 시간이 초과되었습니다. 네트워크 연결을 확인해주세요.");
+        } else {
+          alert(`검색 중 오류가 발생했습니다. (${error.message})`);
+        }
+      } else {
+        alert("알 수 없는 오류가 발생했습니다.");
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleSearch = () => {
-    console.log("검색:", {
-      type: activeTab,
-      keyword: inputText,
-    });
+  // 키보드 엔터 이벤트
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") handleSearch();
   };
 
+  // ---------------------------------------------------------
+  // 1. 확인 화면 렌더링 (선택된 공연이 있을 때 보여줄 화면)
+  // ---------------------------------------------------------
+  if (selectedConcert) {
+    return (
+      <div className="min-h-screen bg-[#0F1320] text-white font-sans flex flex-col">
+        <div className="max-w-2xl mx-auto w-full flex-1 flex flex-col">
+          <SelectBar activeTab={activeTab} onTabChange={setActiveTab} />
+          
+          {/* 안내 멘트 */}
+          <div className="px-6 mb-6 mt-6">
+            <p className="text-[13px] leading-relaxed text-gray-200">
+              이 공연을 예매한 것으로 보여요.
+              <br />
+              이 공연을 예매한 것이 맞다면{" "}
+              <span className="text-[#8e7aff] font-bold">맞아요</span>를 눌러주세요.
+            </p>
+          </div>
+
+          {/* 공연 카드 - 중앙 정렬, 세로 배치 */}
+          <div className="px-6 mb-4">
+            <div className="bg-[#293A5D] rounded-[18px] px-[46px] py-[24px] flex flex-col items-center">
+              {/* 포스터 이미지 - 크게 중앙 배치 */}
+              <div className="w-[140px] h-[196px] rounded-[10px] shadow-xl overflow-hidden bg-gray-800 mb-4">
+                <img
+                  src={selectedConcert.imageUrl}
+                  alt={selectedConcert.title}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+
+              {/* 공연 제목 - 중앙 정렬 */}
+              <h2 className="text-[18px] font-bold text-white text-center leading-tight mb-2 px-6">
+                {selectedConcert.title}
+              </h2>
+
+              {/* 아티스트 이름 + T 뱃지 */}
+              <div className="flex items-center gap-2 mb-4">
+                <p className="text-[16px] font-medium text-gray-200">
+                  {selectedConcert.artist}
+                </p>
+              </div>
+
+              {/* 공연 정보 */}
+              <div className="w-full space-y-2 text-[14px] px-4">
+                {/* 일시 - 파란색 테두리 박스 */}
+                <div className="flex items-start">
+                  <span className="w-12 text-gray-400 flex-shrink-0">일시</span>
+                  
+                    <p className="text-white leading-relaxed">
+                      {selectedConcert.date} {selectedConcert.time}
+                    </p>
+                
+                </div>
+
+                {/* 장소 */}
+                <div className="flex items-start">
+                  <span className="w-12 text-gray-400 flex-shrink-0">장소</span>
+                  <span className="flex-1 text-gray-200">{selectedConcert.venue}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* 하단 버튼 영역 */}
+          <div className="px-5 pb-8 w-full flex gap-2">
+            <button
+              onClick={() => setSelectedConcert(null)}
+              className="flex-1 h-[44px] rounded-[12px] bg-[#414141] hover:bg-[#5A6678] text-white font-bold text-[13px]"
+            >
+              아니에요
+            </button>
+            <button
+              onClick={() =>
+                navigate("/add-detail", { state: { concert: selectedConcert } })
+              }
+              className="flex-1 h-[44px] rounded-[12px] bg-[#7F5AFF] hover:bg-[#6B4DE6] text-white font-bold text-[13px]"
+            >
+              맞아요
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ---------------------------------------------------------
+  // 2. 리스트 화면 렌더링 (선택된 공연이 없을 때)
+  // ---------------------------------------------------------
   return (
-    <div className="min-h-screen bg-[#0a0f1e] text-white">
+    <div className="min-h-screen bg-[#0E172A] text-white font-sans">
       <div className="max-w-2xl mx-auto">
-        <SelectBar
-          tabs={TABS}
-          activeTab={activeTab}
-          onTabChange={setActiveTab}
-        />
+        <SelectBar activeTab={activeTab} onTabChange={setActiveTab} />
 
-        <div>
-          <h1 className="text-xl font-bold px-6 py-3 mt-4">
-            예매 내역 추가하기
-          </h1>
+        <div className="flex items-center gap-2 px-4 py-4">
+          <button onClick={handleBack} className="p-1">
+            <ChevronLeft size={24} className="text-white" />
+          </button>
+          <h1 className="text-lg font-bold">예매 내역 추가하기</h1>
+        </div>
 
-          <div className="p-4 space-y-4">
-            <div className="flex items-center gap-2">
-              <textarea
+        <div className="px-5">
+          {/* 검색바 */}
+          <div className="mb-6">
+            <div className="text-sm font-medium mb-2 text-gray-300">
+              공연 찾기
+            </div>
+            <div className="w-full flex items-center pl-[12px] pr-[4px] py-[4px] gap-[4px] rounded-[10px] border border-black/10 bg-[#1E293B] focus-within:border-purple-500 focus-within:ring-1 focus-within:ring-purple-500">
+              <input
+                type="text"
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
-                placeholder={
-                  activeTab === "public" ? "공연 이름 검색" : "야구 경기 검색"
-                }
-                className="flex-1 max-h-[44px] bg-[#1E293B] border border-gray-700 rounded-[10px] p-2 text-white text-[13px] placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
+                onKeyDown={handleKeyDown} // 엔터키 이벤트 연결
+                placeholder="아티스트 또는 공연명으로 검색하세요."
+                className="flex-1 bg-transparent text-white placeholder-gray-500 outline-none border-none text-[14px]"
               />
-              <button
-                onClick={handleSearch}
-                className="p-2 rounded-lg bg-[#7F5AFF] hover:bg-[#6a46e5] transition"
+              <button 
+                onClick={handleSearch} // 버튼 클릭 이벤트 연결
+                className="w-[40px] h-[40px] bg-[#7F5AFF] hover:bg-[#6B4DE6] rounded-lg flex items-center justify-center transition-colors shadow-lg flex-shrink-0"
               >
-                <Search size={18} />
+                <Search size={22} className="text-white" />
               </button>
             </div>
+          </div>
 
-            <div className="flex gap-4 mt-6">
-              <button
-                onClick={handleCancel}
-                className="flex-1 bg-gray-700 hover:bg-gray-600 text-white py-3 rounded-lg font-medium transition"
-              >
-                취소
+          <div className="flex justify-between items-center mb-4 text-xs">
+            <span className="text-gray-300">
+              {/* 실제 검색 결과 개수 표시 */}
+              검색결과 {searchResults.length}건
+            </span>
+            <div className="flex gap-3 text-gray-500">
+              <button className="flex items-center gap-1 text-white font-medium">
+                <Check size={14} /> 최신순
               </button>
-              <button
-                onClick={handleSubmit}
-                disabled={!inputText.trim()}
-                className="flex-1 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white py-3 rounded-lg font-medium transition"
-              >
-                저장
-              </button>
+              <button>정확도순</button>
             </div>
+          </div>
+
+          {/* 리스트 영역 */}
+          <div className="space-y-0 pb-10">
+            {/* 1. 로딩 중일 때 */}
+            {isLoading && (
+              <SearchSkeleton />
+            )}
+
+            {/* 2. 검색 결과가 없을 때 (로딩 끝남 + 검색함 + 결과 0개) */}
+            {!isLoading && hasSearched && searchResults.length === 0 && (
+              <div className="py-20 text-center text-gray-500">
+                검색 결과가 없습니다.
+              </div>
+            )}
+
+            {/* 3. 검색 결과 목록 표시 */}
+            {!isLoading && searchResults.map((item) => (
+              <div
+                key={item.id}
+                onClick={() => setSelectedConcert(item)}
+                className="flex px-2 gap-[27px] cursor-pointer group hover:bg-white/5 rounded-xl transition-colors py-2"
+              >
+                <div className="w-[103px] h-[144px] rounded-[10px] shadow-[0_4px_4px_0_rgba(0,0,0,0.24)] flex-shrink-0 overflow-hidden bg-gray-800">
+                  <img
+                    src={item.imageUrl}
+                    alt={item.title}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="flex flex-col py-1 overflow-hidden justify-between w-full">
+                  <div>
+                    <h3 className="pr-3 font-bold text-white text-[16px] leading-snug">
+                      {item.title}
+                    </h3>
+                    <p className="w-full font-semibold text-white text-[16px] leading-snug mb-1">
+                      {item.artist}
+                    </p>
+                  </div>
+                  <div className="space-y-1 mb-3">
+                    <div className="flex text-[13px] text-gray-400">
+                      <span className="w-8 flex-shrink-0">일시</span>
+                      <div className="flex flex-col flex-1 px-6">
+                        <span className="text-white">
+                          {item.date} {item.time}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex text-[13px] text-gray-400">
+                      <span className="w-8 flex-shrink-0">장소</span>
+                      <span className="px-6 text-white">{item.venue}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>

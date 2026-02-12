@@ -9,7 +9,7 @@ const Layout: React.FC = () => {
       <div className="w-full max-w-[450px] min-h-screen flex flex-col relative">
         <Header />
 
-        <main className="flex-1 w-full overflow-y-auto pt-20 pb-24">
+        <main className="flex-1 w-full overflow-y-auto pt-20 pb-[66px]">
           <Outlet />
         </main>
 

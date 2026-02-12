@@ -1,8 +1,7 @@
-import { useNavigate } from "react-router-dom";
+//import { useNavigate } from "react-router-dom";
 import { ExternalLink } from "lucide-react";
 import type { Concert } from "../../types/tickets";
 import RV from "../../assets/dumy/ReVel.svg";
-import BackButton from "../../assets/logo/BackButton.svg";
 
 /* ===== 더미 데이터 ===== */
 const concertData: Concert & {
@@ -33,7 +32,7 @@ const concertData: Concert & {
 };
 
 export default function ConcertInfo() {
-  const navigate = useNavigate();
+  //const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-[#0a0f1e] text-white">
@@ -47,13 +46,13 @@ export default function ConcertInfo() {
               alt={concertData.title}
               className="w-full h-full object-cover"
             />
-            
+
             {/* 오버레이 그라데이션 - 아래로 갈수록 어둡게 */}
             <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/30 to-black/90" />
-            
+
             {/* 왼쪽 하단: 썸네일과 콘서트 정보 (세로 배치) */}
             <div className="absolute bottom-6 left-4 flex flex-col gap-3">
-              
+
               {/* 작은 썸네일 */}
               <div className="w-24 h-32 rounded-lg overflow-hidden border-2 border-white/50 shadow-lg">
                 <img
@@ -135,11 +134,10 @@ export default function ConcertInfo() {
 
         {/* ===== 공지사항 바로가기 ===== */}
         <div className="px-4 py-6 border-t border-gray-800 pb-20">
-          <button 
+          <button
             className="flex items-center gap-2 text-base hover:opacity-80 transition-opacity"
-            onClick={() => navigate(`/concert/`)}
           >
-            <span>공지사항 바로가기</span>
+            <span>공지사항 전체 보기</span>
             <ExternalLink size={18} className="text-gray-400" />
           </button>
         </div>

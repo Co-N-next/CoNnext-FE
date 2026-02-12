@@ -21,50 +21,51 @@ const TodayConcert = ({ concert }: TodayConcertProps) => {
             alt={concert.title}
             className="w-full h-full object-cover rounded-[10px]"
           />
-          <div className="absolute inset-0 bg-black/50" />{" "}
+          <div className="absolute inset-0 bg-[#07132D]/50" />{" "}
           {/* 어두운 오버레이 */}
         </div>
 
         {/* 콘텐츠 영역 (z-10으로 배경 위에 올림) */}
-        <div className="relative z-10 p-6 text-white">
+        <div className="relative z-10 pt-[26px] pr-[19px] pl-[20px] pb-[6px] text-white mb-2">
           {/* 헤더: 제목 + 아이콘 버튼 */}
-          <div className="flex justify-between items-start mb-4">
+          <div className="flex justify-between items-start mb-12">
             <h2 className="text-[22px] font-bold leading-tight">오늘의 공연</h2>
             <div className="flex gap-2">
-              <button className="w-10 h-10 flex items-center justify-center rounded-full border border-white/20 hover:bg-white/30 transition">
+              <button className="w-9 h-9 flex items-center justify-center rounded-full border border-white/20 hover:bg-white/30 transition">
                 <Share2 size={20} className="text-white" />
               </button>
-              <button className="w-10 h-10 flex items-center justify-center rounded-full border border-white/20 hover:bg-white/30 transition"> 
+              <button className="w-9 h-9 flex items-center justify-center rounded-full border border-white/20 hover:bg-white/30 transition"> 
                 <Pencil size={20} className="text-white" />
               </button>
             </div>
           </div>
 
           {/* 공연 타이틀 및 부제 */}
-          <div className="mb-6">
-            <h3 className="text-[24px] font-bold leading-tight mb-1">
-              {concert.title}
-            </h3>
-            <p className="text-[18px] font-medium text-gray-200">
-              [{concert.subtitle}]
-            </p>
-          </div>
+  
 
           {/* 상세 정보 리스트 (일시, 장소, 좌석) */}
-          <div className="space-y-1">
-            <div className="flex text-[15px]">
+          <div className="space-y-0.5">
+            <div className="mb-2">
+            <h3 className="text-[24px] font-normal font-family- leading-tight mb-1">
+              {concert.title}
+            </h3>
+            <p className="text-[16px] font-normal text-gray-200">
+              {concert.subtitle}
+            </p>
+          </div>
+            <div className="flex text-[13px]">
               <span className="w-12 text-gray-300 flex-shrink-0">일시</span>
-              <span className="text-white font-medium">
+              <span className="text-white font-normal">
                 {concert.date} {concert.time}
               </span>
             </div>
-            <div className="flex text-[15px]">
+            <div className="flex text-[13px]">
               <span className="w-12 text-gray-300 flex-shrink-0">장소</span>
-              <span className="text-white font-medium">{concert.venue}</span>
+              <span className="text-white font-normal">{concert.venue}</span>
             </div>
-            <div className="flex text-[15px]">
+            <div className="flex text-[13px]">
               <span className="w-12 text-gray-300 flex-shrink-0">좌석</span>
-              <span className="text-white font-medium">
+              <span className="text-white font-normal">
                 {concert.seat || "좌석 정보 없음"}
               </span>
             </div>

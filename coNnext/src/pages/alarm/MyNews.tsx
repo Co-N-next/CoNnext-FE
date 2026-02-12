@@ -57,24 +57,20 @@ export default function MyNews() {
   );
 
   /* ================= 기존 news 로직 ================= */
-  const newsList =
-    data?.payload.news
-      .filter((n: Notification) => n.action_type !== "NONE") // 공연 알림 제외
-      .map((n: Notification) => ({
-        id: n.id,
-        profileImg: n.sender_profile_img,
-        name: n.title,
-        type:
-          n.category === "MATE" ? ("FRIEND" as const) : ("LOCATION" as const),
-        createdAt: n.createdAt,
-      })) ?? [];
+  // TODO: 실제 로그인 유저 ID로 교체 필요
+  const currentUserId = 1;
 
-  const parsedNews = newsList
-    .map((news) => {
-      const { section, timeText } = getTimeInfo(news.createdAt);
-      return { ...news, section, timeText };
+  const actionNewsList =
+    data?.payload.news.filter(
+      (n: Notification) => n.action_type !== "NONE",
+    ) ?? [];
+
+  const parsedNews = actionNewsList
+    .map((n: Notification) => {
+      const { section, timeText } = getTimeInfo(n.createdAt);
+      return { notification: n, section, timeText };
     })
-    .filter((news) => news.section !== "OLD");
+    .filter((item) => item.section !== "OLD");
 
   const todayList = parsedNews.filter((n) => n.section === "TODAY");
   const weekAgoList = parsedNews.filter((n) => n.section === "WEEK_AGO");
@@ -161,14 +157,12 @@ export default function MyNews() {
         </h2>
         <div className="flex flex-col">
           {todayList.map(
-            (news) =>
+            (item) =>
               canRender() && (
                 <MyNewsCard
-                  key={news.id}
-                  profileImg={news.profileImg}
-                  name={news.name}
-                  type={news.type}
-                  time={news.timeText}
+                  key={item.notification.id}
+                  notification={item.notification}
+                  currentUserId={currentUserId}
                 />
               ),
           )}
@@ -182,14 +176,12 @@ export default function MyNews() {
         </h2>
         <div className="flex flex-col">
           {weekAgoList.map(
-            (news) =>
+            (item) =>
               canRender() && (
                 <MyNewsCard
-                  key={news.id}
-                  profileImg={news.profileImg}
-                  name={news.name}
-                  type={news.type}
-                  time={news.timeText}
+                  key={item.notification.id}
+                  notification={item.notification}
+                  currentUserId={currentUserId}
                 />
               ),
           )}

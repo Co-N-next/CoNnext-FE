@@ -165,9 +165,18 @@ const SearchHall = () => {
         </section>
       )}
       {/* 검색 결과 */}
-      {/* 검색 결과 */}
       {search && (
-        <section className="mt-6 grid grid-cols-2 gap-3">
+        <>
+          {!isLoading && data && (
+            <p className="mt-4 mb-2 text-sm text-gray-400">
+              검색결과{" "}
+              <span className="text-white font-semibold">
+                {data.pageInfo?.totalElements ?? data.payload?.length ?? 0}
+              </span>
+              건
+            </p>
+          )}
+          <section className="grid grid-cols-2 gap-3">
           {isLoading && (
             <p className="col-span-2 text-sm text-gray-400">검색 중...</p>
           )}
@@ -185,6 +194,7 @@ const SearchHall = () => {
             </div>
           ))}
         </section>
+        </>
       )}
     </div>
   );

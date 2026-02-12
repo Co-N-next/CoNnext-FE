@@ -1,13 +1,25 @@
 import type { Concert } from "../types/concert";
+import { Share2, Pencil } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface ConcertCardProps {
   concert: Concert;
-  section: string;
 }
 
 const ConcertCard = ({ concert }: ConcertCardProps) => {
+  const navigate = useNavigate();
+
   return (
+    
     <div className="rounded-xl overflow-hidden">
+      <div className="flex justify-end px-6 gap-2">
+                 <button className="w-9 h-9 flex items-center justify-center rounded-full border border-white/20 hover:bg-white/30 transition">
+                <Share2 size={20} className="text-white" />
+              </button>
+              <button className="w-9 h-9 flex items-center justify-center rounded-full border border-white/20 hover:bg-white/30 transition"> 
+                <Pencil size={20} className="text-white" />
+              </button>
+              </div>
       <div className="flex gap-[27px] pr-[24px] pl-[24px] pt-2 pb-[24px]">
         <img
           src={concert.imageUrl}
@@ -47,7 +59,10 @@ const ConcertCard = ({ concert }: ConcertCardProps) => {
       </div>
 
       <div className="px-[24px] py-1 pb-4 space-y-[8px]">
-        <button className="w-full bg-[#414141] hover:bg-gray-600 text-white p-[10px] rounded-[10px] font-medium text-[12px] transition">
+        <button 
+          onClick={() => navigate("/more-info")}
+          className="w-full bg-[#414141] hover:bg-gray-600 text-white p-[10px] rounded-[10px] font-medium text-[12px] transition"
+        >
           정보 더보기
         </button>
         <div className="flex gap-2">

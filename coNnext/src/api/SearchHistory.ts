@@ -1,4 +1,4 @@
-import { axiosInstance } from "./axios";
+import api from "./axios";
 import type {
   GetSearchHistoryResponse,
   PostSearchHistoryRequest,
@@ -9,7 +9,7 @@ import type {
 export const getSearchHistory = async (
   type: SearchType,
 ): Promise<GetSearchHistoryResponse> => {
-  const { data } = await axiosInstance.get("/searchHistory", {
+  const { data } = await api.get("/searchHistory", {
     params: { type },
   });
 
@@ -18,13 +18,13 @@ export const getSearchHistory = async (
 
 // 검색어 저장
 export const postSearchHistory = async (body: PostSearchHistoryRequest) => {
-  const { data } = await axiosInstance.post("/searchHistory", body);
+  const { data } = await api.post("/searchHistory", body);
   return data;
 };
 
 // 검색어 하나 삭제
 export const deleteSearchHistory = async (searchHistoryId: number) => {
-  const { data } = await axiosInstance.delete(
+  const { data } = await api.delete(
     `/searchHistory/${searchHistoryId}`,
   );
   return data;
@@ -32,7 +32,7 @@ export const deleteSearchHistory = async (searchHistoryId: number) => {
 
 // 검색어 전체 삭제
 export const deleteAllSearchHistory = async (type: SearchType) => {
-  const { data } = await axiosInstance.delete("/searchHistory/all", {
+  const { data } = await api.delete("/searchHistory/all", {
     params: { type },
   });
 

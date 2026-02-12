@@ -1,187 +1,192 @@
-<<<<<<< HEAD
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { X } from "lucide-react"; // 삭제 아이콘용 (없으면 텍스트로 대체 가능)
 import type { Concert } from "../../types/concert";
+import type { ReservationResponse } from "../../types/reservation"; // ✅ 타입 임포트 추가
 import ConcertCard from "../../components/ConcertCard";
 import SelectBar from "../../components/SelectBar";
-import AddTicket from "./AddTicket";
-import { X } from "lucide-react";
-import bol4 from "../../assets/images/bol4.svg";
-import seventeen from "../../assets/images/seventeen.svg";
-import { useNavigate } from "react-router-dom";
 import TodayConcert from "../../components/TodayConcert";
+import EmptyTicketState from "./components/EmptyTicketState";
+import ReservationSkeleton from "../../components/skeleton/ReserveSkeleton";
+import { fetchMyReservations, deleteReservation } from "../../api/reservation"; // ✅ API 함수 임포트
 
 const ReservationList = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("public");
 
-  // 예매 내역 입력 화면 표시 여부를 관리하는 state
-  const [showAddTicket, setShowAddTicket] = useState(false);
+  // ✅ 전체 예매 목록 State
+  const [allReservations, setAllReservations] = useState<Concert[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // 예매한 공연 목록을 state로 관리하여 추가/삭제 가능하도록 함
-  const [bookedConcerts, setBookedConcerts] = useState<Concert[]>([]);
+  // ✅ 1. 데이터 불러오기 (Read)
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        setIsLoading(true);
+        const data = await fetchMyReservations();
+        
+        // 데이터 매핑 (백엔드 필드명 -> 프론트엔드 타입)
+        // 백엔드가 이미 Concert 타입과 똑같이 준다면 map 불필요
+        const mappedData = data.map((item: ReservationResponse): Concert => ({
+          id: String(item.reservationId), // 삭제할 때 쓸 ID
+          title: item.concertTitle || item.title || "",
+          subtitle: item.subtitle || "",
+          artist: item.artist || "",
+          date: item.concertDate || item.date || "", // "2025-11-25" or "2025.11.25(월)"
+          time: item.concertTime || item.time || "",
+          venue: item.venue || "",
+          seat: item.seatLocation || item.seat || "",
+          imageUrl: item.posterUrl || item.imageUrl || "",
+        }));
 
-  const upcomingConcerts: Concert[] = [
-    {
-      id: "1",
-      title: "어떤 콘서트 2025",
-      subtitle: "",
-      artist: "볼빨간사춘기",
-      date: "2025.11.25(월)",
-      time: "18:00",
-      venue: "잠실야구장",
-      seat: "1층 $구역 #열 &&번",
-      imageUrl: bol4,
-    },
-  ];
-
-  // 예매 내역 추가 함수 - 테스트용으로 임의의 예매 내역을 바로 추가
-  const handleAddTicket = () => {
-    const newReservation: Concert = {
-      id: `reservation-${Date.now()}`,
-      title: "2022 <BE THE SUN> IN SEOUL",
-      subtitle: "",
-      artist: "세븐틴 (SEVENTEEN)",
-      date: "2022.06.25(월)",
-      time: "18:00",
-      venue: "고척스카이돔",
-      seat: "1층 $구역 #열 &&번",
-      imageUrl: seventeen,
+        setAllReservations(mappedData);
+      } catch (error) {
+        console.error("예매 목록 로딩 실패:", error);
+      } finally {
+        setIsLoading(false);
+      }
     };
-    setBookedConcerts([...bookedConcerts, newReservation]);
+
+    loadData();
+  }, []);
+
+  // ✅ 2. 예매 내역 삭제 함수 (Delete)
+  const handleDelete = async (reservationId: string) => {
+    if (!window.confirm("정말 이 예매 내역을 삭제하시겠습니까?")) return;
+
+    try {
+      await deleteReservation(reservationId);
+      // 성공 시 화면에서도 즉시 제거
+      setAllReservations((prev) => prev.filter((item) => item.id !== reservationId));
+      alert("예매 내역이 삭제되었습니다.");
+    } catch (error) {
+      console.error("삭제 실패:", error);
+      alert("삭제에 실패했습니다. 잠시 후 다시 시도해주세요.");
+    }
   };
 
-  // 예매 내역 입력 화면에서 뒤로 돌아가는 함수
-  const handleBackFromAddTicket = () => {
-    setShowAddTicket(false);
+  // ✅ 3. 날짜 비교 및 분류 로직
+  const getTodayString = () => {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    // 백엔드 데이터가 '2025-11-25' 형식이면 '-' 사용, '2025.11.25'면 '.' 사용
+    // 여기서는 비교를 위해 숫자만 남기는 방식을 추천
+    return `${yyyy}${mm}${dd}`; 
   };
 
-  // 예매 내역 제출 핸들러 - 입력한 텍스트를 기반으로 예매 내역 추가
-  const handleSubmitReservation = (reservationText: string) => {
-    // 입력한 텍스트를 기반으로 예매 내역 생성 (실제로는 서버 API 호출)
-    const newReservation: Concert = {
-      id: `reservation-${Date.now()}`,
-      title: "2022 <BE THE SUN> IN SEOUL",
-      subtitle: "",
-      artist: "세븐틴 (SEVENTEEN)",
-      date: "2022.06.25(월)",
-      time: "18:00",
-      venue: "고척스카이돔",
-      seat: "1층 $구역 #열 &&번",
-      imageUrl: seventeen,
-    };
-    setBookedConcerts([...bookedConcerts, newReservation]);
-    console.log("입력한 예매 내역:", reservationText);
+  const normalizeDate = (dateStr: string) => {
+    // "2025.11.25(월)" -> "20251125" 로 변환하여 비교
+    return dateStr.replace(/[^0-9]/g, "").substring(0, 8);
   };
 
-  // 예매 내역 삭제 함수 - 선택한 예매 내역을 삭제
-  const handleCancelReservation = (concertId: string) => {
-    setBookedConcerts(
-      bookedConcerts.filter((concert) => concert.id !== concertId)
-    );
-  };
+  const todayStr = getTodayString();
 
-  // 공연 찾기 버튼 클릭 핸들러 - 공연 검색 페이지로 이동하거나 공연 목록 표시
-  const handleFindConcert = () => {
-    console.log("공연 찾기 버튼 클릭");
-    navigate("/add");
-    // TODO: 실제 공연 검색 페이지로 라우팅하거나 공연 목록 모달 표시
-  };
+  // 오늘 공연
+  const todayConcerts = allReservations.filter(
+    (c) => normalizeDate(c.date) === todayStr
+  );
 
-  // 공연 추가 버튼 클릭 핸들러 - 예매 내역 입력 화면으로 이동
+  // 다가오는 공연 (오늘이 아닌 날짜)
+  const futureConcerts = allReservations.filter(
+    (c) => normalizeDate(c.date) !== todayStr
+  );
 
-  // 예매 내역 입력 화면이 표시되어야 할 때 해당 화면 렌더링
-  if (showAddTicket) {
-    return (
-      <AddTicket
-        onBack={handleBackFromAddTicket}
-        onSubmit={handleSubmitReservation}
-      />
-    );
-  }
+  const isEmpty = allReservations.length === 0;
 
-  // 기본 예매 내역 목록 화면 렌더링
+  // ---------------------------------------------------------
+  // 렌더링
+  // ---------------------------------------------------------
   return (
     <div className="min-h-screen bg-[#07132D] text-white">
       <div className="max-w-2xl mx-auto">
         <SelectBar activeTab={activeTab} onTabChange={setActiveTab} />
 
-        <div className="space-y-6">
-          {/* Today's Concerts Section */}
-          <section>
-            <h2 className="px-[24px] gap-[12px] py-4 text-[20px] font-semibold leading-[1.2]">
-              오늘의 공연
-            </h2>
-            <div className="bg-gradient-to-b from-[#0E172A] to-[#2B1D5A] space-y-4">
-              {upcomingConcerts.map((concert) => (
-                <TodayConcert key={concert.id} concert={concert} />
-              ))}
-            </div>
-          </section>
+        {/* 로딩 중일 때 */}
+        {isLoading ? (
+          <ReservationSkeleton />
+        ) : isEmpty ? (
+          // 데이터가 없을 때
+          <EmptyTicketState />
+        ) : (
+          // 데이터가 있을 때
+          <div className="space-y-6 pb-24">
+            
+            {/* 1. Today's Concerts Section (오늘 공연) */}
+            {todayConcerts.length > 0 && (
+              <section className="pt-5 px-4">
+                 {/* 오늘 공연은 보통 타이틀 없이 카드만 강조하거나, "오늘의 공연" 타이틀 추가 가능 */}
+                <h2 className="text-[18px] font-bold mb-3 px-2">오늘의 공연</h2>
+                <div className="space-y-4">
+                  {todayConcerts.map((concert) => (
+                    <div key={concert.id} className="relative">
+                      <TodayConcert concert={concert} />
+                      {/* 삭제 버튼 (오늘 공연은 삭제 못하게 할 수도 있음. 필요하면 추가) */}
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
 
-          {/* Booked Concerts Section - 예매한 공연 섹션 */}
-          <section>
-            <h2 className="px-6 pt-2 text-[18px] font-normal mb-4">
-              다가오는 공연
-            </h2>
-
-            {/* 예매 내역이 있을 때: 예매 목록 표시 */}
-            {bookedConcerts.length > 0 ? (
+            {/* 2. Booked Concerts Section (다가오는 공연) */}
+            <section className="px-4">
+              <h2 className="px-2 pt-1 text-[16px] font-normal mb-3">
+                다가오는 공연
+              </h2>
+              
               <div className="space-y-4">
-                {bookedConcerts.map((concert) => (
-                  <div key={concert.id} className="relative">
-                    <ConcertCard concert={concert} section="past" />
-                    {/* 예매 취소 버튼 - 카드 상단 우측에 배치 */}
+                {futureConcerts.map((concert) => (
+                  <div key={concert.id} className="relative group">
+                    {/* 공연 카드 */}
+                    <ConcertCard concert={concert} />
+                    
+                    {/* ✅ 삭제 버튼 (카드 우측 상단에 배치) */}
                     <button
-                      onClick={() => handleCancelReservation(concert.id)}
-                      className="absolute top-2 right-2 bg-red-600 hover:bg-red-700 text-white rounded-full p-1.5 transition z-10"
-                      aria-label="예매 취소"
+                      onClick={(e) => {
+                        e.stopPropagation(); // 카드 클릭 이벤트 방지
+                        handleDelete(concert.id);
+                      }}
+                      className="absolute top-3 right-3 w-8 h-8 bg-black/60 hover:bg-red-500/80 backdrop-blur-sm rounded-full flex items-center justify-center transition-colors z-10"
+                      aria-label="예매 내역 삭제"
                     >
-                      <X className="w-4 h-4" />
+                      <X size={16} className="text-white" />
                     </button>
                   </div>
                 ))}
+
+                {futureConcerts.length === 0 && todayConcerts.length === 0 && (
+                   <div className="px-6 py-4 text-gray-400 text-center text-sm">
+                     예매된 공연이 없습니다.
+                   </div>
+                )}
               </div>
-            ) : (
-              /* 예매 내역이 없을 때: 빈 상태 화면 표시 */
-              <div className="flex flex-col items-center justify-center py-16 px-4">
-                {/* 경고 아이콘 - 빨간색 원형 배경에 느낌표 */}
-                <div className="relative mb-6">
-                  <div className="w-20 h-20 bg-red-900/30 rounded-full flex items-center justify-center">
-                    <div className="text-5xl font-bold text-red-500 mb-1">
-                      !
-                    </div>
-                  </div>
-                </div>
+            </section>
+          </div>
+        )}
 
-                {/* 안내 메시지 */}
-                <p className="text-white text-[16px] font-medium mb-6">
-                  예매한 공연이 없어요!
-                </p>
-
-                {/* 공연 찾기 버튼 - 회색 배경에 흰색 텍스트 */}
-                <button
-                  onClick={handleFindConcert}
-                  className="bg-[#414141] hover:bg-gray-600 text-white w-full text-center text-[12px] px-8 py-3 rounded-lg font-medium transition"
-                >
-                  공연 찾기
-                </button>
-                <button
-                  onClick={handleAddTicket}
-                  className="mt-2 bg-[#7F5AFF] hover:bg-gray-600 text-white w-full text-center text-[12px] px-8 py-3 rounded-lg font-medium transition"
-                >
-                  예매 내역 추가하기
-                </button>
-              </div>
-            )}
-
-            {/* 테스트용 임의 버튼 섹션 - 예매 추가/삭제 테스트용 */}
-          </section>
-        </div>
+        {/* Fixed Footer - 데이터가 있을 때만 표시 */}
+        {!isEmpty && (
+          <div className="bottom-0 left-0 right-0 px-5 py-6 bg-[#07132D] z-50">
+            <div className="max-w-2xl mx-auto flex gap-3">
+              <button
+                onClick={() => navigate("/")}
+                className="w-[28%] bg-white text-[#07132D] p-[14px] rounded-[12px] font-bold text-[16px] leading-[1.2] transition flex items-center justify-center"
+              >
+                닫기
+              </button>
+              <button
+                onClick={() => navigate("/add")}
+                className="flex-1 bg-[#7F5AFF] text-white p-[14px] rounded-[12px] font-bold text-[16px] leading-[1.2] transition flex items-center justify-center gap-1"
+              >
+                + 예매 내역 추가하기
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
 };
 
 export default ReservationList;
-=======
->>>>>>> 90d9491d37fe15f2f04a1d515ee33d890d73a1f7

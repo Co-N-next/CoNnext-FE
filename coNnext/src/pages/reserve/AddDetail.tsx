@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ChevronLeft } from "lucide-react";
 import type { Concert } from "../../types/concert";
+import { fetchConcertDetail } from "../../api/concert"; // ✅ API 함수 임포트
+import { createReservation } from "../../api/reservation";
 
 const AddDetail = () => {
   const navigate = useNavigate();
@@ -11,14 +13,41 @@ const AddDetail = () => {
   // ✅ 화면 모드 상태 (false: 입력 모드, true: 확인 모드)
   const [isChecking, setIsChecking] = useState(false);
 
-  // 입력값 관리 (상태가 유지되므로 왔다갔다 해도 데이터 안 날아감)
-  const [selectedDate, setSelectedDate] = useState("2023.06.25(월)"); // 편의상 기본값 넣음
+  // ✅ API에서 받아온 회차(스케줄) 목록 상태
+  const [schedules, setSchedules] = useState<{ date: string; time: string }[]>([]);
+  
+  // 사용자가 선택한 스케줄의 인덱스 (-1이면 선택 안함)
+  const [selectedScheduleIndex, setSelectedScheduleIndex] = useState<number>(-1);
+
+  // 화면에 표시할 날짜 텍스트 (기본값은 공연 정보의 날짜, 선택 시 변경됨)
+  const [displayDate, setDisplayDate] = useState(concert?.date || ""); 
+
   const [seatInfo, setSeatInfo] = useState({
     floor: "",
     section: "",
     row: "",
     number: "",
   });
+
+  // ✅ 1. 화면 진입 시 공연 회차 정보(날짜 목록) 가져오기
+  useEffect(() => {
+    const loadDetails = async () => {
+      if (concert?.id) {
+        try {
+          // API 호출: 공연 상세(회차) 정보 조회
+          const data = await fetchConcertDetail(concert.id);
+          
+          // 백엔드 응답 구조에 따라 schedules 설정 (예: data.schedules가 배열이라고 가정)
+          // 만약 API가 아직 없다면 빈 배열로 두거나 더미데이터를 넣어서 테스트하세요.
+          setSchedules(data.schedules || []); 
+          
+        } catch (error) {
+          console.error("상세 정보 로딩 실패:", error);
+        }
+      }
+    };
+    loadDetails();
+  }, [concert]);
 
   // 방어 코드
   if (!concert) {
@@ -32,8 +61,35 @@ const AddDetail = () => {
   // 좌석 정보 텍스트 조합
   const fullSeatString = `${seatInfo.floor}층 ${seatInfo.section}구역 ${seatInfo.row}열 ${seatInfo.number}번`;
 
+  // ✅ 2. 최종 저장 ('맞아요' 버튼 클릭 시)
+  const handleConfirm = async () => {
+    try {
+      // 선택된 스케줄이 있다면 그 정보를, 없다면 기본 공연 정보를 사용
+      // (날짜 포맷은 백엔드 요구사항에 맞춰 "YYYY-MM-DD" 형태로 변환 필요할 수 있음)
+      const currentSchedule = selectedScheduleIndex !== -1 ? schedules[selectedScheduleIndex] : null;
+      
+      const finalDate = currentSchedule?.date || concert.date; // 예: "2025-11-25"
+      const finalTime = currentSchedule?.time || concert.time; // 예: "18:00"
+
+      // API 호출: 예매 내역 저장
+      await createReservation({
+        concertId: Number(concert.id),
+        concertDate: finalDate,
+        concertTime: finalTime,
+        seatLocation: fullSeatString,
+      });
+
+      // 성공 시 목록 페이지로 이동
+      navigate("/reserve");
+      
+    } catch (error) {
+      console.error("예매 내역 저장 실패:", error);
+      alert("저장에 실패했습니다. 다시 시도해주세요.");
+    }
+  };
+
   // ------------------------------------------------------------------
-  // 1. 확인 화면 (Check Mode) - isChecking이 true일 때 렌더링
+  // 3. 확인 화면 (Check Mode) - isChecking이 true일 때 렌더링
   // ------------------------------------------------------------------
   if (isChecking) {
     return (
@@ -75,18 +131,19 @@ const AddDetail = () => {
               </div>
 
               {/* 정보 */}
-              <h2 className="text-[16px] font-bold text-center mb-1">
+              <h2 className="text-[16px] font-bold text-center mb-1 mt-4">
                 {concert.title}
               </h2>
               <p className="text-[15px] text-gray-300 mb-6">{concert.artist}</p>
 
-              <div className="w-full">
+              <div className="w-full space-y-2">
                 <div className="flex text-[13px] font-normal">
                   <span className="w-[50px] text-[#A1A1A1] flex-shrink-0">
                     일시
                   </span>
                   <span className="text-white">
-                    {selectedDate} {concert.time}
+                    {/* 선택된 날짜와 시간 표시 */}
+                    {displayDate} {selectedScheduleIndex !== -1 ? schedules[selectedScheduleIndex].time : concert.time}
                   </span>
                 </div>
                 <div className="flex text-[13px]">
@@ -109,15 +166,15 @@ const AddDetail = () => {
           </div>
 
           {/* 하단 버튼 */}
-          <div className="px-5 pb-40 w-full flex gap-3 ">
+          <div className="px-5 pb-40 w-full flex gap-3 mt-8">
             <button
-              onClick={() => navigate("/reserve")} // 최종 완료 시 메인으로
+              onClick={handleConfirm} // ✅ 최종 저장 API 호출
               className="flex-1 h-[40px] rounded-[10px] bg-[#7F5AFF] hover:bg-[#6B4DE6] text-white font-normal text-[13px]"
             >
               맞아요
             </button>
             <button
-              onClick={() => setIsChecking(false)} // ✅ 다시 입력 화면으로 돌아가기
+              onClick={() => setIsChecking(false)}
               className="flex-1 h-[40px] rounded-[10px] bg-[#3C3E4F] hover:bg-[#343644] text-gray-300 font-normal text-[13px]"
             >
               수정할래요
@@ -129,7 +186,7 @@ const AddDetail = () => {
   }
 
   // ------------------------------------------------------------------
-  // 2. 입력 화면 (Input Mode) - isChecking이 false일 때 렌더링
+  // 4. 입력 화면 (Input Mode) - isChecking이 false일 때 렌더링
   // ------------------------------------------------------------------
   return (
     <div className="min-h-screen bg-[#0E172A] text-white font-sans flex flex-col">
@@ -171,9 +228,6 @@ const AddDetail = () => {
                   <span className=" text-white">
                     {concert.date} {concert.time}
                   </span>
-                  <span className="text-white">
-                    {concert.date} {concert.time}
-                  </span>
                 </div>
               </div>
               <div className="flex pb-2">
@@ -195,17 +249,40 @@ const AddDetail = () => {
           </p>
         </div>
 
-        {/* 공연 일자 */}
+        {/* ✅ 공연 일자 선택 (Select Box로 변경) */}
         <div className="mb-8">
           <label className="block text-[15px] font-bold mb-3">
             공연 일자 선택
           </label>
-          <input
-            type="text"
-            readOnly
-            value={selectedDate}
-            className="w-full h-[52px] bg-[#1E293B] border border-white/10 rounded-[10px] px-4 text-white placeholder-gray-500 focus:outline-none focus:border-[#7F5AFF] cursor-pointer"
-          />
+          <div className="relative">
+            <select
+              value={selectedScheduleIndex}
+              onChange={(e) => {
+                const idx = Number(e.target.value);
+                setSelectedScheduleIndex(idx);
+                // 선택한 날짜로 표시 텍스트 업데이트
+                if (idx !== -1 && schedules[idx]) {
+                    setDisplayDate(schedules[idx].date);
+                } else {
+                    setDisplayDate(concert.date);
+                }
+              }}
+              className="w-full h-[52px] bg-[#1E293B] border border-white/10 rounded-[10px] px-4 text-white focus:outline-none focus:border-[#7F5AFF] cursor-pointer appearance-none"
+            >
+              <option value={-1}>
+                {schedules.length > 0 ? "날짜를 선택해주세요" : "로딩 중이거나 날짜 정보가 없습니다"}
+              </option>
+              {schedules.map((schedule, index) => (
+                <option key={index} value={index} className="bg-[#1E293B]">
+                  {schedule.date} {schedule.time}
+                </option>
+              ))}
+            </select>
+            {/* 커스텀 화살표 아이콘 (선택 사항) */}
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400">
+               <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+            </div>
+          </div>
         </div>
 
         {/* 좌석 선택 */}
@@ -220,7 +297,7 @@ const AddDetail = () => {
               onChange={(e) =>
                 setSeatInfo({ ...seatInfo, floor: e.target.value })
               }
-              className="w-[50px] px-[8px] py-[13px] flex items-center justify-end gap-[10px] rounded-[8px] border-[0.5px] border-[#A1A1A1] bg-[#222222]/50 text-white text-right placeholder-[#E8E8E8] outline-none focus:border-[#7F5AFF] focus:ring-1 focus:ring-[#7F5AFF]"
+              className="w-[55px] px-[8px] py-[13px] flex items-center justify-end gap-[10px] rounded-[8px] border-[0.5px] border-[#A1A1A1] bg-[#1E293B] text-white text-right placeholder-[#E8E8E8] outline-none focus:border-[#7F5AFF] focus:ring-1 focus:ring-[#7F5AFF]"
             />
             {/* 구역 */}
             <input
@@ -230,7 +307,7 @@ const AddDetail = () => {
               onChange={(e) =>
                 setSeatInfo({ ...seatInfo, section: e.target.value })
               }
-              className="w-[73px]  px-[8px] py-[13px] flex items-center justify-end gap-[10px] rounded-[8px] border-[0.5px] border-[#A1A1A1] bg-[#222222]/50 text-white text-right placeholder-[#E8E8E8] outline-none focus:border-[#7F5AFF] focus:ring-1 focus:ring-[#7F5AFF]"
+              className="w-[80px] px-[8px] py-[13px] flex items-center justify-end gap-[10px] rounded-[8px] border-[0.5px] border-[#A1A1A1] bg-[#1E293B] text-white text-right placeholder-[#E8E8E8] outline-none focus:border-[#7F5AFF] focus:ring-1 focus:ring-[#7F5AFF]"
             />
             {/* 열 */}
             <input
@@ -240,7 +317,7 @@ const AddDetail = () => {
               onChange={(e) =>
                 setSeatInfo({ ...seatInfo, row: e.target.value })
               }
-              className="w-[84px] px-[8px] py-[13px] flex items-center justify-end gap-[10px] rounded-[8px] border-[0.5px] border-[#A1A1A1] bg-[#222222]/50 text-white text-right placeholder-[#E8E8E8] outline-none focus:border-[#7F5AFF] focus:ring-1 focus:ring-[#7F5AFF]"
+              className="w-[90px] px-[8px] py-[13px] flex items-center justify-end gap-[10px] rounded-[8px] border-[0.5px] border-[#A1A1A1] bg-[#1E293B] text-white text-right placeholder-[#E8E8E8] outline-none focus:border-[#7F5AFF] focus:ring-1 focus:ring-[#7F5AFF]"
             />
             {/* 번 */}
             <input
@@ -250,11 +327,19 @@ const AddDetail = () => {
               onChange={(e) =>
                 setSeatInfo({ ...seatInfo, number: e.target.value })
               }
-              className="w-[114px] px-[8px] py-[13px] flex items-center justify-end gap-[10px] rounded-[8px] border-[0.5px] border-[#A1A1A1] bg-[#222222]/50 text-white text-right placeholder-[#E8E8E8] outline-none focus:border-[#7F5AFF] focus:ring-1 focus:ring-[#7F5AFF]"
+              className="w-full px-[8px] py-[13px] flex items-center justify-end gap-[10px] rounded-[8px] border-[0.5px] border-[#A1A1A1] bg-[#1E293B] text-white text-right placeholder-[#E8E8E8] outline-none focus:border-[#7F5AFF] focus:ring-1 focus:ring-[#7F5AFF]"
             />
           </div>
+          
           <button
-            onClick={() => setIsChecking(true)} // ✅ 확인 모드로 전환
+            onClick={() => {
+                // 선택된 날짜가 있는지 체크 (선택사항)
+                // if (selectedScheduleIndex === -1 && schedules.length > 0) {
+                //    alert("공연 일자를 선택해주세요.");
+                //    return;
+                // }
+                setIsChecking(true);
+            }} 
             className="w-full h-[56px] rounded-[12px] bg-[#7F5AFF] hover:bg-[#6B4DE6] text-white font-bold text-[16px] transition-colors mt-8 mb-8"
           >
             입력 완료

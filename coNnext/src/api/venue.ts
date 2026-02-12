@@ -1,6 +1,6 @@
 // [Venue쪽 API함수]
 
-import { axiosInstance } from "./axios";
+import api from "./axios";
 import type {
   VenueListResponse,
   SearchVenuesResponse,
@@ -11,7 +11,7 @@ import type {
 
 // 인기 검색 공연장 조회(venues/trend-search)
 export const getTrendingVenues = async (): Promise<VenueListResponse> => {
-  const { data } = await axiosInstance.get<VenueListResponse>(
+  const { data } = await api.get<VenueListResponse>(
     "/venues/trend-search",
   );
   return data;
@@ -22,7 +22,7 @@ export const searchVenues = async (
   query: string,
   page: number = 0,
 ): Promise<SearchVenuesResponse> => {
-  const { data } = await axiosInstance.get<SearchVenuesResponse>(
+  const { data } = await api.get<SearchVenuesResponse>(
     "/venues/search",
     {
       params: { query, page },
@@ -35,7 +35,8 @@ export const searchVenues = async (
 export const getNearestVenue = async (
   params: GetNearestVenueRequest,
 ): Promise<GetNearestVenueResponse> => {
-  const { data } = await axiosInstance.get<GetNearestVenueResponse>(
+  console.log("🔥 nearby API 호출됨", params);
+  const { data } = await api.get<GetNearestVenueResponse>(
     "/venues/nearby",
     {
       params: {
@@ -52,6 +53,6 @@ export const getNearestVenue = async (
 export const getFavoriteVenues =
   async (): Promise<GetFavoriteVenuesResponse> => {
     const { data } =
-      await axiosInstance.get<GetFavoriteVenuesResponse>("/venues/favorites");
+      await api.get<GetFavoriteVenuesResponse>("/venues/favorites");
     return data;
   };

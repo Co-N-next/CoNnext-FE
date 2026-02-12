@@ -1,16 +1,16 @@
 import Location from "../assets/logo/Location.svg";
 import Friend from "../assets/logo/Friend.svg";
 import type { Notification } from "../types/notifications";
-import { useAcceptLocation } from "../hooks/mutations/useAcceptLocation ";
-
+import { useAcceptLocation } from "../hooks/mutations/useAcceptLocation";
+import { useAcceptMate } from "../hooks/mutations/useAcceptMate";
 interface MyNewsCardProps {
   notification: Notification;
   currentUserId: number; // 로그인 유저 id
 }
 
 const MyNewsCard = ({ notification, currentUserId }: MyNewsCardProps) => {
-  const { mutate } = useAcceptLocation();
-
+  const { mutate: acceptLocation } = useAcceptLocation();
+  const { mutate: acceptMate } = useAcceptMate();
   const {
     sender_id,
     sender_profile_img,
@@ -41,10 +41,37 @@ const MyNewsCard = ({ notification, currentUserId }: MyNewsCardProps) => {
   const cardBg = isPending ? "bg-[#293A5D]" : "bg-[#0E172A]";
 
   const handleAccept = () => {
-    mutate({
-      user_id: currentUserId,
-      sender_id: sender_id,
-    });
+    if (category === "LOCATION") {
+      acceptLocation({
+        user_id: currentUserId,
+        sender_id: sender_id,
+      });
+    }
+
+    if (category === "MATE") {
+      acceptMate({
+        user_id: currentUserId,
+        sender_id: sender_id,
+      });
+    }
+  };
+
+  const handleReject = () => {
+    if (category === "LOCATION") {
+      acceptLocation({
+        user_id: currentUserId,
+        sender_id: sender_id,
+        action: "REJECT",
+      });
+    }
+
+    if (category === "MATE") {
+      acceptMate({
+        user_id: currentUserId,
+        sender_id: sender_id,
+        action: "REJECT",
+      });
+    }
   };
 
   return (
@@ -96,7 +123,7 @@ const MyNewsCard = ({ notification, currentUserId }: MyNewsCardProps) => {
                 >
                   수락
                 </button>
-                <button className="rounded-full bg-[#1F2A44] px-6 py-2.5 text-xs text-gray-300">
+                <button onClick={handleReject} className="rounded-full bg-[#1F2A44] px-6 py-2.5 text-xs text-gray-300">
                   거절
                 </button>
               </div>
