@@ -39,7 +39,7 @@ const AddDetail = () => {
           
           // 백엔드 응답 구조에 따라 schedules 설정 (예: data.schedules가 배열이라고 가정)
           // 만약 API가 아직 없다면 빈 배열로 두거나 더미데이터를 넣어서 테스트하세요.
-          setSchedules(data.schedules || []); 
+          setSchedules(data.date && data.time ? [{ date: data.date, time: data.time }] : []); 
           
         } catch (error) {
           console.error("상세 정보 로딩 실패:", error);

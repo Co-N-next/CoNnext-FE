@@ -1,8 +1,9 @@
 import axios from "axios";
+import { API_BASE_URL } from "../config/api";
 
 const api = axios.create({
-  baseURL: "https://api.con-next.xyz",
-  withCredentials: true, // ⭐⭐⭐ 쿠키 받기 필수
+  baseURL: API_BASE_URL,
+  withCredentials: true,
 });
 
 export default api;

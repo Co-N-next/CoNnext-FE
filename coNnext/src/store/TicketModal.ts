@@ -1,13 +1,38 @@
-import { create } from "zustand";
+import { useSyncExternalStore } from "react";
 
-interface TicketModalState {
+type TicketModalState = {
   isOpen: boolean;
-  open: () => void;
-  close: () => void;
-}
+};
 
-export const useTicketModalStore = create<TicketModalState>((set) => ({
+const store: TicketModalState = {
   isOpen: false,
-  open: () => set({ isOpen: true }),
-  close: () => set({ isOpen: false }),
-}));
+};
+
+const listeners = new Set<() => void>();
+
+const subscribe = (listener: () => void) => {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
+};
+
+const getSnapshot = () => store.isOpen;
+
+const emit = () => {
+  listeners.forEach((listener) => listener());
+};
+
+export const useTicketModalStore = () => {
+  const isOpen = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
+
+  return {
+    isOpen,
+    open: () => {
+      store.isOpen = true;
+      emit();
+    },
+    close: () => {
+      store.isOpen = false;
+      emit();
+    },
+  };
+};

@@ -2,12 +2,13 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
 import FilterIcon from "../../assets/Icons/Align.svg";
-import type { RecentConcert } from "../../api/concertItem";
-import { getConcertById, getRecentConcerts } from "../../api/concertItem";
+import type { UpcomingConcert } from "../../api/concertItem";
+import { getUpcomingConcerts } from "../../api/concertItem";
 
 type UIConcert = {
   id: number;
-  detailId: number | null;
+  concertId: number;
+  detailId: number;
   title: string;
   subtitle: string;
   artist: string;
@@ -27,22 +28,19 @@ export default function UpcomingConcertPage() {
   useEffect(() => {
     const fetchConcerts = async () => {
       try {
-        const res = await getRecentConcerts();
+        const res = await getUpcomingConcerts();
 
-        const mapped: UIConcert[] = res.payload.map((c: RecentConcert) => {
-          let dDay = 0;
-
-          if (c.schedules?.length > 0) {
-            const start = new Date(c.schedules[0].startAt);
-            const today = new Date();
-            const diff = start.getTime() - today.getTime();
-            dDay = Math.ceil(diff / (1000 * 60 * 60 * 24));
-          }
+        const mapped: UIConcert[] = res.payload.map((c: UpcomingConcert) => {
+          const start = new Date(c.startAt);
+          const today = new Date();
+          const diff = start.getTime() - today.getTime();
+          const dDay = Math.ceil(diff / (1000 * 60 * 60 * 24));
 
           return {
-            id: c.id,
-            detailId: c.schedules?.[0]?.detailId ?? null,
-            title: c.name,
+            id: c.detailId,
+            concertId: c.concertId,
+            detailId: c.detailId,
+            title: c.concertName,
             subtitle: "",
             artist: "",
             poster: c.posterImage,
@@ -53,7 +51,7 @@ export default function UpcomingConcertPage() {
 
         setConcerts(mapped);
       } catch (e) {
-        console.error("최근 공연 조회 실패:", e);
+        console.error("다가오는 공연 조회 실패:", e);
       }
     };
 
@@ -69,27 +67,6 @@ export default function UpcomingConcertPage() {
   const handleFilterChange = (newFilter: FilterType) => {
     setFilter(newFilter);
     setIsMenuOpen(false);
-  };
-
-  const handleConcertClick = async (concert: UIConcert) => {
-    try {
-      if (concert.detailId) {
-        navigate(`/concert/${concert.detailId}`);
-        return;
-      }
-
-      const concertInfo = await getConcertById(concert.id);
-      const fallbackDetailId = concertInfo.payload.schedules?.[0]?.detailId;
-
-      if (!fallbackDetailId) {
-        alert("해당 공연의 회차 정보가 아직 없습니다.");
-        return;
-      }
-
-      navigate(`/concert/${fallbackDetailId}`);
-    } catch {
-      alert("공연 상세 정보를 찾지 못했습니다.");
-    }
   };
 
   return (
@@ -115,9 +92,7 @@ export default function UpcomingConcertPage() {
           {filteredConcerts.map((concert) => (
             <li
               key={concert.id}
-              onClick={() => {
-                void handleConcertClick(concert);
-              }}
+              onClick={() => navigate(`/concert/${concert.concertId}`)}
               className="flex items-center gap-4 rounded-xl bg-[#0f1729] p-3 cursor-pointer hover:bg-[#16203a] transition"
             >
               <img
