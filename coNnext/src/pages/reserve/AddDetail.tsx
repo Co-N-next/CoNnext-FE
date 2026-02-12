@@ -191,9 +191,9 @@ const AddDetail = () => {
   return (
     <div className="min-h-screen bg-[#0E172A] text-white font-sans flex flex-col">
       {/* --- 상단 영역 (배경색이 살짝 다름) --- */}
-      <div className="bg-[#1E293B] rounded-b-[24px] ">
+      <div className="bg-[#293A5D] rounded-b-[24px] ">
         {/* 헤더 */}
-        <div className="bg-[#0E172A] flex items-center gap-2 px-4 py-4 mb-2">
+        <div className="bg-[#0E172A] flex items-center gap-2 px-4 py-2 mb-2">
           <button onClick={() => navigate(-1)} className="p-1">
             <ChevronLeft size={24} className="text-white" />
           </button>
@@ -203,9 +203,9 @@ const AddDetail = () => {
         </div>
 
         {/* 공연 정보 요약 카드 */}
-        <div className="py-[20px] px-[24px] flex gap-[27px]">
+        <div className="py-[20px] pb-[24px] px-[24px] flex gap-[27px]">
           {/* 포스터 */}
-          <div className="w-[84px] h-[112px] rounded-[8px] flex-shrink-0 ">
+          <div className="w-[100px] h-[132px] rounded-[8px] flex-shrink-0 ">
             <img
               src={concert.imageUrl}
               alt={concert.title}
@@ -214,7 +214,7 @@ const AddDetail = () => {
           </div>
 
           {/* 텍스트 정보 */}
-          <div className="flex flex-col justify-center ">
+          <div className="flex flex-col">
             <h2 className="text-[13px] font-bold leading-tight mb-1">
               {concert.title}
             </h2>
@@ -251,7 +251,7 @@ const AddDetail = () => {
 
         {/* ✅ 공연 일자 선택 (Select Box로 변경) */}
         <div className="mb-8">
-          <label className="block text-[15px] font-bold mb-3">
+          <label className="block text-[13px] font-normal mb-3">
             공연 일자 선택
           </label>
           <div className="relative">
@@ -267,13 +267,15 @@ const AddDetail = () => {
                     setDisplayDate(concert.date);
                 }
               }}
-              className="w-full h-[52px] bg-[#1E293B] border border-white/10 rounded-[10px] px-4 text-white focus:outline-none focus:border-[#7F5AFF] cursor-pointer appearance-none"
+              className={`w-full h-[52px] bg-[#1E293B] border border-white/10 rounded-[10px] pl-4 pr-12 text-[13px] outline-none focus:border-[#7F5AFF] cursor-pointer appearance-none truncate ${
+                selectedScheduleIndex === -1 ? "text-[#A1A1A1]" : "text-white"
+              }`}
             >
-              <option value={-1}>
-                {schedules.length > 0 ? "날짜를 선택해주세요" : "로딩 중이거나 날짜 정보가 없습니다"}
+              <option value={-1} className="w-full mx-auto text-[#A1A1A1]">
+                {schedules.length > 0 ? "공연 일자를 선택하세요." : "로딩 중이거나 날짜 정보가 없습니다"}
               </option>
               {schedules.map((schedule, index) => (
-                <option key={index} value={index} className="bg-[#1E293B]">
+                <option key={index} value={index} className="bg-[#1E293B] text-white">
                   {schedule.date} {schedule.time}
                 </option>
               ))}
@@ -334,10 +336,17 @@ const AddDetail = () => {
           <button
             onClick={() => {
                 // 선택된 날짜가 있는지 체크 (선택사항)
-                // if (selectedScheduleIndex === -1 && schedules.length > 0) {
-                //    alert("공연 일자를 선택해주세요.");
-                //    return;
-                // }
+                if (selectedScheduleIndex === -1 && schedules.length > 0) {
+                   alert("공연 일자를 선택해주세요.");
+                   return;
+                }
+                
+                // 좌석 정보 필수 입력 체크
+                if (!seatInfo.floor || !seatInfo.section || !seatInfo.row || !seatInfo.number) {
+                    alert("좌석 정보를 모두 입력해주세요.");
+                    return;
+                }
+
                 setIsChecking(true);
             }} 
             className="w-full h-[56px] rounded-[12px] bg-[#7F5AFF] hover:bg-[#6B4DE6] text-white font-bold text-[16px] transition-colors mt-8 mb-8"

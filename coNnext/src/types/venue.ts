@@ -98,6 +98,57 @@ export interface VenueResponse {
   floors: FloorResponse[];
 }
 
+// 📌 [New] API Raw Data Types (for flexible handling in api/venue.ts)
+export interface Vertex {
+  x: number;
+  y: number;
+}
+
+export interface VenueApiSection {
+  sectionId: string | number;
+  floor?: number | string;
+  type: string;
+  // Path data variations
+  svgPath?: string;
+  pathData?: string;
+  path?: string;
+  vertices?: Vertex[];
+  // Coordinates
+  centerX?: number;
+  centerY?: number;
+}
+
+export interface VenueApiFacility {
+  facilityId?: number | string;
+  id?: number | string;
+  type: string;
+  name: string;
+  floor?: number | string;
+  x: number;
+  y: number;
+}
+
+export interface VenueApiFloor {
+  floor: number | string;
+  sections?: VenueApiSection[];
+  facilities?: VenueApiFacility[];
+}
+
+export interface VenueLayoutApiData {
+  venue?: {
+    venueId: number;
+    name: string;
+    address: string;
+    totalFloors: number;
+    svgWidth: number;
+    svgHeight: number;
+  };
+  // Top-level arrays (sometimes API returns flat lists)
+  sections?: VenueApiSection[];
+  facilities?: VenueApiFacility[];
+  floors?: VenueApiFloor[];
+}
+
 export interface FloorResponse {
   floor: number;
   sections: SectionResponse[];

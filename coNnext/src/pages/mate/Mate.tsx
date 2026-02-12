@@ -2,13 +2,15 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, ChevronRight, PlusCircle } from "lucide-react";
 import jinah from "../../assets/images/jinah.svg";
-import mate from "../../assets/images/mate.svg";
 import star from "../../assets/Icons/star_on.svg";
 import setting from "../../assets/Icons/Settings.svg";
 import userplus from "../../assets/Icons/UserPlus.svg";
 import kakao from "../../assets/Variables/kakao.svg";
 import { useDebounce } from "../../hooks/useDebounce";
 import { useMates } from "../../hooks/useMates";
+import { useQuery } from "@tanstack/react-query";
+import { getFavoriteMates } from "../../api/mate";
+import { useMateMutations } from "../../hooks/useMateMutations";
 import MateSkeleton from "../../components/skeleton/MateSkeleton";
 
 interface Mate {
@@ -30,7 +32,15 @@ const Mate = () => {
   // ✅ 검색어 debouncing (300ms)
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
 
-  // ✅ Infinite Scroll을 위한 React Query 훅
+  // ✅ Hooks & Mutations
+  const {
+    requestMateMutation,
+    deleteMateMutation,
+    // addFavoriteMutation, // (If needed for toggle)
+    // removeFavoriteMutation // (If needed for toggle)
+  } = useMateMutations();
+
+  // ✅ Infinite Scroll을 위한 React Query 훅 (전체/검색 메이트)
   const {
     data,
     fetchNextPage,
@@ -38,6 +48,14 @@ const Mate = () => {
     isFetchingNextPage,
     isLoading,
   } = useMates(debouncedSearchQuery);
+
+  // ✅ 자주 찾는 메이트 (API 호출)
+  const { data: frequentMatesData } = useQuery({
+    queryKey: ["favoriteMates"],
+    queryFn: getFavoriteMates,
+  });
+  
+  const frequentMates = frequentMatesData || [];
 
   // Infinite Scroll을 위한 Intersection Observer
   const observerRef = useRef<HTMLDivElement>(null);
@@ -68,101 +86,42 @@ const Mate = () => {
     imageUrl: jinah,
   };
 
-  // 이 곳에 원하는 이미지 URL을 넣어주세요
-  const MATE_IMAGE_URL = mate;
+  const handleRequestMate = () => {
+      if (!nicknameInput.trim()) return;
+      requestMateMutation.mutate(nicknameInput, {
+          onSuccess: () => {
+              alert("친구 신청을 보냈습니다.");
+              setIsNicknameModalOpen(false);
+              setNicknameInput("");
+          },
+          onError: (error) => {
+              console.error(error);
+              alert("친구 신청 실패. 닉네임을 확인해주세요.");
+          }
+      });
+  };
 
-  const frequentMates: Mate[] = [
-    {
-      id: "2",
-      name: "mate1",
-      imageUrl: MATE_IMAGE_URL,
-    },
-    {
-      id: "3",
-      name: "mate2",
-      imageUrl: MATE_IMAGE_URL,
-    },
-    {
-      id: "4",
-      name: "mate3",
-      imageUrl: MATE_IMAGE_URL,
-    },
-    {
-      id: "5",
-      name: "mate4",
-      imageUrl: MATE_IMAGE_URL,
-    },
-  ];
-
-  const allMates: Mate[] = [
-    {
-      id: "6",
-      name: "mate1",
-      imageUrl: MATE_IMAGE_URL,
-    },
-    {
-      id: "7",
-      name: "mate2",
-      imageUrl: MATE_IMAGE_URL,
-    },
-    {
-      id: "8",
-      name: "mate3",
-      imageUrl: MATE_IMAGE_URL,
-    },
-    {
-      id: "9",
-      name: "mate4",
-      imageUrl: MATE_IMAGE_URL,
-    },
-    {
-      id: "10",
-      name: "mate5",
-      imageUrl: MATE_IMAGE_URL,
-    },
-    {
-      id: "11",
-      name: "mate6",
-      imageUrl: MATE_IMAGE_URL,
-    },
-    {
-      id: "12",
-      name: "mate7",
-      imageUrl: MATE_IMAGE_URL,
-    },
-    {
-      id: "13",
-      name: "mate8",
-      imageUrl: MATE_IMAGE_URL,
-    },
-    {
-      id: "14",
-      name: "mate9",
-      imageUrl: MATE_IMAGE_URL,
-    },
-    {
-      id: "15",
-      name: "mate10",
-      imageUrl: MATE_IMAGE_URL,
-    },
-    {
-      id: "16",
-      name: "mate11",
-      imageUrl: MATE_IMAGE_URL,
-    },
-    {
-      id: "17",
-      name: "mate12",
-      imageUrl: MATE_IMAGE_URL,
-    },
-  ];
+  const handleDeleteMates = async () => {
+      if (confirm(`선택한 ${selectedMates.length}명의 메이트를 삭제하시겠습니까?`)) {
+          // 병렬 처리 혹은 순차 처리
+          try {
+            await Promise.all(selectedMates.map(id => deleteMateMutation.mutateAsync(id)));
+            alert("삭제되었습니다.");
+            setIsEditMode(false);
+            setSelectedMates([]);
+          } catch (e) {
+            console.error(e);
+            alert("일부 메이트 삭제 중 오류가 발생했습니다.");
+          }
+      }
+  };
 
   return (
     <div className="min-h-screen bg-[#0E172A] text-white">
       <div className="max-w-2xl mx-auto pb-50">
         {/* Section 1: 메이트 헤더 및 추천 메이트 카드 */}
         <section className="p-[16px] pl-[24px]">
-          <h1 className="text-[25px] font-semibold mb-[20px]">메이트</h1>
+          <h1 className="text-[23px] font-normal mb-[20px]">메이트</h1>
 
           {/* 카드 컨테이너 */}
           <div className="w-[353px] h-[237px] bg-[#1E293B] rounded-[12px] flex items-center gap-[12px] p-[12px] pr-[10px]">
@@ -227,7 +186,10 @@ const Mate = () => {
 
             <button
               className="text-gray-400 hover:text-white transition"
-              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              onClick={() => {
+                setIsDropdownOpen(!isDropdownOpen);
+                setIsSettingsDropdownOpen(false);
+              }}
             >
               <img src={userplus} alt="" className="w-[24px] h-[24px]" />
             </button>
@@ -255,7 +217,10 @@ const Mate = () => {
               </div>
             )}
             <button
-              onClick={() => setIsSettingsDropdownOpen(!isSettingsDropdownOpen)}
+              onClick={() => {
+                setIsSettingsDropdownOpen(!isSettingsDropdownOpen);
+                setIsDropdownOpen(false);
+              }}
               className="text-gray-400 hover:text-white transition"
             >
               <img src={setting} alt="" className="w-[24px] h-[24px]" />
@@ -288,47 +253,57 @@ const Mate = () => {
               <img src={star} alt="" className="w-[20px] h-[20px]" />
               <h2 className="text-[18px] font-bold">자주 찾는 메이트</h2>
             </div>
-            <div className="bg-[#252D3F] rounded-[12px] p-[12px] pt-[16px]">
-              <div className="grid grid-cols-4 gap-[32px]">
-                {frequentMates.map((mate) => (
-                  <div key={mate.id} className="flex flex-col items-center">
-                    <button
-                      onClick={() => {
-                        if (!isEditMode) {
-                          navigate('/mate/detail', { state: { mate } });
-                        }
-                      }}
-                      className="flex flex-col items-center"
-                    >
-                      <div className="w-[60px] h-[60px] bg-gray-700 rounded-full overflow-hidden mb-1">
-                        <img
-                          src={mate.imageUrl}
-                          alt={mate.name}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <span className="text-[12px] text-[#F2EFFF] mb-2">{mate.name}</span>
-                    </button>
-                    {isEditMode && (
-                      <button
-                        onClick={() => {
-                          setSelectedMates(prev =>
-                            prev.includes(mate.id)
-                              ? prev.filter(id => id !== mate.id)
-                              : [...prev, mate.id]
-                          );
-                        }}
-                        className="w-5 h-5 rounded-full border-2 border-white flex items-center justify-center"
-                      >
-                        {selectedMates.includes(mate.id) && (
-                          <div className="w-2.5 h-2.5 rounded-full bg-[#7F5AFF]" />
+            
+            {frequentMates.length === 0 ? (
+                <div className="bg-[#252D3F] rounded-[12px] p-[20px] text-center text-gray-400 text-sm">
+                    자주 찾는 메이트가 없습니다.
+                </div>
+            ) : (
+                <div className="bg-[#252D3F] rounded-[12px] p-[12px] pt-[16px]">
+                  <div className="grid grid-cols-4 gap-[32px]">
+                    {frequentMates.map((mate: Mate) => (
+                      <div key={mate.id} className="flex flex-col items-center">
+                        <button
+                          onClick={() => {
+                            if (!isEditMode) {
+                              navigate('/mate/detail', { state: { mate } });
+                            }
+                          }}
+                          className="flex flex-col items-center"
+                        >
+                          <div className="w-[60px] h-[60px] bg-gray-700 rounded-full overflow-hidden mb-1">
+                            {/* <img
+                              src={mate.imageUrl || mate} // Fallback image if url missing
+                              alt={mate.name}
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                  (e.target as HTMLImageElement).src = mate;
+                              }}
+                            /> */}
+                          </div>
+                          <span className="text-[12px] text-[#F2EFFF] mb-2">{mate.name}</span>
+                        </button>
+                        {isEditMode && (
+                          <button
+                            onClick={() => {
+                              setSelectedMates(prev =>
+                                prev.includes(mate.id)
+                                  ? prev.filter(id => id !== mate.id)
+                                  : [...prev, mate.id]
+                              );
+                            }}
+                            className="w-5 h-5 rounded-full border-2 border-white flex items-center justify-center"
+                          >
+                            {selectedMates.includes(mate.id) && (
+                              <div className="w-2.5 h-2.5 rounded-full bg-[#7F5AFF]" />
+                            )}
+                          </button>
                         )}
-                      </button>
-                    )}
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            </div>
+                </div>
+            )}
 
           </section>
         )}
@@ -343,46 +318,54 @@ const Mate = () => {
           ) : (
             <>
               <div className="bg-[#252D3F] p-[8px] pt-[12px] m-[12px] rounded-[12px]">
-                <div className="grid grid-cols-4 gap-4">
-                  {/* ✅ API 데이터가 있으면 사용, 없으면 Mock 데이터 사용 */}
-                  {(apiMates.length > 0 ? apiMates : allMates).map((mate) => (
-                    <div key={mate.id} className="flex flex-col items-center">
-                      <button
-                        onClick={() => {
-                          if (!isEditMode) {
-                            navigate('/mate/detail', { state: { mate } });
-                          }
-                        }}
-                        className="flex flex-col items-center"
-                      >
-                        <div className="w-[60px] h-[60px] bg-gray-700 rounded-full overflow-hidden mb-1">
-                          <img
-                            src={mate.imageUrl}
-                            alt={mate.name}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                        <span className="text-[12px] text-[#F2EFFF] mb-2">{mate.name}</span>
-                      </button>
-                      {isEditMode && (
-                        <button
-                          onClick={() => {
-                            setSelectedMates(prev =>
-                              prev.includes(mate.id)
-                                ? prev.filter(id => id !== mate.id)
-                                : [...prev, mate.id]
-                            );
-                          }}
-                          className="w-4 h-4 rounded-full border-1 border-white flex items-center justify-center"
-                        >
-                          {selectedMates.includes(mate.id) && (
-                            <div className="w-2 h-2 rounded-full bg-[#7F5AFF]" />
-                          )}
-                        </button>
-                      )}
+                {apiMates.length === 0 ? (
+                    <div className="text-center py-10 text-gray-400">
+                        등록된 메이트가 없습니다.
                     </div>
-                  ))}
-                </div>
+                ) : (
+                    <div className="grid grid-cols-4 gap-4">
+                      {apiMates.map((mate: Mate) => (
+                        <div key={mate.id} className="flex flex-col items-center">
+                          <button
+                            onClick={() => {
+                              if (!isEditMode) {
+                                navigate('/mate/detail', { state: { mate } });
+                              }
+                            }}
+                            className="flex flex-col items-center"
+                          >
+                            <div className="w-[60px] h-[60px] bg-gray-700 rounded-full overflow-hidden mb-1">
+                              <img
+                                src={mate.imageUrl || mate}
+                                alt={mate.name}
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                    (e.target as HTMLImageElement).src = mate; // fallback
+                                }}
+                              />
+                            </div>
+                            <span className="text-[12px] text-[#F2EFFF] mb-2">{mate.name}</span>
+                          </button>
+                          {isEditMode && (
+                            <button
+                              onClick={() => {
+                                setSelectedMates(prev =>
+                                  prev.includes(mate.id)
+                                    ? prev.filter(id => id !== mate.id)
+                                    : [...prev, mate.id]
+                                );
+                              }}
+                              className="w-4 h-4 rounded-full border-1 border-white flex items-center justify-center"
+                            >
+                              {selectedMates.includes(mate.id) && (
+                                <div className="w-2 h-2 rounded-full bg-[#7F5AFF]" />
+                              )}
+                            </button>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                )}
               </div>
 
               {/* ✅ Infinite Scroll - 더 불러오기 트리거 */}
@@ -413,14 +396,10 @@ const Mate = () => {
               취소하기
             </button>
             <button
-              onClick={() => {
-                // TODO: 선택된 메이트 저장 API 호출
-                console.log('선택된 메이트:', selectedMates);
-                setIsEditMode(false);
-              }}
+              onClick={handleDeleteMates}
               className="flex-1 py-3 bg-[#7F5AFF] hover:bg-[#6B4DE6] text-white rounded-[12px] text-[15px] font-medium transition"
             >
-              완료하기
+              삭제하기
             </button>
           </div>
         )}
@@ -468,16 +447,11 @@ const Mate = () => {
                 취소
               </button>
               <button
-                onClick={() => {
-                  // TODO: 친구 신청 API 호출
-                  console.log('친구 신청:', nicknameInput);
-                  setIsNicknameModalOpen(false);
-                  setNicknameInput("");
-                }}
-                disabled={!nicknameInput.trim()}
+                onClick={handleRequestMate}
+                disabled={!nicknameInput.trim() || requestMateMutation.isPending}
                 className="flex-1 py-3 bg-[#7F5AFF] hover:bg-[#6B4DE6] text-white text-[14px] font-medium transition disabled:bg-gray-600 disabled:cursor-not-allowed"
               >
-                친구 신청
+                {requestMateMutation.isPending ? "전송 중..." : "친구 신청"}
               </button>
             </div>
           </div>

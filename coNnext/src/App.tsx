@@ -11,7 +11,7 @@ import FooterLayout from "./components/layout/FooterLayout";
 
 /* 🔽 페이지 imports */
 import Home from "./pages/home/HomePage";
-import Onboarding from "./pages/onboarding/Onboarding";
+// import Onboarding from "./pages/onboarding/Onboarding"; // HEAD에는 있었으나 사용되지 않을 수 있음, 일단 유지
 import ConcertDetail from "./pages/home/ConcertDetail";
 import FindHall from "./pages/findHall/FindHall";
 import SearchHall from "./pages/findHall/SearchHall";
