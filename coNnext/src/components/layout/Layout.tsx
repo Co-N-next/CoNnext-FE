@@ -1,6 +1,6 @@
 // src/components/layout/Layout.tsx
 import React, { useEffect, useRef, useState } from "react";
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import Header from "./Header";
 import Footer from "./Footer";
 
@@ -12,6 +12,7 @@ const Layout: React.FC = () => {
   const ticketData = useUpcomingConcert();
   const [isTicketOpen, setIsTicketOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const mainRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -23,15 +24,21 @@ const Layout: React.FC = () => {
     if (ticketData) setIsTicketOpen(true);
   });
 
+  const handleTicketClick = () => {
+    if (ticketData) {
+      setIsTicketOpen(true);
+      return;
+    }
+
+    window.alert("오늘 공연이 없습니다. 예매 내역 페이지로 이동합니다.");
+    navigate("/reserve");
+  };
+
   return (
     <div className="min-h-screen flex justify-center bg-[#0a0f1e]">
       <div className="w-full max-w-[450px] min-h-screen flex flex-col relative bg-[#0a0f1e]">
         {/* Header 클릭 시 modal 열림 */}
-        <Header
-          onTicketClick={() => {
-            if (ticketData) setIsTicketOpen(true);
-          }}
-        />
+        <Header onTicketClick={handleTicketClick} />
 
         <main
           ref={mainRef}

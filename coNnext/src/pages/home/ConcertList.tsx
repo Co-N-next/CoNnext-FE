@@ -19,6 +19,27 @@ type UIConcert = {
 
 type FilterType = "dday" | "views";
 
+const pickEarliestByConcertId = (items: UpcomingConcert[]) => {
+  const byConcert = new Map<number, UpcomingConcert>();
+
+  items.forEach((item) => {
+    const current = byConcert.get(item.concertId);
+    if (!current) {
+      byConcert.set(item.concertId, item);
+      return;
+    }
+
+    const currentTime = new Date(current.startAt).getTime();
+    const nextTime = new Date(item.startAt).getTime();
+
+    if (!Number.isNaN(nextTime) && (Number.isNaN(currentTime) || nextTime < currentTime)) {
+      byConcert.set(item.concertId, item);
+    }
+  });
+
+  return [...byConcert.values()];
+};
+
 export default function UpcomingConcertPage() {
   const navigate = useNavigate();
   const [filter, setFilter] = useState<FilterType>("dday");
@@ -29,8 +50,9 @@ export default function UpcomingConcertPage() {
     const fetchConcerts = async () => {
       try {
         const res = await getUpcomingConcerts();
+        const deduped = pickEarliestByConcertId(res.payload ?? []);
 
-        const mapped: UIConcert[] = res.payload.map((c: UpcomingConcert) => {
+        const mapped: UIConcert[] = deduped.map((c: UpcomingConcert) => {
           const start = new Date(c.startAt);
           const today = new Date();
           const diff = start.getTime() - today.getTime();

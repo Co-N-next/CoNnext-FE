@@ -77,6 +77,18 @@ export interface GetNearestVenueResponse {
   pageInfo: PageInfo;
   payload: NearestVenuePayload;
 }
+
+export interface FavoriteVenueActionPayload {
+  id: number;
+  name: string;
+}
+
+export interface FavoriteVenueActionResponse {
+  statusCode: number;
+  message: string;
+  pageInfo: PageInfo;
+  payload: FavoriteVenueActionPayload;
+}
 //===============================
 // /venue/favorites
 // ===============================

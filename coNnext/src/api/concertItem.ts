@@ -1,7 +1,4 @@
-// src/api/concerts.ts
 import api from "./axios";
-
-/* ===== Types ===== */
 
 export interface ConcertSchedule {
   detailId: number;
@@ -38,6 +35,23 @@ export interface TodayConcert {
   price: number;
 }
 
+export interface MyTodayConcert {
+  reservationId: number;
+  concertId: number;
+  concertName: string;
+  posterImage: string;
+  startAt: string;
+  round: number;
+  runningTime: number;
+  price: number;
+  artist: string;
+  venue: string;
+  floor?: number;
+  section?: string;
+  row?: string;
+  seat?: number;
+}
+
 export interface PageInfo {
   page: number;
   size: number;
@@ -66,35 +80,117 @@ export interface ConcertDetailPayload {
   round: number;
 }
 
-/* ===== API ===== */
-
-/** 최신 공연 10개 조회 */
-export const getUpcomingConcerts = async (page: number = 0, size: number = 20) => {
-  const res = await api.get<ApiResponse<UpcomingConcert[]>>(
-    "/concerts/upcoming",
-    { params: { page, size } }
-  );
-  return res.data;
+const dedupeBy = <T>(items: T[], getKey: (item: T) => string | number) => {
+  const seen = new Set<string | number>();
+  return items.filter((item) => {
+    const key = getKey(item);
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 };
 
-/** 오늘 공연 조회 */
+const logUpcomingDuplicates = (items: UpcomingConcert[]) => {
+  if (!import.meta.env.DEV) return;
+  if (!Array.isArray(items) || items.length === 0) return;
+
+  const byDetailKey = new Map<string, number>();
+  const byConcertKey = new Map<number, number>();
+
+  items.forEach((item) => {
+    const detailKey = `${item.concertId}-${item.detailId}-${item.startAt}`;
+    byDetailKey.set(detailKey, (byDetailKey.get(detailKey) ?? 0) + 1);
+    byConcertKey.set(item.concertId, (byConcertKey.get(item.concertId) ?? 0) + 1);
+  });
+
+  const duplicatedDetails = [...byDetailKey.entries()]
+    .filter(([, count]) => count > 1)
+    .map(([key, count]) => ({ key, count }));
+  const duplicatedConcerts = [...byConcertKey.entries()]
+    .filter(([, count]) => count > 1)
+    .map(([concertId, count]) => ({ concertId, count }));
+
+  if (duplicatedDetails.length > 0 || duplicatedConcerts.length > 0) {
+    console.group("[getUpcomingConcerts] duplicate diagnostics");
+    console.log("raw payload length:", items.length);
+    if (duplicatedDetails.length > 0) console.table(duplicatedDetails);
+    if (duplicatedConcerts.length > 0) console.table(duplicatedConcerts);
+    console.groupEnd();
+  }
+};
+
+export const getUpcomingConcerts = async (page: number = 0, size: number = 20) => {
+  const res = await api.get<ApiResponse<UpcomingConcert[]>>("/concerts/upcoming", {
+    params: { page, size },
+  });
+  logUpcomingDuplicates(res.data.payload ?? []);
+
+  const dedupedPayload = dedupeBy(
+    res.data.payload ?? [],
+    (item) => item.detailId ?? `${item.concertId}-${item.startAt}`,
+  );
+
+  return {
+    ...res.data,
+    pageInfo: {
+      ...res.data.pageInfo,
+      totalElements: dedupedPayload.length,
+    },
+    payload: dedupedPayload,
+  };
+};
+
 export const getTodayConcerts = async () => {
   const res = await api.get<ApiResponse<TodayConcert[]>>("/concerts/today");
+
+  const dedupedPayload = dedupeBy(
+    res.data.payload ?? [],
+    (item) => `${item.concertId}-${item.startAt}-${item.round}`,
+  );
+
+  return {
+    ...res.data,
+    pageInfo: {
+      ...res.data.pageInfo,
+      totalElements: dedupedPayload.length,
+    },
+    payload: dedupedPayload,
+  };
+};
+
+export const getMyTodayConcerts = async (debug: boolean = false) => {
+  const res = await api.get<ApiResponse<MyTodayConcert[]>>("/concerts/my-today", {
+    params: { debug },
+  });
+
+  const dedupedPayload = dedupeBy(
+    res.data.payload ?? [],
+    (item) => item.reservationId ?? `${item.concertId}-${item.startAt}-${item.round}`,
+  );
+
+  return {
+    ...res.data,
+    pageInfo: {
+      ...res.data.pageInfo,
+      totalElements: dedupedPayload.length,
+    },
+    payload: dedupedPayload,
+  };
+};
+
+export const getMyTodayConcertCount = async () => {
+  const res = await api.get<ApiResponse<number>>("/concerts/my-today/count");
   return res.data;
 };
 
-/** 공연 상세 회차 조회 */
 export const getConcertDetailById = async (detailId: number | string) => {
   const res = await api.get<ApiResponse<ConcertDetailPayload>>(
-    `/concerts/details/${detailId}`
+    `/concerts/details/${detailId}`,
   );
   return res.data;
 };
 
-/** 공연 기본 정보 조회 (fallback용) */
 export const getConcertById = async (concertId: number | string) => {
-  const res = await api.get<ApiResponse<ConcertByIdPayload>>(
-    `/concerts/${concertId}`
-  );
+  const res = await api.get<ApiResponse<ConcertByIdPayload>>(`/concerts/${concertId}`);
   return res.data;
 };

@@ -7,6 +7,7 @@ import type {
   GetNearestVenueRequest,
   GetNearestVenueResponse,
   GetFavoriteVenuesResponse,
+  FavoriteVenueActionResponse,
 } from "../types/venueSearch";
 
 // 인기 검색 공연장 조회(venues/trend-search)
@@ -25,13 +26,13 @@ export const getHomeVenues = async (): Promise<VenueListResponse> => {
 
 //공연장검색(venue/search)
 export const searchVenues = async (
-  keyword: string,
+  query: string,
   page: number = 0,
 ): Promise<SearchVenuesResponse> => {
   const { data } = await api.get<SearchVenuesResponse>(
     "/venues/search",
     {
-      params: { keyword, page },
+      params: { query, page },
     },
   );
   return data;
@@ -40,7 +41,7 @@ export const searchVenues = async (
 //근처 공연장 조회(venues/nearby)
 export const getNearestVenue = async (
   params: GetNearestVenueRequest,
-): Promise<GetNearestVenueResponse> => {
+): Promise<GetNearestVenueResponse | null> => {
   const { data } = await api.get<GetNearestVenueResponse>(
     "/venues/nearby",
     {
@@ -51,7 +52,7 @@ export const getNearestVenue = async (
       },
     },
   );
-  return data;
+  return data ?? null;
 };
 
 //venue/favoritte
@@ -61,3 +62,21 @@ export const getFavoriteVenues =
       await api.get<GetFavoriteVenuesResponse>("/venues/favorites");
     return data;
   };
+
+export const addFavoriteVenue = async (
+  venueId: number,
+): Promise<FavoriteVenueActionResponse> => {
+  const { data } = await api.post<FavoriteVenueActionResponse>(
+    `/venues/favorites/${venueId}`,
+  );
+  return data;
+};
+
+export const removeFavoriteVenue = async (
+  venueId: number,
+): Promise<FavoriteVenueActionResponse> => {
+  const { data } = await api.delete<FavoriteVenueActionResponse>(
+    `/venues/favorites/${venueId}`,
+  );
+  return data;
+};

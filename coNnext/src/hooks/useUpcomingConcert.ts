@@ -1,6 +1,20 @@
 import { useEffect, useState } from "react";
-import { getTodayConcerts } from "../api/concertItem";
+import { getMyTodayConcertCount, getMyTodayConcerts } from "../api/concertItem";
 import type { ConcertData } from "../types/concert";
+
+const formatSeat = (item: {
+  floor?: number;
+  section?: string;
+  row?: string;
+  seat?: number;
+}) => {
+  const floorText = typeof item.floor === "number" ? `${item.floor}F` : "";
+  const sectionText = item.section ? `${item.section} Section` : "";
+  const rowText = item.row ? `${item.row} Row` : "";
+  const seatText = typeof item.seat === "number" ? `${item.seat} Seat` : "";
+
+  return [floorText, sectionText, rowText, seatText].filter(Boolean).join(" ");
+};
 
 export const useUpcomingConcert = () => {
   const [concert, setConcert] = useState<ConcertData | null>(null);
@@ -8,8 +22,19 @@ export const useUpcomingConcert = () => {
   useEffect(() => {
     const load = async () => {
       try {
-        const res = await getTodayConcerts();
-        const first = res.payload?.[0];
+        const [countRes, todayRes] = await Promise.all([
+          getMyTodayConcertCount(),
+          getMyTodayConcerts(false),
+        ]);
+
+        if (import.meta.env.DEV) {
+          console.group("[my-today diagnostics]");
+          console.log("count payload:", countRes.payload);
+          console.log("my-today payload length:", todayRes.payload?.length ?? 0);
+          console.groupEnd();
+        }
+
+        const first = todayRes.payload?.[0];
         if (!first) return;
 
         const start = new Date(first.startAt);
@@ -21,19 +46,19 @@ export const useUpcomingConcert = () => {
 
         setConcert({
           title: first.concertName,
-          artist: "",
-          place: "",
+          artist: first.artist || "",
+          place: first.venue || "",
           date: `${yyyy}.${mm}.${dd}`,
           time: `${hh}:${min}`,
-          seat: "",
+          seat: formatSeat(first),
           poster: first.posterImage,
         });
       } catch (error) {
-        console.error("오늘 공연 조회 실패:", error);
+        console.error("Failed to fetch my-today concert:", error);
       }
     };
 
-    load();
+    void load();
   }, []);
 
   return concert;
