@@ -13,6 +13,7 @@ export const TABS = [
 export default function AlarmPage() {
   const [activeTab, setActiveTab] = useState<AlarmTab>("mynews");
 
+
   return (
     // HomePage와 완전히 동일한 래퍼(Wrapper) 구성
     <div className="min-h-screen bg-[#0a0f1e] text-white flex justify-center">

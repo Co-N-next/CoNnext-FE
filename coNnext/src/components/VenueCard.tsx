@@ -5,9 +5,8 @@
 //   isToday?: boolean;
 //   isNew?: boolean;
 // };
-import type { Venue } from "../types/venueSearch";
-
-const VenueCard = ({ name, city, imageUrl, isToday, isNew }: Venue) => {
+import type { VenueListItem } from "../types/venue.ts";
+const VenueCard = ({ name, city, imageUrl, isToday, isNew }: VenueListItem) => {
   return (
     <div className="h-[204px] w-[150px] overflow-hidden rounded-xl border border-white/20 text-white">
       {/* ÀÌ¹ÌÁö */}

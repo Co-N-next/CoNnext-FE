@@ -3,7 +3,7 @@ import ConNext from "../assets/logo/Con-next.svg";
 
  export interface Notice {
   id: number;
-  logoImg: string;
+  logoImg?: string;
   title: string;
   content: string;
   createdAt: string;

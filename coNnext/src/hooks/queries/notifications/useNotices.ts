@@ -1,13 +1,11 @@
-import { useQuery } from "@tanstack/react-query";
-import { getNotices } from "../../../api/notifications";
-import type { Notice } from "../../../types/notifications";
+// hooks/queries/notifications/useNotices.ts (notifications/notices : 공지사항 전체조회)
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
+import { fetchNotices } from "../../../api/notifications";
 
-import type { NoticeListResponse } from "../../../types/notifications";
-
-export const useNotices = () => {
-  return useQuery<NoticeListResponse, Error, Notice[]>({
-    queryKey: ["notices"],
-    queryFn: getNotices,
-    select: (data) => data.payload.payload.notices,
+export const useNotices = (page: number) => {
+  return useQuery({
+    queryKey: ["notifications", "notices", page],
+    queryFn: () => fetchNotices(page),
+    placeholderData: keepPreviousData,
   });
 };

@@ -9,9 +9,15 @@ import {
   searchConcerts, 
   fetchSearchHistory, 
   saveSearchHistory, 
-  //deleteSearchHistory, 
   deleteAllSearchHistory 
 } from "../../api/concert"; 
+
+// [수정 1] 검색 기록 객체 타입 정의
+interface SearchHistoryItem {
+  id: number;
+  keyword: string;
+  searchType: string;
+}
 
 interface AddTicketProps {
   onBack?: () => void;
@@ -21,27 +27,25 @@ const AddTicket = ({ onBack }: AddTicketProps = {}) => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("public");
   
-  // 검색어 입력 State
   const [inputText, setInputText] = useState("");
-
-  // ✅ 선택된 공연 정보 (이게 있으면 확인 화면, 없으면 검색 리스트 화면)
   const [selectedConcert, setSelectedConcert] = useState<Concert | null>(null);
 
-  // ✅ API 연동을 위한 State (검색 결과, 로딩, 검색 여부)
   const [searchResults, setSearchResults] = useState<Concert[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false); 
   
-  // ✅ 최근 검색어 State
-  const [searchHistory, setSearchHistory] = useState<string[]>([]);
+  // [수정 2] string[] -> SearchHistoryItem[] 으로 변경
+  const [searchHistory, setSearchHistory] = useState<SearchHistoryItem[]>([]);
   const [isHistoryExpanded, setIsHistoryExpanded] = useState(false);
 
   // 최근 검색어 불러오기
   useEffect(() => {
     const loadHistory = async () => {
         try {
+            // API가 객체 배열을 반환한다고 가정
             const history = await fetchSearchHistory();
-            setSearchHistory(history);
+            // 타입 단언을 사용하여 에러 방지 (API 응답이 any인 경우)
+            setSearchHistory(history as unknown as SearchHistoryItem[]);
         } catch (error) {
             console.error("검색 기록 로딩 실패:", error);
         }
@@ -49,7 +53,6 @@ const AddTicket = ({ onBack }: AddTicketProps = {}) => {
     loadHistory();
   }, []);
 
-  // 뒤로가기 핸들러
   const handleBack = () => {
     if (selectedConcert) {
       setSelectedConcert(null);
@@ -59,11 +62,9 @@ const AddTicket = ({ onBack }: AddTicketProps = {}) => {
     else navigate("/reserve");
   };
 
-  // ✅ 검색 핸들러 (API 호출)
   const handleSearch = async (keyword: string = inputText) => {
     if (!keyword.trim()) return;
 
-    // 입력창 업데이트 (히스토리 클릭 시 필요)
     setInputText(keyword);
     setIsHistoryExpanded(false);
 
@@ -71,18 +72,15 @@ const AddTicket = ({ onBack }: AddTicketProps = {}) => {
       setIsLoading(true);
       setHasSearched(true); 
       
-      // 검색어 저장 API 호출
-      // 실패해도 검색은 진행되도록 처리
       try {
         await saveSearchHistory(keyword);
-        // 저장 후 목록 갱신 (선택사항, 최신화)
+        // 저장 후 목록 갱신
         const updatedHistory = await fetchSearchHistory();
-        setSearchHistory(updatedHistory);
+        setSearchHistory(updatedHistory as unknown as SearchHistoryItem[]);
       } catch (err) {
         console.error("검색어 저장 실패:", err);
       }
 
-      // API 호출
       const results = await searchConcerts(keyword);
       setSearchResults(results);
       
@@ -91,8 +89,6 @@ const AddTicket = ({ onBack }: AddTicketProps = {}) => {
       if (axios.isAxiosError(error)) {
         if (error.response?.status === 404) {
           alert("검색 결과를 찾을 수 없습니다.");
-        } else {
-             // ... 에러 처리
         }
       }
     } finally {
@@ -100,34 +96,6 @@ const AddTicket = ({ onBack }: AddTicketProps = {}) => {
     }
   };
 
-  /* 최근 검색어 삭제
-  const handleDeleteHistory = async (id: number) => { // API가 id를 받는데 index인지 DB ID인지 확인 필요. 
-      // 만약 string 배열만 받는다면 index로 지워야 하는지, value로 지워야 하는지?
-      // API 정의상 deleteSearchHistory(id: number) 이므로 id가 필요함.
-      // 하지만 fetchSearchHistory는 string[]을 반환한다고 되어 있음 (기존 코드 분석 기반).
-      // 만약 string[]만 온다면 ID를 알 수 없음. 
-      
-      // ** 중요: API 명세를 보면 "/searchHistory" GET -> result: string[] 의 가능성이 높음 (단순 키워드 리스트).
-      // 하지만 DELETE는 /searchHistory/{id} 임.
-      // 모순점: string[] 만 있으면 id를 모름. 
-      // 해결책: fetchSearchHistory의 응답 타입이 { id: number, keyword: string }[] 형태여야 함.
-      // 일단 string[] 으로 가정하고 index를 넘기거나, API가 객체를 리턴한다고 가정하고 수정해야 함.
-      // 현재 concert.ts에서는 string[]으로 캐스팅 중. 
-      // 만약 진짜 string[] 이라면 DELETE를 쓸 수 없음 (또는 BE가 keyword 삭제를 지원해야 함).
-      // User Request에는 "최근 검색어 반환 GET /searchHistory" 라고만 되어 있음.
-      // "최근 검색어 단일 삭제 DELETE /searchHistory/1" -> ID 기반.
-      
-      // 임시 조치: UI에서는 일단 삭제 버튼을 누르면 API 호출 시도하되, 
-      // string[] 이라면 index+1 이나, 별도 처리가 필요. 
-      // 여기서는 string[]을 가정하고 있으므로, 정확한 구현을 위해선 BE 응답 타입 확인이 필요하지만, 
-      // 우선 UI만 구성하거나, 로그만 남김.
-      try {
-           // await deleteSearchHistory(id); 
-           // setDisplayHistory(...)
-      } catch(e) {}
-  };
-  */
-  // 전체 삭제
   const handleClearAllHistory = async () => {
       try {
           await deleteAllSearchHistory();
@@ -137,21 +105,17 @@ const AddTicket = ({ onBack }: AddTicketProps = {}) => {
       }
   };
 
-  // 키보드 엔터 이벤트
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") handleSearch(inputText);
   };
 
-  // ---------------------------------------------------------
-  // 1. 확인 화면 렌더링 (선택된 공연이 있을 때 보여줄 화면)
-  // ---------------------------------------------------------
+  // 1. 확인 화면 렌더링
   if (selectedConcert) {
     return (
       <div className="min-h-screen bg-[#0F1320] text-white font-sans flex flex-col">
         <div className="max-w-2xl mx-auto w-full flex-1 flex flex-col">
           <SelectBar activeTab={activeTab} onTabChange={setActiveTab} />
           
-          {/* 안내 멘트 */}
           <div className="px-6 mb-6 mt-6">
             <p className="text-[13px] leading-relaxed text-gray-200">
               이 공연을 예매한 것으로 보여요.
@@ -161,10 +125,8 @@ const AddTicket = ({ onBack }: AddTicketProps = {}) => {
             </p>
           </div>
 
-          {/* 공연 카드 - 중앙 정렬, 세로 배치 */}
           <div className="px-6 mb-4">
             <div className="bg-[#293A5D] rounded-[28px] px-[46px] py-[24px] flex flex-col items-center">
-              {/* 포스터 이미지 - 크게 중앙 배치 */}
               <div className="w-[140px] h-[196px] rounded-[10px] shadow-xl overflow-hidden bg-gray-800 mb-4">
                 <img
                   src={selectedConcert.imageUrl}
@@ -173,31 +135,24 @@ const AddTicket = ({ onBack }: AddTicketProps = {}) => {
                 />
               </div>
 
-              {/* 공연 제목 - 중앙 정렬 */}
               <h2 className="text-[18px] font-bold text-white text-center leading-tight mb-2 px-6">
                 {selectedConcert.title}
               </h2>
 
-              {/* 아티스트 이름 + T 뱃지 */}
               <div className="flex items-center gap-2 mb-4">
                 <p className="text-[16px] font-medium text-gray-200">
                   {selectedConcert.artist}
                 </p>
               </div>
 
-              {/* 공연 정보 */}
               <div className="w-full space-y-2 text-[14px] px-4">
-                {/* 일시 - 파란색 테두리 박스 */}
                 <div className="flex items-start">
                   <span className="w-12 text-gray-400 flex-shrink-0">일시</span>
-                  
                     <p className="text-white leading-relaxed">
                       {selectedConcert.date} {selectedConcert.time}
                     </p>
-                
                 </div>
 
-                {/* 장소 */}
                 <div className="flex items-start">
                   <span className="w-12 text-gray-400 flex-shrink-0">장소</span>
                   <span className="flex-1 text-gray-200">{selectedConcert.venue}</span>
@@ -206,7 +161,6 @@ const AddTicket = ({ onBack }: AddTicketProps = {}) => {
             </div>
           </div>
 
-          {/* 하단 버튼 영역 */}
           <div className="px-5 pb-8 w-full flex gap-2">
             <button
               onClick={() => setSelectedConcert(null)}
@@ -228,9 +182,7 @@ const AddTicket = ({ onBack }: AddTicketProps = {}) => {
     );
   }
 
-  // ---------------------------------------------------------
-  // 2. 리스트 화면 렌더링 (선택된 공연이 없을 때)
-  // ---------------------------------------------------------
+  // 2. 리스트 화면 렌더링
   return (
     <div className="min-h-screen bg-[#0E172A] text-white font-sans">
       <div className="max-w-2xl mx-auto">
@@ -270,7 +222,7 @@ const AddTicket = ({ onBack }: AddTicketProps = {}) => {
               </button>
             </div>
             
-            {/* 최근 검색어 드롭다운 (검색 전이고 포커스/확장 상태일 때) */}
+            {/* [수정 3] 최근 검색어 렌더링 로직 수정 */}
             {isHistoryExpanded && searchHistory.length > 0 && !hasSearched && (
                 <div className="absolute top-full left-0 right-0 mt-2 bg-[#1E293B] rounded-xl shadow-xl z-20 border border-white/5 overflow-hidden">
                     <div className="flex items-center justify-between px-4 py-3 border-b border-white/5">
@@ -286,23 +238,20 @@ const AddTicket = ({ onBack }: AddTicketProps = {}) => {
                         </button>
                     </div>
                     <ul>
-                        {searchHistory.map((word, idx) => (
-                            <li key={idx} className="flex items-center justify-between px-4 py-3 hover:bg-white/5 cursor-pointer group">
+                        {searchHistory.map((item) => (
+                            <li key={item.id} className="flex items-center justify-between px-4 py-3 hover:bg-white/5 cursor-pointer group">
                                 <span 
                                     className="flex-1 text-sm text-gray-300"
-                                    onClick={() => handleSearch(word)}
+                                    onClick={() => handleSearch(item.keyword)} // [수정] 객체가 아니라 keyword 문자열 전달
                                 >
-                                    {word}
+                                    {item.keyword} {/* [수정] 객체 전체가 아니라 keyword만 렌더링 */}
                                 </span>
-                                {/* 삭제 기능이 API 응답 타입 이슈로 현재는 숨김 처리하거나 기능 없음 */}
-                                {/* <button className="text-gray-600 hover:text-red-400"><X size={14}/></button> */}
                             </li>
                         ))}
                     </ul>
                 </div>
             )}
             
-            {/* 배경 클릭 시 드롭다운 닫기 위한 오버레이 */}
             {isHistoryExpanded && (
                 <div 
                     className="fixed inset-0 z-10" 
@@ -314,7 +263,6 @@ const AddTicket = ({ onBack }: AddTicketProps = {}) => {
 
           <div className="flex justify-between items-center mb-4 text-xs">
             <span className="text-gray-300">
-              {/* 실제 검색 결과 개수 표시 */}
               검색결과 {searchResults.length}건
             </span>
             <div className="flex gap-3 text-gray-500">
@@ -327,19 +275,16 @@ const AddTicket = ({ onBack }: AddTicketProps = {}) => {
 
           {/* 리스트 영역 */}
           <div className="space-y-0 pb-10">
-            {/* 1. 로딩 중일 때 */}
             {isLoading && (
               <SearchSkeleton />
             )}
 
-            {/* 2. 검색 결과가 없을 때 (로딩 끝남 + 검색함 + 결과 0개) */}
             {!isLoading && hasSearched && searchResults.length === 0 && (
               <div className="py-20 text-center text-gray-500">
                 검색 결과가 없습니다.
               </div>
             )}
 
-            {/* 3. 검색 결과 목록 표시 */}
             {!isLoading && searchResults.map((item) => (
               <div
                 key={item.id}

@@ -1,92 +1,58 @@
 import Location from "../assets/logo/Location.svg";
 import Friend from "../assets/logo/Friend.svg";
-import type {
-  NotificationActionType,
-  NotificationActionStatus,
-} from "../types/notifications";
-
-
-import { postShareMate, postShareLocation } from "../api/notifications";
-import { useState } from "react";
-type NewsType = "LOCATION" | "FRIEND";
+import type { Notification } from "../types/notifications";
+import { useAcceptLocation } from "../hooks/mutations/useAcceptLocation";
+import { useAcceptMate } from "../hooks/mutations/useAcceptMate";
 
 interface MyNewsCardProps {
-    id: number; // 🔥 추가
-
-  profileImg: string;
-  content: string;
-  type: NewsType;
-  time: string;
-  actionType: NotificationActionType;
-  status: NotificationActionStatus;
-    read: boolean;  // ✅ 추가
-
+  notification: Notification;
 }
 
-const MyNewsCard = ({
-  id,
-  profileImg,
-  content,
-  type,
-  time,
-  actionType,
-  status,
-  read,   // ✅ 여기 추가
-}: MyNewsCardProps) => {
-  // ACCEPT_REJECT 타입만 카드 렌더
-if (actionType !== "ACCEPT_REJECT") {
-  return null;
-}
+const MyNewsCard = ({ notification }: MyNewsCardProps) => {
+  const { mutate: acceptLocation } = useAcceptLocation();
+  const { mutate: acceptMate } = useAcceptMate();
+  const {
+    id,
+    senderProfileImg,
+    title,
+    createdAt,
+    category,
+    actionStatus,
+  } = notification;
 
-const [localStatus, setLocalStatus] = useState(status);
-const isPending = localStatus === "PENDING";
+  const isPending = actionStatus === "PENDING";
 
-  const title = type === "LOCATION" ? "위치 공유" : "친구";
-  // const actionText = type === "LOCATION" ? "위치 공유 요청" : "친구 요청";
+  const actionText = category === "LOCATION" ? "위치 공유 요청" : "친구 요청";
 
-  
+  const contentText =
+    actionStatus === "PENDING"
+      ? `${title}님이 ${actionText}을 보냈습니다.`
+      : actionStatus === "ACCEPTED"
+        ? `${title}님의 ${actionText}이 수락되었습니다.`
+        : `${title}님의 ${actionText}이 거절되었습니다.`;
 
-  // ✅ content 기본값 유지
-let contentText = content ?? "";
-
-if (localStatus === "ACCEPTED") {
-  contentText =
-    type === "LOCATION"
-      ? "위치 공유 요청이 수락되었습니다."
-      : "친구 요청이 수락되었습니다.";
-} else if (localStatus === "REJECTED") {
-  contentText =
-    type === "LOCATION"
-      ? "위치 공유 요청이 거절되었습니다."
-      : "친구 요청이 거절되었습니다.";
-}
-
- const badgeBg =
-  localStatus === "ACCEPTED"
-    ? "bg-[#9576FF]"
-    : localStatus === "REJECTED"
-    ? "bg-[#414141]"
-    : "bg-[#7f5aff]";
+  const badgeBg =
+    actionStatus === "ACCEPTED"
+      ? "bg-[#9576FF]"
+      : actionStatus === "REJECTED"
+        ? "bg-[#414141]"
+        : "bg-[#7f5aff]";
 
   const cardBg = isPending ? "bg-[#293A5D]" : "bg-[#0E172A]";
 
- const handleAccept = async () => {
-  try {
-    if (type === "FRIEND") {
-      await postShareMate({ notificationId: id });
-    } else if (type === "LOCATION") {
-      await postShareLocation({ notificationId: id });
+  const handleAccept = () => {
+    if (category === "LOCATION") {
+      acceptLocation({ notificationId: id });
     }
+    if (category === "MATE") {
+      acceptMate({ notificationId: id });
+    }
+  };
 
-    setLocalStatus("ACCEPTED");
-  } catch (e) {
-    console.error(e);
-  }
-};
-
-const handleReject = () => {
-  setLocalStatus("REJECTED");
-};
+  const handleReject = () => {
+    // TODO: 스웨거에 거절 API 별도 엔드포인트가 있는지 확인 필요
+    // 현재 스웨거에는 수락만 있음
+  };
 
   return (
     <div
@@ -98,20 +64,12 @@ const handleReject = () => {
           {/* 프로필 */}
           <div className="relative shrink-0">
             <img
-              src={
-                profileImg ||
-                "https://i.namu.wiki/i/coaGyXmbX_-iJhY6vWDvO510yViZLni2ocXsd3Asd7ZL68JcMHS4tnd4EWNi4DchSf9btppXgHrFNhvsVDa-Lg.webp"
-              }
+              src={senderProfileImg}
               alt="profile"
               className={`rounded-full object-cover transition-all duration-300
                 ${isPending ? "h-24 w-24" : "h-16 w-16"}`}
-              onError={(e) => {
-                (e.currentTarget as HTMLImageElement).src =
-                  "https://i.namu.wiki/i/coaGyXmbX_-iJhY6vWDvO510yViZLni2ocXsd3Asd7ZL68JcMHS4tnd4EWNi4DchSf9btppXgHrFNhvsVDa-Lg.webp";
-              }}
             />
 
-            {/* 타입 뱃지 */}
             <div
               className={`absolute bottom-0 right-0 translate-x-[15%] translate-y-[15%]
                 flex items-center justify-center rounded-full transition-all duration-300
@@ -119,50 +77,37 @@ const handleReject = () => {
                 ${isPending ? "h-8 w-8" : "h-6 w-6"}`}
             >
               <img
-                src={type === "LOCATION" ? Location : Friend}
+                src={category === "LOCATION" ? Location : Friend}
                 alt=""
                 className={`${isPending ? "h-5 w-5" : "h-4 w-4"}`}
               />
             </div>
           </div>
 
-          {/* 텍스트 영역 */}
-          <div
-            className={`flex-1 transition-all duration-300
-              ${isPending ? "mt-0" : "mt-1"}`}
-          >
+          {/* 텍스트 */}
+          <div className="flex-1">
             <div className="flex justify-between items-center">
-              <span className="text-[10px] font-normal leading-[1.3] tracking-[-0.025em] text-gray-400">
-                {title}
+              <span className="text-[10px] text-gray-400">
+                {category === "LOCATION" ? "위치 공유" : "친구"}
               </span>
-              <span className="text-[11px] text-gray-400 whitespace-nowrap">
-                {time}
-              </span>
+              <span className="text-[11px] text-gray-400">{createdAt}</span>
             </div>
 
-            <p
-              className={`text-white transition-all duration-300
-                ${isPending ? "mt-1 text-[13px]" : "mt-2 text-[13px]"}`}
-            >
-              {contentText}
-            </p>
+            <p className="mt-2 text-[13px] text-white">{contentText}</p>
 
-            {isPending && !read && (
-  <div className="mt-5 flex gap-2 transition-all duration-300">
-    <button
-      onClick={handleAccept}
-      className="rounded-full bg-[#7f5aff] px-6 py-2.5 text-xs font-medium text-white"
-    >
-      수락
-    </button>
-    <button
-      onClick={handleReject}
-      className="rounded-full bg-[#1F2A44] px-6 py-2.5 text-xs text-gray-300"
-    >
-      거절
-    </button>
-  </div>
-)}
+            {isPending && (
+              <div className="mt-5 flex gap-2">
+                <button
+                  onClick={handleAccept}
+                  className="rounded-full bg-[#7f5aff] px-6 py-2.5 text-xs font-medium text-white"
+                >
+                  수락
+                </button>
+                <button onClick={handleReject} className="rounded-full bg-[#1F2A44] px-6 py-2.5 text-xs text-gray-300">
+                  거절
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>

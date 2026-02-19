@@ -1,92 +1,25 @@
 // types/notification.ts
-import type { Notice } from "../components/NoticesCard";
-export type { Notice };//notifications/news: 내소식 전체 조회 응답값(반응값 없음)
-// ==============================
-// Notification Enums
-// ==============================
 
-export type NotificationCategory =
-  | "MATE"
-  | "LOCATION"
-  | "NOTICE";
+//notifications/news: 내소식 전체 조회 응답값
+export type NotificationCategory = "MATE" | "NOTICE" | "LOCATION";
+export type NotificationActionType = "ACCEPT_REJECT" | "NONE";
+export type NotificationActionStatus = "PENDING" | "ACCEPTED" | "REJECTED";
 
-export type NotificationActionType =
-  | "NONE"
-  | "ACCEPT_REJECT";
-
-export type NotificationActionStatus =
-  | "PENDING"
-  | "ACCEPTED"
-  | "REJECTED";
-
-
-// ==============================
-// PageInfo
-// ==============================
-
-export interface PageInfo {
-  page: number;
-  size: number;
-  hasNext: boolean;
-  totalElements: number;
-  totalPages: number;
-}
-
-
-// ==============================
-// Single Notification Item
-// ==============================
-
-export interface NewsItem {
+export interface Notification {
   id: number;
-  senderProfileImg: string;
   senderId: number;
+  senderProfileImg: string;
   title: string;
   content: string;
-  createdAt: string; // ISO Date string
+  createdAt: string;
+  read: boolean;
   category: NotificationCategory;
   actionType: NotificationActionType;
   actionStatus: NotificationActionStatus;
-  img: string;
-  read: boolean;
+  img?: string;
 }
 
-
-// ==============================
-// Inner Payload (news wrapper)
-// ==============================
-
-export interface MyNotificationInnerPayload {
-  news: NewsItem[];
-}
-
-
-// ==============================
-// Payload
-// ==============================
-
-export interface MyNotificationPayload {
-  pageInfo: PageInfo;
-  payload: MyNotificationInnerPayload;
-}
-
-
-// ==============================
-// Final API Response
-// ==============================
-
-export interface MyNotificationResponse {
-  statusCode: number;
-  message: string;
-  payload: MyNotificationPayload;
-}
-//notifications/news: 내소식 전체 조회 응답값(반응값 없음)
-
-
-//notifications/notices
-
-// 2️⃣ 페이지 정보
-export interface PageInfo {
+export interface NotificationPageInfo {
   page: number;
   size: number;
   hasNext: boolean;
@@ -94,58 +27,55 @@ export interface PageInfo {
   totalPages: number;
 }
 
-// 3️⃣ notices 감싸는 payload
-export interface NoticePayload {
-  notices: Notice[];
+export interface NotificationListResponse {
+  statusCode: number;
+  message: string;
+  pageInfo: NotificationPageInfo;
+  payload: {
+    pageInfo: NotificationPageInfo;
+    payload: {
+      news: Notification[];
+    };
+  };
 }
 
-// 4️⃣ payload 전체 구조
-export interface NoticeResponsePayload {
-  pageInfo: PageInfo;
-  payload: NoticePayload;
+// =============================
+// 위치 공유 수락 / 메이트 수락 공통
+// POST /notifications/news/share-locations
+// POST /notifications/news/share-mates
+// =============================
+export interface AcceptNotificationRequest {
+  notificationId: number;
 }
 
-// 5️⃣ 최종 API 응답 타입
+export interface AcceptNotificationResponse {
+  statusCode: number;
+  message: string;
+  pageInfo: NotificationPageInfo;
+  payload: Record<string, never>; // 빈 객체 {}
+}
+
+//notifications/notices
+// =============================
+// 공지사항 하나
+// =============================
+export interface Notice {
+  id: number;
+  senderProfileImg: string;
+  title: string;
+  content: string;
+  createdAt: string;
+  read: boolean;
+}
+
+// =============================
+// 공지사항 전체 조회 응답
+// =============================
 export interface NoticeListResponse {
   statusCode: number;
   message: string;
-  payload: NoticeResponsePayload;
-}
-
-// ==============================
-// share-mates (POST) 요청 타입
-// ==============================
-
-export interface ShareMateRequest {
-  notificationId: number;
-}
-
-
-// ==============================
-// share-mates (POST) 응답 타입
-// ==============================
-
-export interface ShareMateResponse {
-  statusCode: number;
-  message: string;
-  payload: {};
-}
-
-// ==============================
-// share-locations (POST) 요청 타입
-// ==============================
-
-export interface ShareLocationRequest {
-  notificationId: number;
-}
-
-
-// ==============================
-// share-locations (POST) 응답 타입
-// ==============================
-
-export interface ShareLocationResponse {
-  statusCode: number;
-  message: string;
-  payload: {};
+  pageInfo: NotificationPageInfo;
+  payload: {
+    notices: Notice[];
+  };
 }

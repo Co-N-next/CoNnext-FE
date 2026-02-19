@@ -9,13 +9,13 @@ export interface MateResponse {
   name: string;
   imageUrl: string;
   location?: string;
-  // 필요 시 명세에 맞춰 필드 추가 (ex: age, gender 등)
+  // 필요 시 명세에 맞춰 필드 추가 (ex: age, gender, status 등)
 }
 
 export interface MateProfileResponse extends MateResponse {
   description?: string;
   tags?: string[];
-  favoriteGenres?: string[];
+  favoriteGenres?: string[]; // 예시: 선호 장르
 }
 
 export interface MatesPageResponse {
@@ -41,6 +41,7 @@ export const fetchMates = async (
     return response.data.payload;
   } catch (error) {
     console.error("메이트 목록 조회 실패:", error);
+    // 에러 시 빈 목록 반환 (화면 깨짐 방지)
     return { mates: [], hasMore: false };
   }
 };
@@ -64,7 +65,7 @@ export const searchMates = async (
 };
 
 // 3. 메이트 프로필 조회 (GET /mates/{mateId}/profile)
-// (기존 fetchMateDetail 대신 명세에 있는 이 함수를 메인으로 사용하세요)
+// (기존 fetchMateDetail 대신 사용)
 export const getMateProfile = async (mateId: string): Promise<MateProfileResponse> => {
   try {
     const response = await apiClient.get<{ payload: MateProfileResponse }>(
@@ -104,8 +105,9 @@ export const getTodayMates = async (): Promise<MateResponse[]> => {
 // ------------------------------------------------------------------
 
 // 6. 메이트 요청 (POST /mates/request)
-export const requestMate = async (nickname: string) => {
-  const response = await apiClient.post(`/mates/request`, { nickname });
+export const requestMate = async (addresseeId: number) => {
+  // 백엔드가 원하는 키 이름 "addresseeId"로 보냅니다.
+  const response = await apiClient.post(`/mates/request`, { addresseeId });
   return response.data;
 };
 

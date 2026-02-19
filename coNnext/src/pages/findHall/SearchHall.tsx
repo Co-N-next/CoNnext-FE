@@ -1,15 +1,16 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Search from "../../components/common/Search";
-import before from "../../assets/Icons/back.svg";
-import PopularVenueTicker from "../../components/PopularVenueTicket";
+
+import before from "../../assets/logo/before.svg";
+import PopularVenueTicker from "../../components/PopularVenueTicker";
 import { useVenuesearch } from "../../hooks/queries/useVenuesearch";
 import {
   getSearchHistory,
   postSearchHistory,
   deleteSearchHistory,
   deleteAllSearchHistory,
-} from "../../api/history";
+} from "../../api/SearchHistory";
 import VenueCard from "../../components/VenueCard";
 import { useTrendingVenues } from "../../hooks/queries/useTrendingVenues";
 

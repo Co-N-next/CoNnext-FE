@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Search from "../../components/common/Search";
 import { useTrendingVenues } from "../../hooks/queries/useTrendingVenues";
 import { useGetNearestVenue } from "../../hooks/queries/useGetNearestVenue";
-import { NearbyBanner } from "../../components/NearByBanner";
+import { NearbyBanner } from "../../components/NearbyBanner";
 import VenueCard from "../../components/VenueCard";
 import { useFavoriteVenues } from "../../hooks/queries/useFavoriteVenues";
 import type { Venue } from "../../types/venueSearch";
@@ -59,7 +59,7 @@ const FindHall = () => {
   return (
     <div className="flex min-h-screen justify-center bg-[#0a0f1f] text-white">
       <div className="w-full max-w-[600px] space-y-4 px-2.5 py-2.5">
-        <h1 className="text-[18px] font-semibold">°ø¿¬Àå Ã£±â</h1>
+        <h1 className="text-[18px] font-semibold">ê³µì—°ì¥ ì°¾ê¸°</h1>
 
         {!isNearestLoading && !isNearestError && nearestVenueData?.payload && (
           <div className="flex justify-center">
@@ -72,23 +72,23 @@ const FindHall = () => {
 
         {!isNearestLoading && !nearestVenueData?.payload && (
           <div className="rounded-xl bg-[#1B2540] p-4 text-sm text-gray-300">
-            ±ÙÃ³¿¡ °ø¿¬ÀåÀÌ ¾ø½À´Ï´Ù.
+            ê·¼ì²˜ì— ê³µì—°ì¥ì´ ì—†ìŠµë‹ˆë‹¤.
           </div>
         )}
 
         <Search readOnly onClick={() => navigate("/search")} />
 
         <section>
-          <h2 className="mb-1 text-[15px] font-semibold">Áñ°ÜÃ£±â</h2>
+          <h2 className="mb-1 text-[15px] font-semibold">ì¦ê²¨ì°¾ê¸°</h2>
 
           <div className="flex gap-2 overflow-x-auto pb-1">
             {isFavoritePending && (
-              <div className="text-sm text-gray-400">ºÒ·¯¿À´Â Áß...</div>
+              <div className="text-sm text-gray-400">ë¶ˆëŸ¬ì˜¤ëŠ” ì¤‘...</div>
             )}
 
             {isFavoriteError && (
               <div className="text-sm text-red-400">
-                Áñ°ÜÃ£±â¸¦ ºÒ·¯¿ÀÁö ¸øÇß½À´Ï´Ù.
+                ì¦ê²¨ì°¾ê¸°ë¥¼ ë¶ˆëŸ¬ì˜¤ì§€ ëª»í–ˆìŠµë‹ˆë‹¤.
               </div>
             )}
 
@@ -117,23 +117,23 @@ const FindHall = () => {
               !isFavoriteError &&
               (favoriteData?.payload ?? []).length === 0 && (
                 <div className="text-sm text-gray-500">
-                  Áñ°ÜÃ£±â °ø¿¬ÀåÀÌ ¾ø½À´Ï´Ù.
+                  ì¦ê²¨ì°¾ê¸° ê³µì—°ì¥ì´ ì—†ìŠµë‹ˆë‹¤.
                 </div>
               )}
           </div>
         </section>
 
         <section>
-          <h2 className="mb-1 text-[15px] font-semibold">ÀÎ±â °ø¿¬Àå</h2>
+          <h2 className="mb-1 text-[15px] font-semibold">ì¸ê¸° ê³µì—°ì¥</h2>
 
           <div className="flex gap-2 overflow-x-auto pb-1">
             {isTrendingPending && (
-              <div className="text-sm text-gray-400">ºÒ·¯¿À´Â Áß...</div>
+              <div className="text-sm text-gray-400">ë¶ˆëŸ¬ì˜¤ëŠ” ì¤‘...</div>
             )}
 
             {isTrendingError && (
               <div className="text-sm text-red-400">
-                °ø¿¬ÀåÀ» ºÒ·¯¿ÀÁö ¸øÇß½À´Ï´Ù.
+                ê³µì—°ì¥ì„ ë¶ˆëŸ¬ì˜¤ì§€ ëª»í–ˆìŠµë‹ˆë‹¤.
               </div>
             )}
 

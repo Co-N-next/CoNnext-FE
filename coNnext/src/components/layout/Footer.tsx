@@ -19,13 +19,13 @@ const Footer: React.FC = () => {
     { id: 5, label: '마이페이지', path: '/mypage', icon: MyPageIcon },
   ];
 
-const ACTIVE_COLOR = "#CBBBFF";
-const INACTIVE_COLOR = "#E8E8E8";
+  const ACTIVE_COLOR = "#CBBBFF";
+  const INACTIVE_COLOR = "#E8E8E8";
 
-const ACTIVE_FILTER = "brightness(0) saturate(100%) invert(84%) sepia(21%) saturate(541%) hue-rotate(206deg) brightness(101%) contrast(101%)";
+  const ACTIVE_FILTER = "brightness(0) saturate(100%) invert(84%) sepia(21%) saturate(541%) hue-rotate(206deg) brightness(101%) contrast(101%)";
 
-return (
-    <footer className="fixed bottom-0 left-1/2 -translate-x-1/2 bg-[#0f1729] border-t border-gray-800 z-50 w-full max-w-112.5">
+  return (
+    <footer className="fixed bottom-0 left-1/2 -translate-x-1/2 bg-[#0f1729] border-t border-gray-800 z-50 w-full max-w-[450px]">
       <nav className="w-full">
         <ul className="flex items-center justify-around py-3">
           {navItems.map((item) => {

@@ -1,11 +1,39 @@
 @import "tailwindcss";
 
+/* =========================
+   Global Default Font
+========================= */
 :root {
-  /* 기본 폰트를 Pretendard */
   font-family: "Pretendard", sans-serif;
-
 }
-/* Pretendard Regular (400) */
+
+/* =========================
+   Pretendard (All Weights)
+========================= */
+@font-face {
+  font-family: "Pretendard";
+  src: url("/fonts/Pretendard-Thin.woff") format("woff");
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Pretendard";
+  src: url("/fonts/Pretendard-ExtraLight.woff") format("woff");
+  font-weight: 200;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Pretendard";
+  src: url("/fonts/Pretendard-Light.woff") format("woff");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
 @font-face {
   font-family: "Pretendard";
   src: url("/fonts/Pretendard-Regular.woff") format("woff");
@@ -14,7 +42,6 @@
   font-display: swap;
 }
 
-/* Pretendard Medium (500) */
 @font-face {
   font-family: "Pretendard";
   src: url("/fonts/Pretendard-Medium.woff") format("woff");
@@ -23,33 +50,6 @@
   font-display: swap;
 }
 
-/* Pretendard SemiBold (600) */
-@font-face {
-  font-family: "Pretendard";
-  src: url("/fonts/Pretendard-SemiBold.woff") format("woff");
-  font-weight: 600;
-  font-style: normal;
-  font-display: swap;
-}
-/* Pretendard Regular (400) */
-@font-face {
-  font-family: "Pretendard";
-  src: url("/fonts/Pretendard-Regular.woff") format("woff");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-/* Pretendard Medium (500) */
-@font-face {
-  font-family: "Pretendard";
-  src: url("/fonts/Pretendard-Medium.woff") format("woff");
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-
-/* Pretendard SemiBold (600) */
 @font-face {
   font-family: "Pretendard";
   src: url("/fonts/Pretendard-SemiBold.woff") format("woff");
@@ -58,44 +58,70 @@
   font-display: swap;
 }
 
+@font-face {
+  font-family: "Pretendard";
+  src: url("/fonts/Pretendard-Bold.woff") format("woff");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Pretendard";
+  src: url("/fonts/Pretendard-ExtraBold.woff") format("woff");
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Pretendard";
+  src: url("/fonts/Pretendard-Black.woff") format("woff");
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* =========================
+   Inter (Variable Font)
+========================= */
 @font-face {
   font-family: "Inter";
-  src: url("./assets/fonts/Inter-VariableFont_opsz,wght.ttf")
+  src: url("/fonts/Inter-VariableFont_opsz,wght.ttf")
     format("truetype-variations");
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
 }
 
+/* =========================
+   Lyyra
+========================= */
 @font-face {
   font-family: "Lyyra";
-  src: url("./assets/fonts/lyyra-expanded-4.ttf") format("truetype");
+  src: url("/fonts/lyyra-expanded-4.ttf") format("truetype");
   font-weight: 400;
   font-style: normal;
+  font-display: swap;
 }
 
-/* Yde Street Light*/
+/* =========================
+   Yde Street
+========================= */
 @font-face {
   font-family: "YdeStreetL";
-  src: url("./assets/fonts/YdestreetL.ttf") format("truetype");
+  src: url("/fonts/YdestreetL.ttf") format("truetype");
   font-weight: 300;
   font-style: normal;
+  font-display: swap;
 }
 
-/* Yde Street Bold*/
 @font-face {
   font-family: "YdeStreetB";
-  src: url("./assets/fonts/YdestreetB.ttf") format("truetype");
+  src: url("/fonts/YdestreetB.ttf") format("truetype");
   font-weight: 700;
   font-style: normal;
-}
-
-/* Pretendard-Medium */
-@font-face {
-  font-family: "Pretendard";
-  src: url("./assets/fonts/Pretendard-Medium.woff2") format("woff2");
-  font-weight: 500;
-  font-display: normal;
+  font-display: swap;
 }
 
 html, body, #root {
@@ -105,4 +131,40 @@ html, body, #root {
   height: 100%;
   overflow-x: hidden;
   background-color: #0a0f1e;
+}
+
+
+/* globals.css에 추가 */
+.scrollbar-hover {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.scrollbar-hover::-webkit-scrollbar {
+  height: 6px;
+  background: transparent;
+}
+
+.scrollbar-hover::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-hover::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 10px;
+  transition: background 0.3s ease;
+}
+
+/* hover 시에만 스크롤바 표시 */
+.scrollbar-hover:hover {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.4) transparent;
+}
+
+.scrollbar-hover:hover::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.scrollbar-hover:hover::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.6);
 }
