@@ -181,7 +181,7 @@ const Onboarding: React.FC = () => {
   <div className="w-full px-6" style={{ marginTop: '50px', zIndex: 10, position: 'relative' }}>
     <h1
       style={{
-        fontFamily: 'Pretendard',
+        fontFamily: 'PretendardSemiBold',
         fontWeight: 600,
         fontSize: '24px',
         color: '#FEFEFEE5',
@@ -257,7 +257,7 @@ const Onboarding: React.FC = () => {
     {currentData.subtitle && displayedSubtitle && (
       <h2
         style={{
-          fontFamily: 'Pretendard',
+          fontFamily: 'PretendardSemiBold',
           fontWeight: 600,
           fontSize: '24px',
           color: '#FEFEFEE5',
@@ -351,7 +351,7 @@ const Onboarding: React.FC = () => {
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M15 18L9 12L15 6" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
               </button>
               <div style={{ width: '280px', height: '60px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                <h1 style={{ fontFamily: 'Pretendard', fontWeight: 600, fontSize: '23px', color: '#FEFEFE', textAlign: 'left', letterSpacing: '-2.5%', lineHeight: '1.3', margin: 0 }}>
+                <h1 style={{ fontFamily: 'PretendardSemiBold', fontWeight: 600, fontSize: '23px', color: '#FEFEFE', textAlign: 'left', letterSpacing: '-2.5%', lineHeight: '1.3', margin: 0 }}>
                   {currentData.title}<br />{currentData.subtitle}
                 </h1>
               </div>
@@ -362,10 +362,10 @@ const Onboarding: React.FC = () => {
             <div className="absolute w-full px-6" style={{ bottom: '80px', left: 0, zIndex: 20 }}>
               <div className="flex flex-col items-center" style={{ gap: '12px', width: '100%' }}>
                 <button onClick={handleStartWithoutLogin} className="flex items-center justify-center" style={{ width: '345px', height: '40px', backgroundColor: '#7A7A7A', border: 'none', borderRadius: '10px', cursor: 'pointer' }}>
-                  <span style={{ fontFamily: 'Pretendard', fontSize: '13px', color: '#FEFEFE' }}>로그인 없이 시작하기</span>
+                  <span style={{ fontFamily: 'PretendardMedium', fontSize: '13px', color: '#FEFEFE' }}>로그인 없이 시작하기</span>
                 </button>
                 <button onClick={handleLogin} className="flex items-center justify-center" style={{ width: '345px', height: '40px', backgroundColor: '#7F5AFF', border: 'none', borderRadius: '10px', cursor: 'pointer' }}>
-                  <span style={{ fontFamily: 'Pretendard', fontSize: '13px', color: '#FEFEFE' }}>로그인하기</span>
+                  <span style={{ fontFamily: 'PretendardMedium', fontSize: '13px', color: '#FEFEFE' }}>로그인하기</span>
                 </button>
               </div>
             </div>
