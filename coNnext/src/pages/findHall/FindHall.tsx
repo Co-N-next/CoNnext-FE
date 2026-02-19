@@ -11,14 +11,7 @@ import { useState, useEffect } from "react";
 // ⭐ NEW
 import { useFavoriteVenues } from "../../hooks/queries/useFavoriteVenues";
 
-const todayVenueSummary = {
-  hasTodayVenue: true,
-  venue: {
-    name: "KSPO DOME",
-    city: "서울특별시 송파구",
-    image: "https://images.unsplash.com/photo-1506157786151-b8491531f063",
-  },
-};
+
 const FindHall = () => {
   const navigate = useNavigate();
 
@@ -114,31 +107,7 @@ const FindHall = () => {
             />
           </div>
         )}
-        {/* =========================
-         * Today Venue
-         * ========================= */}
-        {todayVenueSummary.hasTodayVenue && (
-          <section>
-            <h2 className="mb-4 text-[15px] font-semibold">오늘의 공연장</h2>
 
-            <div className="flex justify-center">
-              <div
-                className="w-[400px] h-[180px]
-                [&_div:first-child]:h-[120px]
-                [&_div:first-child]:aspect-auto"
-              >
-                <VenueCard
-                  id={0} // 임시 ID
-                  name={todayVenueSummary.venue.name}
-                  city={todayVenueSummary.venue.city}
-                  imageUrl={todayVenueSummary.venue.image}
-                  isToday={true}
-                  isNew={false}
-                />
-              </div>
-            </div>
-          </section>
-        )}
         {/* =========================
          * Search
          * ========================= */}

@@ -111,3 +111,41 @@ export interface NoticeListResponse {
   message: string;
   payload: NoticeResponsePayload;
 }
+
+// ==============================
+// share-mates (POST) 요청 타입
+// ==============================
+
+export interface ShareMateRequest {
+  notificationId: number;
+}
+
+
+// ==============================
+// share-mates (POST) 응답 타입
+// ==============================
+
+export interface ShareMateResponse {
+  statusCode: number;
+  message: string;
+  payload: {};
+}
+
+// ==============================
+// share-locations (POST) 요청 타입
+// ==============================
+
+export interface ShareLocationRequest {
+  notificationId: number;
+}
+
+
+// ==============================
+// share-locations (POST) 응답 타입
+// ==============================
+
+export interface ShareLocationResponse {
+  statusCode: number;
+  message: string;
+  payload: {};
+}
