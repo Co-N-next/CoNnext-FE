@@ -1,48 +1,67 @@
-import React, { useState } from 'react';
+//src/pages/login/SignUp.tsx
+
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import {
+  localSignUp,
+  checkEmailAvailability,
+  getRandomNickname,
+} from '../../api/auth';
+
 
 import BackButton from '../../assets/Icons/back.svg';
 import EmailDelete from '../../assets/Icons/x.svg';
 import EyeOn from '../../assets/Icons/Eye.svg';
 import EyeOff from '../../assets/Icons/Eye_off.svg';
-import CheckboxOn from '../../assets/Icons/Checked.svg';
-import CheckboxOff from '../../assets/Icons/Unchecked.svg';
+import SelectNone from '../../assets/Icons/SelectNone.svg';
+import SelectAll from '../../assets/Icons/SelectAll.svg';
+import Unchecked from '../../assets/Icons/Unchecked.svg';
+import Checked from '../../assets/Icons/Checked.svg';
+
+import TermsModal from '../../components/modal/TermsModal';
 
 const SignUpScreen: React.FC = () => {
-  const navigate = useNavigate();
+   const navigate = useNavigate();
 
   const [email, setEmail] = useState('');
+  const [emailError, setEmailError] = useState('');
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
-  
+
   const [showPassword, setShowPassword] = useState(false);
   const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
-  
-  const [isEmailDuplicate, setIsEmailDuplicate] = useState(false); // 이메일 중복 여부
-  
+
+  const [isEmailDuplicate, setIsEmailDuplicate] = useState(false);
+
   const isPasswordDiff = passwordConfirm.length > 0 && password !== passwordConfirm;
+  
 
   const [agreements, setAgreements] = useState({
+    all: false,
     service: false,
     privacy: false,
-    marketing: false
+    marketing: false,
   });
 
-  // ✅ 계산된 값(derived state)으로 변경 - useEffect 불필요
-  const allChecked = agreements.service && agreements.privacy && agreements.marketing;
-  const isFormValid = 
-    email.length > 0 &&
-    password.length >= 8 &&
-    password === passwordConfirm &&
-    agreements.service &&
-    agreements.privacy &&
-    agreements.marketing &&
-    !isEmailDuplicate;
+  const [isFormValid, setIsFormValid] = useState(false);
+
+  // 약관 팝업 상태
+  const [modalState, setModalState] = useState<{
+    isOpen: boolean;
+    type: 'service' | 'privacy' | 'marketing' | null;
+  }>({
+    isOpen: false,
+    type: null
+  });
 
   // 전체 동의 체크박스 핸들러
   const handleAllAgreement = () => {
-    const newValue = !allChecked;
+    const newValue = !agreements.all;
     setAgreements({
+      all: newValue,
       service: newValue,
       privacy: newValue,
       marketing: newValue
@@ -57,25 +76,128 @@ const SignUpScreen: React.FC = () => {
     }));
   };
 
-  // ✅ useEffect 제거 - 위에서 계산된 값으로 처리
+  // 약관 보기 버튼 핸들러
+  const handleShowTerms = (type: 'service' | 'privacy' | 'marketing') => {
+    setModalState({
+      isOpen: true,
+      type
+    });
+  };
 
-  // 이메일 중복 체크 (임시 - 추후 백엔드 연동)
-  const checkEmailDuplicate = (emailValue: string) => {
-    // 임시로 특정 이메일을 중복으로 처리
-    if (emailValue === 'test@example.com') {
-      setIsEmailDuplicate(true);
-    } else {
-      setIsEmailDuplicate(false);
+  // 모달 닫기 핸들러
+  const handleCloseModal = () => {
+    setModalState({
+      isOpen: false,
+      type: null
+    });
+  };
+
+  // 전체 동의 상태 업데이트
+  useEffect(() => {
+    const allChecked = agreements.service && agreements.privacy && agreements.marketing;
+    if (allChecked !== agreements.all) {
+      setAgreements(prev => ({ ...prev, all: allChecked }));
     }
-  };
+  }, [agreements.service, agreements.privacy, agreements.marketing]);
 
-  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setEmail(value);
-    checkEmailDuplicate(value);
-  };
+   /* ================= 이메일 중복 체크 ================= */
+  const checkEmailDuplicate = async () => {
+  // 프론트 1차 형식 체크 (선택)
+  if (!emailRegex.test(email)) {
+    setEmailError('올바른 이메일 형식이 아닙니다.');
+    setIsEmailDuplicate(true);
+    return false;
+  }
 
-    const inputStyle: React.CSSProperties = {
+  try {
+    await checkEmailAvailability(email);
+
+    // ✅ 200: 사용 가능
+    setEmailError('');
+    setIsEmailDuplicate(false);
+    return true;
+
+  } catch (error: any) {
+    const status = error?.response?.status;
+
+    if (status === 400) {
+      setEmailError('올바른 이메일 형식이 아닙니다.');
+    } else if (status === 409) {
+      setEmailError(
+        '이 이메일 주소는 사용 중입니다. 다른 메일로 시도하시거나 다시 로그인하세요.'
+      );
+    } else {
+      setEmailError('이메일 확인 중 오류가 발생했습니다.');
+    }
+
+    setIsEmailDuplicate(true);
+    return false;
+  }
+};
+
+
+
+
+/* ================= 회원가입 ================= */
+ const handleLocalSignUp = async () => {
+  const emailValid = await checkEmailDuplicate();
+  if (!emailValid) return;
+
+  if (!isFormValid) return;
+
+  try {
+    // 서버 스펙: agreedTermIds 배열로 전송
+    // 약관 ID는 서버 기준: 서비스(1), 개인정보(2), 마케팅(4) - 실제 ID는 GET /auth/terms 응답 기준
+    const agreedTermIds: number[] = [];
+    if (agreements.service) agreedTermIds.push(1);
+    if (agreements.privacy) agreedTermIds.push(2);
+    if (agreements.marketing) agreedTermIds.push(4);
+
+    await localSignUp(email, password, agreedTermIds);
+
+    sessionStorage.setItem('userEmail', email);
+
+    // 회원가입 성공 시 서버가 자동 부여한 닉네임을 가져와 sessionStorage에 저장
+    try {
+      const nicknameRes = await getRandomNickname();
+      const nickname = nicknameRes.data?.payload?.nickname ?? '';
+      if (nickname) sessionStorage.setItem('userNickname', nickname);
+    } catch {
+      // 닉네임 조회 실패해도 회원가입 자체는 성공이므로 무시
+    }
+
+    navigate('/home');
+  } catch (e: any) {
+    if (e?.response?.status === 409) {
+      alert('이미 사용 중인 이메일입니다.');
+    } else {
+      alert('회원가입에 실패했습니다.');
+    }
+    console.error(e);
+  }
+};
+
+    /* ================= 폼 유효성 ================= */
+  useEffect(() => {
+    const valid =
+      email.length > 0 &&
+      password.length >= 8 &&
+      password === passwordConfirm &&
+      agreements.service &&
+      agreements.privacy &&
+      !isEmailDuplicate;
+
+    setIsFormValid(valid);
+  }, [
+    email,
+    password,
+    passwordConfirm,
+    agreements.service,
+    agreements.privacy,
+    isEmailDuplicate,
+  ]);
+
+  const inputStyle: React.CSSProperties = {
     width: '347px',
     height: '42px',
     borderRadius: '8px',
@@ -85,7 +207,7 @@ const SignUpScreen: React.FC = () => {
     paddingLeft: '16px',
     paddingRight: '16px',
     fontSize: '13px',
-    fontFamily: 'PretendardMedium',
+    fontFamily: 'Pretendard',
     fontWeight: 500,
     outline: 'none',
   };
@@ -125,7 +247,7 @@ const SignUpScreen: React.FC = () => {
         position: 'relative'
       }}
     >
-      <div className="w-full max-w-[345px]">
+      <div className="w-full max-w-86.25">
         {/* Back Button */}
         <button 
           onClick={() => navigate('/login')}
@@ -138,10 +260,6 @@ const SignUpScreen: React.FC = () => {
           <img 
             src={BackButton} 
             alt="뒤로가기" 
-            style={{ 
-              width: '6px', 
-              height: '12px'
-            }} 
           />
         </button>
 
@@ -149,7 +267,7 @@ const SignUpScreen: React.FC = () => {
         <h1 
           className="mb-10"
           style={{
-            fontFamily: 'PretendardSemiBold',
+            fontFamily: 'Pretendard',
             fontWeight: 600,
             fontSize: '23px',
             lineHeight: '1.3',
@@ -165,7 +283,7 @@ const SignUpScreen: React.FC = () => {
         <div className="mb-4">
           <label 
             style={{
-              fontFamily: 'PretendardMedium',
+              fontFamily: 'Pretendard',
               fontWeight: 500,
               fontSize: '13px',
               color: '#E8E8E8',
@@ -180,7 +298,12 @@ const SignUpScreen: React.FC = () => {
               type="email"
               placeholder="이메일을 입력해주세요."
               value={email}
-              onChange={handleEmailChange}
+              onChange={(e) => {
+              setEmail(e.target.value);
+              setEmailError('');
+              setIsEmailDuplicate(false);
+            }}
+
               style={isEmailDuplicate ? inputErrorStyle : inputStyle}
               className="placeholder-[#A1A1A1]"
             />
@@ -196,17 +319,18 @@ const SignUpScreen: React.FC = () => {
               </button>
             )}
           </div>
-          {isEmailDuplicate && (
-            <p style={{
-              fontFamily: 'PretendardRegular',
-              fontSize: '10px',
-              color: '#FF4848',
-              marginTop: '8px',
-              marginLeft: '4px'
-            }}>
-              이 이메일 주소는 사용 중입니다. 다른 메일로 시도하시거나 다시 로그인하세요.
-            </p>
-          )}
+          {emailError && (
+  <p style={{
+    fontFamily: 'Pretendard',
+    fontSize: '10px',
+    color: '#FF4848',
+    marginTop: '8px',
+    marginLeft: '4px'
+  }}>
+    {emailError}
+  </p>
+)}
+
         </div>
 
         {/* Password Input */}
@@ -283,10 +407,9 @@ const SignUpScreen: React.FC = () => {
               </button>
             )}
           </div>
-          {/* 비밀번호 불일치 안내 문구 추가 */}
           {isPasswordDiff && (
             <p style={{
-              fontFamily: 'PretendardRegular',
+              fontFamily: 'Pretendard',
               fontSize: '10px',
               color: '#FF4848',
               marginTop: '8px',
@@ -296,7 +419,6 @@ const SignUpScreen: React.FC = () => {
             </p>
           )}
         </div>
-        
 
         {/* Agreements */}
         <div className="mb-8">
@@ -305,17 +427,17 @@ const SignUpScreen: React.FC = () => {
             className="flex items-center"
             style={{ 
               cursor: 'pointer',
-              marginBottom: '14px' // 전체 동의와 아래 박스 간격
+              marginBottom: '14px'
             }}
             onClick={handleAllAgreement}
           >
             <img 
-              src={allChecked ? CheckboxOn : CheckboxOff} 
+              src={agreements.all ? SelectAll : SelectNone} 
               alt="전체 동의" 
-              style={{ width: '19px', height: '19px', marginRight: '8px' }} 
+              style={{ marginRight: '8px' }} 
             />
             <span style={{
-              fontFamily: 'PretendardMedium',
+              fontFamily: 'Pretendard',
               fontSize: '16px',
               fontWeight: 500,
               color: '#E8E8E8'
@@ -329,7 +451,7 @@ const SignUpScreen: React.FC = () => {
             {/* Service Agreement */}
             <div 
               className="flex items-center justify-between"
-              style={{ marginBottom: '16px' }} // 16px 간격
+              style={{ marginBottom: '16px' }}
             >
               <div 
                 className="flex items-center"
@@ -337,27 +459,30 @@ const SignUpScreen: React.FC = () => {
                 onClick={() => handleAgreement('service')}
               >
                 <img 
-                  src={agreements.service ? CheckboxOn : CheckboxOff} 
+                  src={agreements.service ? Checked : Unchecked} 
                   alt="서비스 이용약관" 
-                  style={{ width: '19px', height: '19px', marginRight: '8px' }} 
+                  style={{ marginRight: '8px' }} 
                 />
                 <span style={{
-                  fontFamily: 'PretendardMedium',
+                  fontFamily: 'Pretendard',
                   fontSize: '13px',
                   color: '#A1A1A1'
                 }}>
-                  서비스 이용약관 동의 (필수)
+                  서비스 이용약관 동의 <span className="text-[#B59FFF]">(필수)</span>
                 </span>
               </div>
-              <button style={{
-                fontFamily: 'PretendardMedium',
-                fontSize: '13px',
-                color: '#A1A1A1',
-                textDecoration: 'underline',
-                background: 'transparent',
-                border: 'none',
-                cursor: 'pointer'
-              }}>
+              <button 
+                onClick={() => handleShowTerms('service')}
+                style={{
+                  fontFamily: 'Pretendard',
+                  fontSize: '13px',
+                  color: '#A1A1A1',
+                  textDecoration: 'underline',
+                  background: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer'
+                }}
+              >
                 보기
               </button>
             </div>
@@ -365,7 +490,7 @@ const SignUpScreen: React.FC = () => {
             {/* Privacy Agreement */}
             <div 
               className="flex items-center justify-between"
-              style={{ marginBottom: '16px' }} // 16px 간격
+              style={{ marginBottom: '16px' }}
             >
               <div 
                 className="flex items-center"
@@ -373,27 +498,30 @@ const SignUpScreen: React.FC = () => {
                 onClick={() => handleAgreement('privacy')}
               >
                 <img 
-                  src={agreements.privacy ? CheckboxOn : CheckboxOff} 
+                  src={agreements.privacy ? Checked : Unchecked} 
                   alt="개인정보 수집" 
-                  style={{ width: '19px', height: '19px', marginRight: '8px' }} 
+                  style={{ marginRight: '8px' }} 
                 />
                 <span style={{
-                  fontFamily: 'PretendardMedium',
+                  fontFamily: 'Pretendard',
                   fontSize: '13px',
                   color: '#A1A1A1'
                 }}>
-                  개인정보 수집 및 이용 동의 (필수)
+                  개인정보 수집 및 이용 동의 <span className="text-[#B59FFF]">(필수)</span>
                 </span>
               </div>
-              <button style={{
-                fontFamily: 'PretendardMedium',
-                fontSize: '13px',
-                color: '#A1A1A1',
-                textDecoration: 'underline',
-                background: 'transparent',
-                border: 'none',
-                cursor: 'pointer'
-              }}>
+              <button 
+                onClick={() => handleShowTerms('privacy')}
+                style={{
+                  fontFamily: 'Pretendard',
+                  fontSize: '13px',
+                  color: '#A1A1A1',
+                  textDecoration: 'underline',
+                  background: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer'
+                }}
+              >
                 보기
               </button>
             </div>
@@ -406,72 +534,65 @@ const SignUpScreen: React.FC = () => {
                 onClick={() => handleAgreement('marketing')}
               >
                 <img 
-                  src={agreements.marketing ? CheckboxOn : CheckboxOff} 
+                  src={agreements.marketing ? Checked : Unchecked} 
                   alt="마케팅 이용" 
-                  style={{ width: '19px', height: '19px', marginRight: '8px' }} 
+                  style={{ marginRight: '8px' }} 
                 />
                 <span style={{
-                  fontFamily: 'PretendardMedium',
+                  fontFamily: 'Pretendard',
                   fontSize: '13px',
                   color: '#A1A1A1'
                 }}>
                   마케팅 이용 동의 (선택)
                 </span>
               </div>
-              <button style={{
-                fontFamily: 'PretendardMedium',
-                fontSize: '13px',
-                color: '#A1A1A1',
-                textDecoration: 'underline',
-                background: 'transparent',
-                border: 'none',
-                cursor: 'pointer'
-              }}>
+              <button 
+                onClick={() => handleShowTerms('marketing')}
+                style={{
+                  fontFamily: 'Pretendard',
+                  fontSize: '13px',
+                  color: '#A1A1A1',
+                  textDecoration: 'underline',
+                  background: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer'
+                }}
+              >
                 보기
               </button>
             </div>
           </div>
         </div>
 
-        {/* Submit Button - 수정됨 */}
-        <div
-          style={{
-            position: 'absolute',
-            top: '774px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            width: '345px'
-          }}
-        >
+        {/* Submit Button */}
+        <div className="fixed bottom-10 left-1/2 w-86.25 -translate-x-1/2 z-50">
           <button
-            onClick={() => {
-              if (isFormValid) {
-                navigate('/');
-              }
-            }}
+            onClick={handleLocalSignUp}
             disabled={!isFormValid}
-            style={{
-               width: '345px',
-              height: '40px',
-              borderRadius: '10px',
-              border: 'none',
-              background: isFormValid ? '#7F5AFF' : '#7A7A7A',
-              color: '#FFFFFF',
-              fontFamily: 'PretendardMedium',
-              fontWeight: 500,
-              fontSize: '13px',
-              lineHeight: '130%',
-              letterSpacing: '-0.025em',
-              cursor: isFormValid ? 'pointer' : 'not-allowed',
-              transition: 'all 0.3s ease',
-              opacity: 1
-            }}
-            className={isFormValid ? 'hover:opacity-90 active:scale-[0.98]' : ''}
+            className={`
+              w-86.25 h-10 rounded-[10px] border-none
+              font-['Pretendard'] font-medium text-[13px] leading-[130%] tracking-[-0.025em]
+              text-[#FFFFFF] transition-all duration-300 opacity-100
+              ${
+                isFormValid
+                  ? 'bg-[#7F5AFF] cursor-pointer hover:opacity-90 active:scale-[0.98]'
+                  : 'bg-[#7A7A7A] cursor-not-allowed'
+              }
+            `}
           >
             다음
           </button>
         </div>
       </div>
+
+      {/* 약관 팝업 모달 */}
+      {modalState.type && (
+        <TermsModal
+          isOpen={modalState.isOpen}
+          onClose={handleCloseModal}
+          type={modalState.type}
+        />
+      )}
     </div>
   );
 };
