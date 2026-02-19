@@ -46,7 +46,7 @@ const MyPageGuest: React.FC = () => {
           <div 
             className="text-white text-left"
             style={{
-              fontFamily: 'PretendardSemiBold',
+              fontFamily: 'Pretendard',
               fontWeight: 600, 
               fontSize: '16px',
               lineHeight: '130%', 
@@ -64,7 +64,7 @@ const MyPageGuest: React.FC = () => {
           <div 
             className="text-gray-400 mb-1"
             style={{
-              fontFamily: 'PretendardMedium',
+              fontFamily: 'Pretendard',
               fontSize: '12px',
               lineHeight: '130%',
             }}
@@ -74,7 +74,7 @@ const MyPageGuest: React.FC = () => {
           <div 
             className="font-bold"
             style={{
-              fontFamily: 'PretendardSemiBold',
+              fontFamily: 'Pretendard',
               fontSize: '24px',
               lineHeight: '130%',
               color: '#FFFFFF'
@@ -87,7 +87,7 @@ const MyPageGuest: React.FC = () => {
           <div 
             className="text-gray-400 mb-1"
             style={{
-              fontFamily: 'PretendardMedium',
+              fontFamily: 'Pretendard',
               fontSize: '12px',
               lineHeight: '130%',
             }}
@@ -97,7 +97,7 @@ const MyPageGuest: React.FC = () => {
           <div 
             className="font-bold"
             style={{
-              fontFamily: 'PretendardSemiBold',
+              fontFamily: 'Pretendard',
               fontSize: '24px',
               lineHeight: '130%',
               color: '#FFFFFF'
@@ -110,7 +110,7 @@ const MyPageGuest: React.FC = () => {
           <div 
             className="text-gray-400 mb-1"
             style={{
-              fontFamily: 'PretendardMedium',
+              fontFamily: 'Pretendard',
               fontSize: '12px',
               lineHeight: '130%',
             }}
@@ -120,7 +120,7 @@ const MyPageGuest: React.FC = () => {
           <div 
             className="font-bold"
             style={{
-              fontFamily: 'PretendardSemiBold',
+              fontFamily: 'Pretendard',
               fontSize: '24px',
               lineHeight: '130%',
               color: '#FFFFFF'
@@ -147,7 +147,7 @@ const MyPageGuest: React.FC = () => {
           <h2 
             className="mb-2 ml-1"
             style={{
-              fontFamily: 'PretendardMedium',
+              fontFamily: 'Pretendard',
               fontSize: '14px',
               color: '#9CA3AF'
             }}
@@ -164,7 +164,7 @@ const MyPageGuest: React.FC = () => {
           >
             <span 
               style={{
-                fontFamily: 'PretendardMedium',
+                fontFamily: 'Pretendard',
                 fontSize: '16px',
                 color: '#E5E7EB'
               }}
@@ -220,7 +220,7 @@ const MyPageGuest: React.FC = () => {
             <div 
               className="text-center"
               style={{
-                fontFamily: 'PretendardMedium',
+                fontFamily: 'Pretendard',
                 fontSize: '13px',
                 color: '#FEFEFE',
                 lineHeight: '130%'
@@ -243,7 +243,7 @@ const MyPageGuest: React.FC = () => {
               onClick={handleLoginClick}
               className="w-full text-center transition-opacity active:opacity-70"
               style={{
-                fontFamily: 'PretendardsemiBold',
+                fontFamily: 'Pretendard',
                 fontSize: '16px',
                 color: '#7F5AFF',
                 padding: 0

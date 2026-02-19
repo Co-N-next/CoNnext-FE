@@ -1,376 +1,419 @@
-import React, { useState } from 'react';
+// src/pages/login/SocialSignUp.tsx
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import {
+  getSocialSignUpInfo,
+  socialSignUp,
+  getRandomNickname,
+  reissueToken,
+} from '../../api/auth';
 
 import BackButton from '../../assets/Icons/back.svg';
-import EmailDelete from '../../assets/Icons/x.svg';
-import CheckboxOn from '../../assets/Icons/Checked.svg';
-import CheckboxOff from '../../assets/Icons/Unchecked.svg';
+import SelectNone from '../../assets/Icons/SelectNone.svg';
+import SelectAll from '../../assets/Icons/SelectAll.svg';
+import Unchecked from '../../assets/Icons/Unchecked.svg';
+import Checked from '../../assets/Icons/Checked.svg';
 
-const SignUpScreen: React.FC = () => {
+import TermsModal from '../../components/modal/TermsModal';
+
+const SocialSignUp: React.FC = () => {
   const navigate = useNavigate();
 
   const [email, setEmail] = useState('');
+  const [isLoadingEmail, setIsLoadingEmail] = useState(true);
 
-  const [isEmailDuplicate, setIsEmailDuplicate] = useState(false); // 이메일 중복 여부
-  
   const [agreements, setAgreements] = useState({
+    all: false,
     service: false,
     privacy: false,
-    marketing: false
+    marketing: false,
   });
 
-  // ✅ 계산된 값(derived state)으로 변경 - useEffect 불필요
-  const allChecked = agreements.service && agreements.privacy && agreements.marketing;
-  const isFormValid = email.length > 0 && agreements.service && agreements.privacy && agreements.marketing && !isEmailDuplicate;
+  const [isFormValid, setIsFormValid] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
-  // 전체 동의 체크박스 핸들러
+  const [modalState, setModalState] = useState<{
+    isOpen: boolean;
+    type: 'service' | 'privacy' | 'marketing' | null;
+  }>({ isOpen: false, type: null });
+
+  // ── 페이지 진입 시 Signup Token으로 이메일 자동 조회 ──────────
+  useEffect(() => {
+    const fetchSocialInfo = async () => {
+      try {
+        const res = await getSocialSignUpInfo();
+        /**
+         * 백엔드 응답 스펙: { email: "qwer@example.com" }
+         * 일부 서버는 { payload: { email: "..." } } 로 감싸기도 하므로 둘 다 대응
+         */
+        const fetchedEmail =
+          res.data?.email ?? (res.data as any)?.payload?.email ?? '';
+        setEmail(fetchedEmail);
+        if (fetchedEmail) sessionStorage.setItem('userEmail', fetchedEmail);
+      } catch (error: any) {
+        console.error('소셜 회원가입 정보 조회 실패:', error);
+        if (error.response?.status === 401) {
+          // Signup Token 없음/만료 → 로그인으로
+          alert('소셜 로그인이 필요합니다.');
+          navigate('/login');
+        } else if (error.response?.status === 403) {
+          // 이미 가입 완료된 유저(ACTIVE) → reissue 후 홈으로
+          try {
+            await reissueToken();
+          } catch {
+            // reissue 실패해도 홈으로 보냄
+          }
+          navigate('/home');
+        }
+      } finally {
+        setIsLoadingEmail(false);
+      }
+    };
+    fetchSocialInfo();
+  }, [navigate]);
+
+  // ── 약관 동의 핸들러 ──────────────────────────────────────────
   const handleAllAgreement = () => {
-    const newValue = !allChecked;
+    const newValue = !agreements.all;
     setAgreements({
+      all: newValue,
       service: newValue,
       privacy: newValue,
-      marketing: newValue
+      marketing: newValue,
     });
   };
 
-  // 개별 동의 체크박스 핸들러
   const handleAgreement = (key: 'service' | 'privacy' | 'marketing') => {
-    setAgreements(prev => ({
-      ...prev,
-      [key]: !prev[key]
-    }));
+    setAgreements((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
-  // ✅ useEffect 제거 - 위에서 계산된 값으로 처리
+  const handleShowTerms = (type: 'service' | 'privacy' | 'marketing') => {
+    setModalState({ isOpen: true, type });
+  };
 
-  // 이메일 중복 체크 (임시 - 추후 백엔드 연동)
-  const checkEmailDuplicate = (emailValue: string) => {
-    // 임시로 특정 이메일을 중복으로 처리
-    if (emailValue === 'test@example.com') {
-      setIsEmailDuplicate(true);
-    } else {
-      setIsEmailDuplicate(false);
+  const handleCloseModal = () => {
+    setModalState({ isOpen: false, type: null });
+  };
+
+  // 개별 체크 → 전체 체크 동기화
+  useEffect(() => {
+    const allChecked =
+      agreements.service && agreements.privacy && agreements.marketing;
+    if (allChecked !== agreements.all) {
+      setAgreements((prev) => ({ ...prev, all: allChecked }));
+    }
+  }, [agreements.service, agreements.privacy, agreements.marketing]);
+
+  // 필수 약관(service, privacy) 체크 시 제출 버튼 활성화
+  useEffect(() => {
+    setIsFormValid(agreements.service && agreements.privacy);
+  }, [agreements.service, agreements.privacy]);
+
+  // ── 소셜 회원가입 제출 ────────────────────────────────────────
+  const handleSocialSignUp = async () => {
+    if (!isFormValid || isLoading) return;
+    setIsLoading(true);
+    setErrorMessage('');
+
+    try {
+      /**
+       * 약관 ID 배열 구성 (백엔드 스펙 기준)
+       * 1: 서비스 이용약관, 2: 개인정보 수집 및 이용, 4: 마케팅 이용 동의
+       */
+      const agreedTermIds: number[] = [];
+      if (agreements.service) agreedTermIds.push(1);
+      if (agreements.privacy) agreedTermIds.push(2);
+      if (agreements.marketing) agreedTermIds.push(4);
+
+      // 1단계: 소셜 회원가입 (Signup Token 쿠키로 서버가 이메일 처리)
+      await socialSignUp(agreedTermIds);
+
+      /**
+       * 2단계: Access Token 재발급 (필수)
+       * 소셜 회원가입 성공 후 Refresh Token이 발급되므로
+       * reissue를 호출해야 실제 Access Token을 얻을 수 있음
+       */
+      await reissueToken();
+
+      // 3단계: 닉네임 조회 후 sessionStorage 저장 (선택)
+      try {
+        const nicknameRes = await getRandomNickname();
+        const nickname =
+          nicknameRes.data?.payload?.nickname ??
+          nicknameRes.data?.nickname ??
+          '';
+        if (nickname) sessionStorage.setItem('userNickname', nickname);
+      } catch {
+        // 닉네임 조회 실패는 무시하고 계속 진행
+      }
+
+      navigate('/home');
+    } catch (error: any) {
+      console.error('소셜 회원가입 실패:', error);
+      const status = error.response?.status;
+      if (status === 401) {
+        setErrorMessage(
+          '회원가입 토큰이 만료되었습니다. 다시 소셜 로그인해주세요.'
+        );
+      } else if (status === 400) {
+        setErrorMessage(
+          error.response?.data?.message ?? '유효하지 않은 요청입니다.'
+        );
+      } else {
+        setErrorMessage(
+          error.response?.data?.message ?? '회원가입에 실패했습니다.'
+        );
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setEmail(value);
-    checkEmailDuplicate(value);
-  };
+  // ── 로딩 화면 ─────────────────────────────────────────────────
+  if (isLoadingEmail) {
+    return (
+      <div
+        className="min-h-screen w-full flex items-center justify-center"
+        style={{ background: '#0a1628' }}
+      >
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-white" />
+      </div>
+    );
+  }
 
-    const inputStyle: React.CSSProperties = {
-    width: '347px',
-    height: '42px',
-    borderRadius: '8px',
-    border: 'none',
-    backgroundColor: '#1E293B',
-    color: '#FFFFFF',
-    paddingLeft: '16px',
-    paddingRight: '16px',
-    marginBottom: '32px',
-    fontSize: '13px',
-    fontFamily: 'PretendardMedium',
-    fontWeight: 500,
-    outline: 'none',
-  };
-
-  const inputErrorStyle: React.CSSProperties = {
-    ...inputStyle,
-    border: '0.5px solid #FF4848',
-  };
-
-  const inputContainerStyle: React.CSSProperties = {
-    position: 'relative',
-    width: '347px',
-    display: 'flex',
-    alignItems: 'center'
-  };
-
-  const iconButtonStyle: React.CSSProperties = {
-    position: 'absolute',
-    right: '16px',
-    background: 'transparent',
-    border: 'none',
-    cursor: 'pointer',
-    padding: 0,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '20px',
-    height: '20px'
-  };
-
+  // ── UI ────────────────────────────────────────────────────────
   return (
-    <div 
+    <div
       className="min-h-screen w-full flex flex-col items-center"
-      style={{
-        background: '#0a1628',
-        paddingTop: '60px',
-        position: 'relative'
-      }}
+      style={{ background: '#0a1628', paddingTop: '60px' }}
     >
       <div className="w-full max-w-[345px]">
-        {/* Back Button */}
-        <button 
-          onClick={() => navigate('/login')}
-          className="mb-6 hover:opacity-70 transition-opacity"
-          style={{
-            width: '24px',
-            height: '24px'
-          }}
-        >
-          <img 
-            src={BackButton} 
-            alt="뒤로가기" 
-            style={{ 
-              width: '6px', 
-              height: '12px'
-            }} 
-          />
+        {/* 뒤로가기 */}
+        <button onClick={() => navigate('/login')} className="mb-6">
+          <img src={BackButton} alt="뒤로가기" />
         </button>
 
-        {/* Title */}
-        <h1 
-          className="mb-10"
-          style={{
-            fontFamily: 'PretendardSemiBold',
-            fontWeight: 600,
-            fontSize: '23px',
-            lineHeight: '1.3',
-            color: '#FFFFFF',
-            margin: 0,
-            marginBottom: '48px'
-          }}
-        >
+        <h1 className="mb-12 text-white text-[23px] font-semibold">
           회원가입
         </h1>
 
-        {/* Email Input */}
-        <div className="mb-4">
-          <label 
-            style={{
-              fontFamily: 'PretendardMedium',
-              fontWeight: 500,
-              fontSize: '13px',
-              color: '#E8E8E8',
-              marginBottom: '8px',
-              display: 'block'
-            }}
-          >
-            이메일
-          </label>
-          <div style={inputContainerStyle}>
-            <input
-              type="email"
-              placeholder="이메일을 입력해주세요."
-              value={email}
-              onChange={handleEmailChange}
-              style={isEmailDuplicate ? inputErrorStyle : inputStyle}
-              className="placeholder-[#A1A1A1]"
-            />
-            {email && (
-              <button
-                onClick={() => {
-                  setEmail('');
-                  setIsEmailDuplicate(false);
-                }}
-                style={iconButtonStyle}
-              >
-                <img src={EmailDelete} alt="삭제" style={{ width: '16px', height: '16px' }} />
-              </button>
-            )}
-          </div>
-          {isEmailDuplicate && (
-            <p style={{
-              fontFamily: 'PretendardRegular',
-              fontSize: '10px',
-              color: '#FF4848',
-              marginTop: '8px',
-              marginLeft: '4px'
-            }}>
-              이 이메일 주소는 사용 중입니다. 다른 메일로 시도하시거나 다시 로그인하세요.
-            </p>
-          )}
+        {/* 이메일 (읽기 전용 - Signup Token으로 자동 조회) */}
+        <label className="text-[#E8E8E8] text-[13px] mb-2 block">
+          이메일
+        </label>
+        <div
+          style={{
+            width: '345px',
+            height: '42px',
+            borderRadius: '8px',
+            backgroundColor: '#1E293B',
+            color: '#7A7A7A',
+            padding: '0 16px',
+            marginBottom: '32px',
+            fontSize: '13px',
+            fontFamily: 'Pretendard',
+            fontWeight: 500,
+            display: 'flex',
+            alignItems: 'center',
+          }}
+        >
+          {email || '이메일을 불러오는 중...'}
         </div>
 
-
-        {/* Agreements */}
+        {/* 약관 동의 */}
         <div className="mb-8">
-          {/* All Agreement */}
-          <div 
+          {/* 전체 동의 */}
+          <div
             className="flex items-center"
-            style={{ 
-              cursor: 'pointer',
-              marginBottom: '14px' // 전체 동의와 아래 박스 간격
-            }}
+            style={{ cursor: 'pointer', marginBottom: '14px' }}
             onClick={handleAllAgreement}
           >
-            <img 
-              src={allChecked ? CheckboxOn : CheckboxOff} 
-              alt="전체 동의" 
-              style={{ width: '19px', height: '19px', marginRight: '8px' }} 
+            <img
+              src={agreements.all ? SelectAll : SelectNone}
+              alt="전체 동의"
+              style={{ marginRight: '8px' }}
             />
-            <span style={{
-              fontFamily: 'PretendardMedium',
-              fontSize: '16px',
-              fontWeight: 500,
-              color: '#E8E8E8'
-            }}>
+            <span
+              style={{
+                fontFamily: 'Pretendard',
+                fontSize: '16px',
+                fontWeight: 500,
+                color: '#E8E8E8',
+              }}
+            >
               전체 동의
             </span>
           </div>
 
-          {/* Individual Agreements */}
           <div style={{ marginLeft: '32px' }}>
-            {/* Service Agreement */}
-            <div 
+            {/* 서비스 이용약관 */}
+            <div
               className="flex items-center justify-between"
-              style={{ marginBottom: '16px' }} // 16px 간격
+              style={{ marginBottom: '16px' }}
             >
-              <div 
+              <div
                 className="flex items-center"
                 style={{ cursor: 'pointer' }}
                 onClick={() => handleAgreement('service')}
               >
-                <img 
-                  src={agreements.service ? CheckboxOn : CheckboxOff} 
-                  alt="서비스 이용약관" 
-                  style={{ width: '19px', height: '19px', marginRight: '8px' }} 
+                <img
+                  src={agreements.service ? Checked : Unchecked}
+                  alt="서비스 이용약관"
+                  style={{ marginRight: '8px' }}
                 />
-                <span style={{
-                  fontFamily: 'PretendardMedium',
-                  fontSize: '13px',
-                  color: '#A1A1A1'
-                }}>
-                  서비스 이용약관 동의 (필수)
+                <span
+                  style={{
+                    fontFamily: 'Pretendard',
+                    fontSize: '13px',
+                    color: '#A1A1A1',
+                  }}
+                >
+                  서비스 이용약관 동의{' '}
+                  <span className="text-[#B59FFF]">(필수)</span>
                 </span>
               </div>
-              <button style={{
-                fontFamily: 'PretendardMedium',
-                fontSize: '13px',
-                color: '#A1A1A1',
-                textDecoration: 'underline',
-                background: 'transparent',
-                border: 'none',
-                cursor: 'pointer'
-              }}>
+              <button
+                onClick={() => handleShowTerms('service')}
+                style={{
+                  fontFamily: 'Pretendard',
+                  fontSize: '13px',
+                  color: '#A1A1A1',
+                  textDecoration: 'underline',
+                  background: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                }}
+              >
                 보기
               </button>
             </div>
 
-            {/* Privacy Agreement */}
-            <div 
+            {/* 개인정보 수집 */}
+            <div
               className="flex items-center justify-between"
-              style={{ marginBottom: '16px' }} // 16px 간격
+              style={{ marginBottom: '16px' }}
             >
-              <div 
+              <div
                 className="flex items-center"
                 style={{ cursor: 'pointer' }}
                 onClick={() => handleAgreement('privacy')}
               >
-                <img 
-                  src={agreements.privacy ? CheckboxOn : CheckboxOff} 
-                  alt="개인정보 수집" 
-                  style={{ width: '19px', height: '19px', marginRight: '8px' }} 
+                <img
+                  src={agreements.privacy ? Checked : Unchecked}
+                  alt="개인정보 수집"
+                  style={{ marginRight: '8px' }}
                 />
-                <span style={{
-                  fontFamily: 'PretendardMedium',
-                  fontSize: '13px',
-                  color: '#A1A1A1'
-                }}>
-                  개인정보 수집 및 이용 동의 (필수)
+                <span
+                  style={{
+                    fontFamily: 'Pretendard',
+                    fontSize: '13px',
+                    color: '#A1A1A1',
+                  }}
+                >
+                  개인정보 수집 및 이용 동의{' '}
+                  <span className="text-[#B59FFF]">(필수)</span>
                 </span>
               </div>
-              <button style={{
-                fontFamily: 'PretendardMedium',
-                fontSize: '13px',
-                color: '#A1A1A1',
-                textDecoration: 'underline',
-                background: 'transparent',
-                border: 'none',
-                cursor: 'pointer'
-              }}>
+              <button
+                onClick={() => handleShowTerms('privacy')}
+                style={{
+                  fontFamily: 'Pretendard',
+                  fontSize: '13px',
+                  color: '#A1A1A1',
+                  textDecoration: 'underline',
+                  background: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                }}
+              >
                 보기
               </button>
             </div>
 
-            {/* Marketing Agreement */}
+            {/* 마케팅 */}
             <div className="flex items-center justify-between">
-              <div 
+              <div
                 className="flex items-center"
                 style={{ cursor: 'pointer' }}
                 onClick={() => handleAgreement('marketing')}
               >
-                <img 
-                  src={agreements.marketing ? CheckboxOn : CheckboxOff} 
-                  alt="마케팅 이용" 
-                  style={{ width: '19px', height: '19px', marginRight: '8px' }} 
+                <img
+                  src={agreements.marketing ? Checked : Unchecked}
+                  alt="마케팅 이용"
+                  style={{ marginRight: '8px' }}
                 />
-                <span style={{
-                  fontFamily: 'PretendardMedium',
-                  fontSize: '13px',
-                  color: '#A1A1A1'
-                }}>
+                <span
+                  style={{
+                    fontFamily: 'Pretendard',
+                    fontSize: '13px',
+                    color: '#A1A1A1',
+                  }}
+                >
                   마케팅 이용 동의 (선택)
                 </span>
               </div>
-              <button style={{
-                fontFamily: 'PretendardMedium',
-                fontSize: '13px',
-                color: '#A1A1A1',
-                textDecoration: 'underline',
-                background: 'transparent',
-                border: 'none',
-                cursor: 'pointer'
-              }}>
+              <button
+                onClick={() => handleShowTerms('marketing')}
+                style={{
+                  fontFamily: 'Pretendard',
+                  fontSize: '13px',
+                  color: '#A1A1A1',
+                  textDecoration: 'underline',
+                  background: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                }}
+              >
                 보기
               </button>
             </div>
           </div>
         </div>
 
-        {/* Submit Button - 수정됨 */}
-        <div
-          style={{
-            position: 'absolute',
-            top: '774px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            width: '345px'
-          }}
-        >
-          <button
-            onClick={() => {
-              if (isFormValid) {
-                navigate('/');
-              }
-            }}
-            disabled={!isFormValid}
+        {/* 에러 메시지 */}
+        {errorMessage && (
+          <p
             style={{
-               width: '345px',
-              height: '40px',
-              borderRadius: '10px',
-              border: 'none',
-              background: isFormValid ? '#7F5AFF' : '#7A7A7A',
-              color: '#FFFFFF',
-              fontFamily: 'PretendardMedium',
-              fontWeight: 500,
+              fontFamily: 'Pretendard',
               fontSize: '13px',
-              lineHeight: '130%',
-              letterSpacing: '-0.025em',
-              cursor: isFormValid ? 'pointer' : 'not-allowed',
-              transition: 'all 0.3s ease',
-              opacity: 1
+              color: '#FF4848',
+              marginBottom: '16px',
             }}
-            className={isFormValid ? 'hover:opacity-90 active:scale-[0.98]' : ''}
           >
-            다음
-          </button>
-        </div>
+            {errorMessage}
+          </p>
+        )}
+
+        {/* 제출 버튼 */}
+        <button
+          onClick={handleSocialSignUp}
+          disabled={!isFormValid || isLoading}
+          className={`
+            w-86.25 h-10 rounded-[10px] border-none
+            font-['Pretendard'] font-medium text-[13px] leading-[130%] tracking-[-0.025em]
+            text-[#FFFFFF] transition-all duration-300
+            ${
+              isFormValid && !isLoading
+                ? 'bg-[#7F5AFF] cursor-pointer hover:opacity-90 active:scale-[0.98]'
+                : 'bg-[#7A7A7A] cursor-not-allowed'
+            }
+          `}
+        >
+          {isLoading ? '처리 중...' : '다음'}
+        </button>
+
+        {/* 약관 팝업 모달 */}
+        {modalState.type && (
+          <TermsModal
+            isOpen={modalState.isOpen}
+            onClose={handleCloseModal}
+            type={modalState.type}
+          />
+        )}
       </div>
     </div>
   );
 };
 
-export default SignUpScreen;
+export default SocialSignUp;
