@@ -1,115 +1,172 @@
 import { useRef, useState } from "react";
-import { Colors } from "../../styles/tokens/colors";
 import Revel from "../../assets/dumy/Revel.svg";
-
+import StarOn from "../../assets/Icons/star_on.svg";
+import StarOff from "../../assets/Icons/star_off.svg";
+import ShareIcon from "../../assets/Icons/share.svg";
 import LocationIcon from "../../assets/Variables/location_off.svg";
 import LocationOnIcon from "../../assets/Variables/location_on.svg";
 import ArrowIcon from "../../assets/Variables/arrow.svg";
+import {
+  useAddFavoriteVenue,
+  useFavoriteVenues,
+} from "../../hooks/queries/useFavoriteVenues";
 
 type LocationStep = "myLocation" | "destination" | "ready";
 
 type Props = {
   open: boolean;
   onClose: () => void;
+  venueId: number;
+  venueName: string;
+  venueAddress: string;
 };
 
-export default function BottomSheet({ open, onClose }: Props) {
+export default function BottomSheet({
+  open,
+  onClose,
+  venueId,
+  venueName,
+  venueAddress,
+}: Props) {
   const sheetRef = useRef<HTMLDivElement>(null);
-
-  /* 모드 */
   const [mode, setMode] = useState<"info" | "locationMap">("info");
-
-  /* 위치 단계 */
   const [step, setStep] = useState<LocationStep>("myLocation");
   const FOOTER_HEIGHT = 70;
   const SHEET_HEIGHT = 327;
 
- 
+  const { data: favoriteData } = useFavoriteVenues();
+  const addFavoriteMutation = useAddFavoriteVenue();
+  const isFavorited =
+    (favoriteData?.payload ?? []).some((item) => item.id === venueId);
+
+  const handleFavoriteClick = async () => {
+    if (!venueId) return;
+    if (isFavorited) {
+      window.alert("이미 즐겨찾기에 등록된 공연장입니다.");
+      return;
+    }
+
+    try {
+      await addFavoriteMutation.mutateAsync(venueId);
+      window.alert("즐겨찾기에 추가되었습니다.");
+    } catch (error) {
+      console.error("즐겨찾기 등록 실패:", error);
+      window.alert("즐겨찾기 등록에 실패했습니다.");
+    }
+  };
+
+  const handleShareClick = async () => {
+    const url = window.location.href;
+    const payload = {
+      title: venueName || "공연장",
+      text: `${venueName || "공연장"} 정보를 확인해보세요.`,
+      url,
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(payload);
+        return;
+      }
+      await navigator.clipboard.writeText(url);
+      window.alert("링크가 복사되었습니다.");
+    } catch (error) {
+      console.error("공유 실패:", error);
+    }
+  };
+
   return (
     <>
-      {/* Dim */}
       {open && (
-        <div
-          className="fixed inset-0 bg-black/40 z-40"
-          onClick={onClose}
-        />
+        <div className="fixed inset-0 z-40 bg-black/40" onClick={onClose} />
       )}
 
       <div
         ref={sheetRef}
-        className="absolute left-0 right-0 z-50 bg-[#0B1220] rounded-t-3xl shadow-xl"
+        className="fixed left-1/2 z-[60] w-full max-w-[450px] -translate-x-1/2 rounded-t-3xl bg-[#0B1220] shadow-xl"
         style={{
           bottom: FOOTER_HEIGHT,
           height: SHEET_HEIGHT,
           transform: open ? "translateY(0)" : `translateY(${SHEET_HEIGHT}px)`,
-          transition: "transform 250ms ease",
+          transition: "transform 250ms ease, opacity 250ms ease",
+          opacity: open ? 1 : 0,
+          pointerEvents: open ? "auto" : "none",
         }}
       >
-        {/* Drag Handle */}
-        <div style={{ backgroundColor: Colors.gray.G500 }}
-          className="w-full flex justify-center py-3 cursor-pointer"
-        >
-          <div className="w-12 h-1.5 rounded-full bg-gray-500/40" />
+        <div className="flex w-full justify-center py-3">
+          <div className="h-1.5 w-12 rounded-full bg-gray-500/40" />
         </div>
 
-        {/* ================= Content ================= */}
-        <div style={{ backgroundColor: Colors.gray.G500 }}
-          className="px-5 pb-10 overflow-y-auto h-full text-white">
-
-          {/* ================= info MODE ================= */}
+        <div className="h-full overflow-y-auto px-5 pb-10 text-white">
           {mode === "info" && (
             <>
-              <h2 className="text-lg font-semibold mb-1">KSPO DOME</h2>
-              <p className="text-sm text-gray-400 mb-4">
-                서울 송파구 올림픽로 424
-              </p>
+              <div className="mb-4 flex items-start justify-between gap-3">
+                <div>
+                  <h2 className="mb-1 text-lg font-semibold">
+                    {venueName || "공연장"}
+                  </h2>
+                  <p className="text-sm text-gray-400">
+                    {venueAddress || "주소 정보가 없습니다."}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      void handleFavoriteClick();
+                    }}
+                    disabled={addFavoriteMutation.isPending}
+                    className="flex h-9 w-9 items-center justify-center rounded-full bg-[#1E293B] disabled:opacity-60"
+                  >
+                    <img
+                      src={isFavorited ? StarOn : StarOff}
+                      alt="favorite"
+                      className="h-5 w-5"
+                    />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      void handleShareClick();
+                    }}
+                    className="flex h-9 w-9 items-center justify-center rounded-full bg-[#1E293B]"
+                  >
+                    <img src={ShareIcon} alt="share" className="h-5 w-5" />
+                  </button>
+                </div>
+              </div>
 
-              {/* 공연 카드 */}
-              <div className="bg-[#0F192A] rounded-xl p-4 mb-4 flex gap-4 items-center">
-
-                {/* 포스터 */}
-                <div className="w-20 h-28 rounded-lg overflow-hidden flex-shrink-0">
+              <div className="mb-4 flex items-center gap-4 rounded-xl bg-[#0F192A] p-4">
+                <div className="h-28 w-20 flex-shrink-0 overflow-hidden rounded-lg">
                   <img
                     src={Revel}
                     alt="poster"
-                    className="w-full h-full object-cover"
+                    className="h-full w-full object-cover"
                   />
                 </div>
-
-                {/* 정보 */}
                 <div className="flex-1">
-                  <p className="font-semibold text-base mb-2">
-                    볼빨간사춘기 첫 팬미팅
+                  <p className="mb-2 text-base font-semibold">
+                    볼빨간사춘기 첫 콘서트
                   </p>
-
-                  <div className="text-sm text-gray-400 space-y-1">
+                  <div className="space-y-1 text-sm text-gray-400">
                     <div className="flex gap-2">
-                      <span className="text-gray-500 w-10">일시</span>
+                      <span className="w-10 text-gray-500">일시</span>
                       <span>오늘 오후 7:00</span>
                     </div>
-
                     <div className="flex gap-2">
-                      <span className="text-gray-500 w-10">좌석</span>
-                      <span className="text-purple-400">
-                        1층 S구역 F열 12번
-                      </span>
+                      <span className="w-10 text-gray-500">좌석</span>
+                      <span className="text-purple-400">1층 S구역 F열 12번</span>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* 버튼 */}
               <div className="flex gap-3">
-                <button
-                  style={{ backgroundColor: Colors.violet.H300 }}
-                  className="flex-1 py-3 rounded-xl font-medium"
-                >
-                  메이트 위치 켜기
+                <button className="flex-1 rounded-xl bg-[#7B5CFF] py-3 font-medium">
+                  메이트 위치 찾기
                 </button>
-
                 <button
-                  style={{ backgroundColor: Colors.violet.H300 }}
-                  className="flex-1 py-3 rounded-xl font-medium"
+                  className="flex-1 rounded-xl bg-[#7B5CFF] py-3 font-medium"
                   onClick={() => {
                     setMode("locationMap");
                     setStep("myLocation");
@@ -121,109 +178,78 @@ export default function BottomSheet({ open, onClose }: Props) {
             </>
           )}
 
-          {/* ================= locationMap MODE ================= */}
           {mode === "locationMap" && (
-            <div className="flex flex-col h-full w-full px-2 text-white">
-
-              {/* Header */}
-              <div className="relative flex items-center justify-center mb-10">
-                <button
-                  onClick={() => setMode("info")}
-                  className="absolute left-0 text-lg"
-                >
-                  ←
+            <div className="flex h-full w-full flex-col px-2 text-white">
+              <div className="relative mb-10 flex items-center justify-center">
+                <button onClick={() => setMode("info")} className="absolute left-0 text-lg">
+                  {"<"}
                 </button>
                 <h3 className="text-lg font-semibold">위치 설정</h3>
               </div>
 
-              <div className="flex flex-col flex-1 justify-center">
-
-                {/* 아이콘 라인 */}
-                <div className="flex items-center justify-between w-full mb-12">
-
-                  {/* 내 위치 */}
+              <div className="flex flex-1 flex-col justify-center">
+                <div className="mb-12 flex w-full items-center justify-between">
                   <div className="flex flex-col items-center gap-2">
                     <div
-                      className={`w-14 h-14 rounded-full flex items-center justify-center transition
-                        ${step === "myLocation" ? "bg-violetH300" : "bg-[#0B1220]"}`}
+                      className={`flex h-14 w-14 items-center justify-center rounded-full transition ${
+                        step === "myLocation" ? "bg-[#7B5CFF]" : "bg-[#0B1220]"
+                      }`}
                     >
                       <img
                         src={step === "myLocation" ? LocationOnIcon : LocationIcon}
-                        className="w-7 h-7"
+                        className="h-7 w-7"
                       />
                     </div>
-                    <span
-                      className={`text-xs ${step === "myLocation" ? "text-violet-400" : "text-gray-400"
-                        }`}
-                    >
+                    <span className={`text-xs ${step === "myLocation" ? "text-violet-400" : "text-gray-400"}`}>
                       내 위치
                     </span>
                   </div>
 
-                  <div className="flex-1 flex items-center justify-center px-3">
-                    <div className="w-full h-[1px] bg-gray-500/40 relative flex items-center justify-center">
+                  <div className="flex flex-1 items-center justify-center px-3">
+                    <div className="relative flex h-[1px] w-full items-center justify-center bg-gray-500/40">
                       <img src={ArrowIcon} className="h-5 opacity-70" />
                     </div>
                   </div>
 
-
-                  {/* 도착지 */}
                   <div className="flex flex-col items-center gap-2">
                     <div
-                      className={`w-14 h-14 rounded-full flex items-center justify-center transition
-                        ${step !== "myLocation" ? "bg-violetH300" : "bg-[#0B1220]"}`}
+                      className={`flex h-14 w-14 items-center justify-center rounded-full transition ${
+                        step !== "myLocation" ? "bg-[#7B5CFF]" : "bg-[#0B1220]"
+                      }`}
                     >
                       <img
-                        src={
-                          step !== "myLocation"
-                            ? LocationOnIcon
-                            : LocationIcon
-                        }
-                        className="w-7 h-7"
+                        src={step !== "myLocation" ? LocationOnIcon : LocationIcon}
+                        className="h-7 w-7"
                       />
                     </div>
-                    <span
-                      className={`text-xs ${step !== "myLocation"
-                          ? "text-violet-400"
-                          : "text-gray-400"
-                        }`}
-                    >
-                      도착지
+                    <span className={`text-xs ${step !== "myLocation" ? "text-violet-400" : "text-gray-400"}`}>
+                      목적지
                     </span>
                   </div>
                 </div>
 
-                {/* 버튼 */}
                 {step === "myLocation" && (
                   <button
-                    style={{ backgroundColor: Colors.violet.H300 }}
-                    className="w-full py-3 rounded-xl font-medium"
+                    className="w-full rounded-xl bg-[#7B5CFF] py-3 font-medium"
                     onClick={() => setStep("destination")}
                   >
-                    이 위치로 설정
+                    내 위치로 설정
                   </button>
                 )}
-
                 {step === "destination" && (
                   <button
-                    style={{ backgroundColor: Colors.violet.H300 }}
-                    className="w-full py-3 rounded-xl font-medium"
+                    className="w-full rounded-xl bg-[#7B5CFF] py-3 font-medium"
                     onClick={() => setStep("ready")}
                   >
-                    도착지로 설정
+                    목적지로 설정
                   </button>
                 )}
-
                 {step === "ready" && (
-                  <button
-                    style={{ backgroundColor: Colors.violet.H300 }}
-                    className="w-full py-3 rounded-xl font-medium"
-                  >
+                  <button className="w-full rounded-xl bg-[#7B5CFF] py-3 font-medium">
                     길찾기
                   </button>
                 )}
               </div>
-
               <div className="h-6" />
             </div>
           )}

@@ -32,6 +32,27 @@ const TABS = [
 
 type TabKey = (typeof TABS)[number]["key"];
 
+const pickEarliestByConcertId = (items: UpcomingConcert[]) => {
+  const byConcert = new Map<number, UpcomingConcert>();
+
+  items.forEach((item) => {
+    const current = byConcert.get(item.concertId);
+    if (!current) {
+      byConcert.set(item.concertId, item);
+      return;
+    }
+
+    const currentTime = new Date(current.startAt).getTime();
+    const nextTime = new Date(item.startAt).getTime();
+
+    if (!Number.isNaN(nextTime) && (Number.isNaN(currentTime) || nextTime < currentTime)) {
+      byConcert.set(item.concertId, item);
+    }
+  });
+
+  return [...byConcert.values()];
+};
+
 const parseDDay = (dday?: string | null, startAt?: string | null) => {
   const safeDDay = String(dday ?? "");
   const digitsOnly = safeDDay.replace(/\D/g, "");
@@ -81,7 +102,8 @@ export default function HomePage() {
     const fetchConcerts = async () => {
       try {
         const res = await getUpcomingConcerts();
-        const mappedConcerts: HomeConcert[] = (res.payload ?? []).map(
+        const deduped = pickEarliestByConcertId(res.payload ?? []);
+        const mappedConcerts: HomeConcert[] = deduped.map(
           (concert: UpcomingConcert) => ({
             id: concert.detailId,
             title: concert.concertName,

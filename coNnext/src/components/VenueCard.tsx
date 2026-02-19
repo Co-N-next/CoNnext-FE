@@ -8,9 +8,9 @@
 import type { VenueListItem } from "../types/venue.ts";
 const VenueCard = ({ name, city, imageUrl, isToday, isNew }: VenueListItem) => {
   return (
-    <div className="border border-white/20 text-white rounded-xl w-full">
+    <div className="h-[204px] w-[150px] overflow-hidden rounded-xl border border-white/20 text-white">
       {/* 이미지 */}
-      <div className="relative w-full aspect-square overflow-hidden rounded-xl">
+      <div className="relative h-[150px] w-[150px] overflow-hidden">
         <img src={imageUrl} alt={name} className="w-full h-full object-cover" />
 
         {isToday && (
@@ -26,8 +26,10 @@ const VenueCard = ({ name, city, imageUrl, isToday, isNew }: VenueListItem) => {
         )}
       </div>
 
-      <span className="mt-2 ml-2 block text-[10px] text-gray-300 truncate">{city}</span>
-      <h3 className="font-semibold text-[16px] mb-2 ml-2 truncate">{name}</h3>
+      <div className="h-[54px] px-2 py-1">
+        <span className="block text-[10px] text-gray-300">{city}</span>
+        <h3 className="truncate text-[16px] font-semibold">{name}</h3>
+      </div>
     </div>
   );
 };
