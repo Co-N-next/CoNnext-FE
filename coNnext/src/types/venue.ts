@@ -207,6 +207,72 @@ export interface Facility {
   y: number;
 }
 
+// ===============================
+// 길찾기(Pathfinding) 타입
+// ===============================
+export interface PathCoordinate {
+  x: number;
+  y: number;
+  floor: number;
+}
+
+export interface FloorTransition {
+  stairsId: number;
+  stairsName: string;
+  fromFloor: number;
+  toFloor: number;
+  x: number;
+  y: number;
+  pathIndex: number;
+}
+
+export interface NavigationStep {
+  stepOrder: number;
+  description: string;
+  type: string;
+  distance: number;
+  coordinate: PathCoordinate;
+}
+
+export interface PathfindingResult {
+  success: boolean;
+  errorMessage?: string;
+  coordinates: PathCoordinate[];
+  totalDistance: number;
+  nodeCount: number;
+  startFloor: number;
+  endFloor: number;
+  startPoint: PathCoordinate;
+  endPoint: PathCoordinate;
+  floorTransitions: FloorTransition[];
+  multiFloor: boolean;
+  navigationSteps?: NavigationStep[];
+  empty?: boolean;
+}
+
+export interface PathfindingQueryRequest {
+  startX: number;
+  startY: number;
+  startFloor: number;
+  endX: number;
+  endY: number;
+  endFloor: number;
+  includeGuide?: boolean;
+}
+
+export interface PathfindingBodyRequest extends PathfindingQueryRequest {
+  sameFloor?: boolean;
+  startCoordinate?: PathCoordinate;
+  endCoordinate?: PathCoordinate;
+}
+
+export interface PathfindingToFacilityRequest {
+  startX: number;
+  startY: number;
+  startFloor: number;
+  includeGuide?: boolean;
+}
+
 // 백엔드 시설 타입을 프론트엔드 타입으로 매핑하는 헬퍼 함수
 export const mapFacilityType = (
   backendType: string,

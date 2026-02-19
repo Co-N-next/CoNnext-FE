@@ -42,7 +42,7 @@ const MyPage: React.FC = () => {
 
   return (
     <div
-      className="min-h-screen w-full text-white pb-24 overflow-y-auto"
+      className="min-h-screen w-full text-white pb-24"
       style={{ background: "#0E172A" }}
     >
       <div className="p-6">

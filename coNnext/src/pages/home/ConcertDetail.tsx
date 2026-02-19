@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { ExternalLink } from "lucide-react";
-import { getConcertDetailById } from "../../api/concertItem";
+import { getConcertById, getConcertDetailById } from "../../api/concertItem";
 
 type ViewConcert = {
   detailId: number;
@@ -35,21 +35,33 @@ const formatDuration = (runningTime?: number, intermission?: number) => {
 };
 
 export default function ConcertDetail() {
-  const { detailId } = useParams<{ detailId: string }>();
+  const { id } = useParams<{ id: string }>();
   const [data, setData] = useState<ViewConcert | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const load = async () => {
-      if (!detailId) {
+      if (!id) {
         setLoading(false);
         return;
       }
 
       try {
         setLoading(true);
-        const res = await getConcertDetailById(detailId);
-        const payload = res.payload;
+        let payload;
+        try {
+          const detailRes = await getConcertDetailById(id);
+          payload = detailRes.payload;
+        } catch {
+          const concertRes = await getConcertById(id);
+          const firstSchedule = concertRes.payload?.schedules?.[0];
+          if (!firstSchedule?.detailId) {
+            throw new Error("상세 회차(detailId)를 찾을 수 없습니다.");
+          }
+          const detailRes = await getConcertDetailById(firstSchedule.detailId);
+          payload = detailRes.payload;
+        }
+
         const { date, time } = formatDateTime(payload.startAt);
 
         setData({
@@ -72,7 +84,7 @@ export default function ConcertDetail() {
     };
 
     load();
-  }, [detailId]);
+  }, [id]);
 
   const noticeEnabled = useMemo(() => Boolean(data?.noticeUrl), [data?.noticeUrl]);
 

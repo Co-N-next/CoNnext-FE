@@ -6,13 +6,17 @@ export interface Concert {
   date: string;
   time: string;
   venue: string;
+  venueId?: number;
   seat: string;
   imageUrl: string;
 }
 export type ConcertData = {
+  concertId?: number;
+  detailId?: number;
   title: string;
   artist: string;
   place: string;
+  venueId?: number;
   date: string;
   time: string;
   seat: string;

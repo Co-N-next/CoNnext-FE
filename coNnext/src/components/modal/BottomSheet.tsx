@@ -19,6 +19,16 @@ type Props = {
   venueId: number;
   venueName: string;
   venueAddress: string;
+  selectedPointLabel?: string;
+  selectedPointFloor?: number;
+  startPointLabel?: string;
+  endPointLabel?: string;
+  pathDistance?: number | null;
+  pathLoading: boolean;
+  pathError?: string | null;
+  onSetStartPoint: () => boolean;
+  onSetEndPoint: () => boolean;
+  onFindPath: () => Promise<boolean>;
 };
 
 export default function BottomSheet({
@@ -27,12 +37,24 @@ export default function BottomSheet({
   venueId,
   venueName,
   venueAddress,
+  selectedPointLabel,
+  selectedPointFloor,
+  startPointLabel,
+  endPointLabel,
+  pathDistance,
+  pathLoading,
+  pathError,
+  onSetStartPoint,
+  onSetEndPoint,
+  onFindPath,
 }: Props) {
   const sheetRef = useRef<HTMLDivElement>(null);
   const [mode, setMode] = useState<"info" | "locationMap">("info");
   const [step, setStep] = useState<LocationStep>("myLocation");
-  const FOOTER_HEIGHT = 70;
-  const SHEET_HEIGHT = 327;
+  const FOOTER_OFFSET = 84;
+  const INFO_SHEET_HEIGHT = 327;
+  const LOCATION_SHEET_HEIGHT = 380;
+  const sheetHeight = mode === "locationMap" ? LOCATION_SHEET_HEIGHT : INFO_SHEET_HEIGHT;
 
   const { data: favoriteData } = useFavoriteVenues();
   const addFavoriteMutation = useAddFavoriteVenue();
@@ -77,7 +99,7 @@ export default function BottomSheet({
 
   return (
     <>
-      {open && (
+      {open && mode !== "locationMap" && (
         <div className="fixed inset-0 z-40 bg-black/40" onClick={onClose} />
       )}
 
@@ -85,9 +107,9 @@ export default function BottomSheet({
         ref={sheetRef}
         className="fixed left-1/2 z-[60] w-full max-w-[450px] -translate-x-1/2 rounded-t-3xl bg-[#0B1220] shadow-xl"
         style={{
-          bottom: FOOTER_HEIGHT,
-          height: SHEET_HEIGHT,
-          transform: open ? "translateY(0)" : `translateY(${SHEET_HEIGHT}px)`,
+          bottom: `calc(${FOOTER_OFFSET}px + env(safe-area-inset-bottom))`,
+          height: sheetHeight,
+          transform: open ? "translateY(0)" : `translateY(${sheetHeight}px)`,
           transition: "transform 250ms ease, opacity 250ms ease",
           opacity: open ? 1 : 0,
           pointerEvents: open ? "auto" : "none",
@@ -97,7 +119,7 @@ export default function BottomSheet({
           <div className="h-1.5 w-12 rounded-full bg-gray-500/40" />
         </div>
 
-        <div className="h-full overflow-y-auto px-5 pb-10 text-white">
+        <div className="h-full overflow-y-auto px-5 pb-14 text-white">
           {mode === "info" && (
             <>
               <div className="mb-4 flex items-start justify-between gap-3">
@@ -231,7 +253,14 @@ export default function BottomSheet({
                 {step === "myLocation" && (
                   <button
                     className="w-full rounded-xl bg-[#7B5CFF] py-3 font-medium"
-                    onClick={() => setStep("destination")}
+                    onClick={() => {
+                      const ok = onSetStartPoint();
+                      if (!ok) {
+                        window.alert("지도에서 출발 지점을 먼저 선택해주세요.");
+                        return;
+                      }
+                      setStep("destination");
+                    }}
                   >
                     내 위치로 설정
                   </button>
@@ -239,16 +268,41 @@ export default function BottomSheet({
                 {step === "destination" && (
                   <button
                     className="w-full rounded-xl bg-[#7B5CFF] py-3 font-medium"
-                    onClick={() => setStep("ready")}
+                    onClick={() => {
+                      const ok = onSetEndPoint();
+                      if (!ok) {
+                        window.alert("지도에서 목적지를 먼저 선택해주세요.");
+                        return;
+                      }
+                      setStep("ready");
+                    }}
                   >
                     목적지로 설정
                   </button>
                 )}
                 {step === "ready" && (
-                  <button className="w-full rounded-xl bg-[#7B5CFF] py-3 font-medium">
+                  <button
+                    className="w-full rounded-xl bg-[#7B5CFF] py-3 font-medium disabled:opacity-60"
+                    onClick={async () => {
+                      const ok = await onFindPath();
+                      if (!ok) {
+                        window.alert("경로를 찾을 수 없습니다.");
+                      }
+                    }}
+                    disabled={pathLoading}
+                  >
                     길찾기
                   </button>
                 )}
+                <div className="mt-4 rounded-xl bg-[#111D33] px-3 py-2 text-xs text-gray-300">
+                  <p>
+                    선택 지점: {selectedPointLabel ? `${selectedPointLabel} (${selectedPointFloor}층)` : "없음"}
+                  </p>
+                  <p>출발: {startPointLabel || "미설정"}</p>
+                  <p>도착: {endPointLabel || "미설정"}</p>
+                  {pathDistance != null && <p>거리: {pathDistance.toFixed(1)}m</p>}
+                  {pathError && <p className="text-[#F87171]">{pathError}</p>}
+                </div>
               </div>
               <div className="h-6" />
             </div>

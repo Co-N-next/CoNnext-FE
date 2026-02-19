@@ -5,7 +5,11 @@ import type {
   VenueLayoutApiData, 
   VenueApiSection, 
   VenueApiFacility, 
-  VenueApiFloor 
+  VenueApiFloor,
+  PathfindingResult,
+  PathfindingQueryRequest,
+  PathfindingBodyRequest,
+  PathfindingToFacilityRequest,
 } from "../types/venue";
 import {
   mapFacilityType,
@@ -167,4 +171,49 @@ export const fetchVenueMap = async (venueId: number): Promise<Venue> => {
     svgViewBoxY: finalViewBoxY,
     floors: floors,
   };
+};
+
+type ApiWrapped<T> = {
+  payload?: T;
+  result?: T;
+} & T;
+
+const normalizePathfindingResponse = (
+  raw: ApiWrapped<PathfindingResult>,
+): PathfindingResult => {
+  return raw.payload || raw.result || raw;
+};
+
+export const getPathByQuery = async (
+  venueId: number,
+  params: PathfindingQueryRequest,
+): Promise<PathfindingResult> => {
+  const response = await apiClient.get<ApiWrapped<PathfindingResult>>(
+    `/venues/${venueId}/pathfinding/path`,
+    { params },
+  );
+  return normalizePathfindingResponse(response.data);
+};
+
+export const postPathByBody = async (
+  venueId: number,
+  body: PathfindingBodyRequest,
+): Promise<PathfindingResult> => {
+  const response = await apiClient.post<ApiWrapped<PathfindingResult>>(
+    `/venues/${venueId}/pathfinding/path`,
+    body,
+  );
+  return normalizePathfindingResponse(response.data);
+};
+
+export const getPathToFacility = async (
+  venueId: number,
+  facilityId: number,
+  params: PathfindingToFacilityRequest,
+): Promise<PathfindingResult> => {
+  const response = await apiClient.get<ApiWrapped<PathfindingResult>>(
+    `/venues/${venueId}/pathfinding/to-facility/${facilityId}`,
+    { params },
+  );
+  return normalizePathfindingResponse(response.data);
 };

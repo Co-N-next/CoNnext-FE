@@ -18,6 +18,7 @@ const mapReservationToConcert = (item: ReservationResponse): Concert => ({
   date: item.concertDate || item.date || "",
   time: item.concertTime || item.time || "",
   venue: item.venue || "",
+  venueId: item.venueId,
   seat: item.seatLocation || item.seat || "",
   imageUrl: item.posterUrl || item.imageUrl || "",
 });

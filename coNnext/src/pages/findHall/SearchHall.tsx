@@ -25,6 +25,16 @@ const SearchHall = () => {
   const [submittedSearch, setSubmittedSearch] = useState("");
   const [recentKeywords, setRecentKeywords] = useState<SearchKeyword[]>([]);
 
+  const refreshRecentKeywords = async () => {
+    const res = await getSearchHistory("VENUE");
+    setRecentKeywords(
+      (res.payload ?? []).slice(0, 7).map((item) => ({
+        id: item.id,
+        keyword: item.keyword,
+      })),
+    );
+  };
+
   const normalizedSearch = submittedSearch.trim();
 
   const {
@@ -43,13 +53,7 @@ const SearchHall = () => {
   useEffect(() => {
     const fetchRecentKeywords = async () => {
       try {
-        const res = await getSearchHistory("VENUE");
-        setRecentKeywords(
-          (res.payload ?? []).slice(0, 7).map((item) => ({
-            id: item.id,
-            keyword: item.keyword,
-          })),
-        );
+        await refreshRecentKeywords();
       } catch (e) {
         console.error(e);
       }
@@ -73,22 +77,15 @@ const SearchHall = () => {
     setSearch(keyword);
     setSubmittedSearch(keyword);
 
-    const exists = recentKeywords.some((item) => item.keyword === keyword);
-    if (exists) return;
-
     try {
-      await postSearchHistory({
-        keyword,
-        searchType: "VENUE",
-      });
-
-      const res = await getSearchHistory("VENUE");
-      setRecentKeywords(
-        (res.payload ?? []).map((item) => ({
-          id: item.id,
-          keyword: item.keyword,
-        })),
-      );
+      const exists = recentKeywords.some((item) => item.keyword === keyword);
+      if (!exists) {
+        await postSearchHistory({
+          keyword,
+          searchType: "VENUE",
+        });
+      }
+      await refreshRecentKeywords();
     } catch (e) {
       console.error(e);
     }

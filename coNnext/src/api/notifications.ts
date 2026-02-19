@@ -39,5 +39,28 @@ export const fetchNotices = async (
   const { data } = await api.get("/notifications/notices", {
     params: { page },
   });
-  return data;
+
+  const normalizedNotices =
+    data?.payload?.payload?.notices ??
+    data?.payload?.notices ??
+    [];
+
+  const normalizedPageInfo =
+    data?.payload?.pageInfo ??
+    data?.pageInfo ?? {
+      page: 0,
+      size: 20,
+      hasNext: false,
+      totalElements: normalizedNotices.length,
+      totalPages: 1,
+    };
+
+  return {
+    statusCode: data?.statusCode ?? 200,
+    message: data?.message ?? "",
+    pageInfo: normalizedPageInfo,
+    payload: {
+      notices: normalizedNotices,
+    },
+  };
 };

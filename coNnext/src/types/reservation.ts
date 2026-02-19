@@ -10,6 +10,7 @@ export interface ReservationResponse {
   concertTime?: string;
   time?: string;
   venue: string;
+  venueId?: number;
   seatLocation?: string;
   seat?: string;
   posterUrl?: string;

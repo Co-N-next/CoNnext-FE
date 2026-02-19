@@ -291,7 +291,7 @@ export default function HomePage() {
                   <button
                     key={v.id}
                     type="button"
-                    onClick={() => navigate("/find")}
+                    onClick={() => navigate(`/map/${v.id}`)}
                     className="shrink-0 overflow-hidden rounded-2xl border border-white/12 bg-[#0B1734] text-left shadow-[0_10px_22px_rgba(0,0,0,0.34)]"
                   >
                     <div className="relative h-[150px] w-[150px]">

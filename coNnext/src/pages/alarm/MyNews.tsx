@@ -8,7 +8,8 @@ import type { Notification } from "../../types/notifications";
 /* ================= 유틸 ================= */
 const isToday = (date: string) => {
   const today = new Date().toISOString().slice(0, 10);
-  return date === today;
+  const target = new Date(date).toISOString().slice(0, 10);
+  return target === today;
 };
 
 
@@ -40,15 +41,21 @@ function getTimeInfo(createdAt: string) {
 /* ================= 컴포넌트 ================= */
 export default function MyNews() {
   const { data, isLoading } = useMyNotifications(0);
+  const newsList: Notification[] =
+    data?.payload?.payload?.news ??
+    ((data?.payload as unknown as { news?: Notification[] } | undefined)?.news ?? []);
 
   /* ================= 오늘의 공연 추출 ================= */
-  const todayConcertNotification = data?.payload.payload.news.find(
-    (n: Notification) => n.actionType === "NONE" && isToday(n.createdAt), // 오늘 생성된 NONE 알림만
+  const todayConcertNotification = newsList.find(
+    (n: Notification) =>
+      n.category === "NOTICE" &&
+      n.actionType === "NONE" &&
+      isToday(n.createdAt),
   );
 
 
   const actionNewsList =
-    data?.payload.payload.news.filter(
+    newsList.filter(
       (n: Notification) => n.actionType !== "NONE",
     ) ?? [];
 

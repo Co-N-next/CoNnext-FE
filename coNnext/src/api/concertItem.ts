@@ -38,6 +38,7 @@ export interface TodayConcert {
 export interface MyTodayConcert {
   reservationId: number;
   concertId: number;
+  venueId?: number;
   concertName: string;
   posterImage: string;
   startAt: string;
@@ -88,6 +89,25 @@ const dedupeBy = <T>(items: T[], getKey: (item: T) => string | number) => {
     seen.add(key);
     return true;
   });
+};
+
+const normalizeListPayload = <T>(payload: unknown): T[] => {
+  if (Array.isArray(payload)) return payload as T[];
+  if (
+    payload &&
+    typeof payload === "object" &&
+    Array.isArray((payload as { payload?: unknown }).payload)
+  ) {
+    return (payload as { payload: T[] }).payload;
+  }
+  if (
+    payload &&
+    typeof payload === "object" &&
+    Array.isArray((payload as { result?: unknown }).result)
+  ) {
+    return (payload as { result: T[] }).result;
+  }
+  return [];
 };
 
 const logUpcomingDuplicates = (items: UpcomingConcert[]) => {
@@ -142,9 +162,10 @@ export const getUpcomingConcerts = async (page: number = 0, size: number = 20) =
 
 export const getTodayConcerts = async () => {
   const res = await api.get<ApiResponse<TodayConcert[]>>("/concerts/today");
+  const rawItems = normalizeListPayload<TodayConcert>(res.data.payload);
 
   const dedupedPayload = dedupeBy(
-    res.data.payload ?? [],
+    rawItems,
     (item) => `${item.concertId}-${item.startAt}-${item.round}`,
   );
 
@@ -162,9 +183,10 @@ export const getMyTodayConcerts = async (debug: boolean = false) => {
   const res = await api.get<ApiResponse<MyTodayConcert[]>>("/concerts/my-today", {
     params: { debug },
   });
+  const rawItems = normalizeListPayload<MyTodayConcert>(res.data.payload);
 
   const dedupedPayload = dedupeBy(
-    res.data.payload ?? [],
+    rawItems,
     (item) => item.reservationId ?? `${item.concertId}-${item.startAt}-${item.round}`,
   );
 

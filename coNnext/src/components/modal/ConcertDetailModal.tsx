@@ -1,8 +1,9 @@
-import React from "react";
+﻿import React from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import type { ConcertData } from "../../types/concert";
+import { resolveVenueId } from "../../utils/venueNavigation";
 
 type Props = {
   open: boolean;
@@ -12,8 +13,18 @@ type Props = {
 
 const ConcertDetailModal: React.FC<Props> = ({ open, onClose, data }) => {
   const navigate = useNavigate();
-  if (!open) return null;
+  const detailTargetId = data.detailId ?? data.concertId;
 
+  const handleViewMap = async () => {
+    const venueId = await resolveVenueId(data.place, data.venueId);
+    if (!venueId) {
+      window.alert("공연장 지도를 찾을 수 없습니다.");
+      return;
+    }
+    navigate(`/map/${venueId}`);
+  };
+
+  if (!open) return null;
 
   return (
     <AnimatePresence>
@@ -41,10 +52,7 @@ const ConcertDetailModal: React.FC<Props> = ({ open, onClose, data }) => {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20" />
 
-              <button
-                onClick={onClose}
-                className="absolute top-3 right-3 z-20 text-white"
-              >
+              <button onClick={onClose} className="absolute top-3 right-3 z-20 text-white">
                 <X size={22} />
               </button>
 
@@ -65,13 +73,12 @@ const ConcertDetailModal: React.FC<Props> = ({ open, onClose, data }) => {
                 </div>
 
                 <div
-                  className="absolute top-50 space-y-3 text-sm mb-4"
+                  className="absolute top-50 space-y-1.5 text-sm mb-3"
                   style={{ fontFamily: "PretendardMedium" }}
                 >
                   <div>
                     <p className="text-white/60 text-[11px]">장소</p>
-                    <p className="font-semibold">
-                      {data.place}</p>
+                    <p className="font-semibold">{data.place}</p>
                   </div>
 
                   <div>
@@ -89,9 +96,15 @@ const ConcertDetailModal: React.FC<Props> = ({ open, onClose, data }) => {
 
                 <div className="py-10 flex flex-col gap-2">
                   <button
-                    className=" w-full py-2 rounded-xl bg-white/20 text-sm font-medium backdrop-blur"
+                    className="w-full py-2 rounded-xl bg-white/20 text-sm font-medium backdrop-blur"
                     style={{ fontFamily: "PretendardMedium" }}
-                    onClick={() => navigate("/concertdetail")}
+                    onClick={() => {
+                      if (!detailTargetId) {
+                        window.alert("상세 정보를 확인할 공연 ID가 없습니다.");
+                        return;
+                      }
+                      navigate(`/concert/${detailTargetId}`);
+                    }}
                   >
                     정보 더보기
                   </button>
@@ -107,7 +120,7 @@ const ConcertDetailModal: React.FC<Props> = ({ open, onClose, data }) => {
                     <button
                       className="flex-1 py-2 rounded-xl bg-[#7B5CFF] text-sm font-medium backdrop-blur"
                       style={{ fontFamily: "PretendardMedium" }}
-                      onClick={() => navigate("/map")}
+                      onClick={() => void handleViewMap()}
                     >
                       지도 보기
                     </button>

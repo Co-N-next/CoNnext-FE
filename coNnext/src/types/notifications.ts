@@ -61,7 +61,8 @@ export interface AcceptNotificationResponse {
 // =============================
 export interface Notice {
   id: number;
-  senderProfileImg: string;
+  logoImg?: string;
+  senderProfileImg?: string;
   title: string;
   content: string;
   createdAt: string;

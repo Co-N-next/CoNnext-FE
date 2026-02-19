@@ -18,7 +18,11 @@ const Layout: React.FC = () => {
   useEffect(() => {
     mainRef.current?.scrollTo({ top: 0, left: 0, behavior: "auto" });
     window.scrollTo({ top: 0, left: 0, behavior: "auto" });
-  }, [location.pathname]);
+    requestAnimationFrame(() => {
+      mainRef.current?.scrollTo({ top: 0, left: 0, behavior: "auto" });
+      window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    });
+  }, [location.pathname, location.search]);
 
   useShake(() => {
     if (ticketData) setIsTicketOpen(true);
@@ -36,13 +40,14 @@ const Layout: React.FC = () => {
 
   return (
     <div className="min-h-screen flex justify-center bg-[#0a0f1e]">
-      <div className="w-full max-w-[450px] min-h-screen flex flex-col relative bg-[#0a0f1e]">
+      <div className="w-full max-w-[450px] h-[100dvh] flex flex-col relative bg-[#0a0f1e]">
         {/* Header 클릭 시 modal 열림 */}
         <Header onTicketClick={handleTicketClick} />
 
         <main
+          key={`${location.pathname}${location.search}`}
           ref={mainRef}
-          className="flex-1 w-full overflow-y-auto bg-[#0a0f1e] pt-20 pb-[66px]"
+          className="flex-1 min-h-0 w-full overflow-y-auto bg-[#0a0f1e] pt-20 pb-[66px]"
         >
           <Outlet />
         </main>

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useEffect } from "react";
 import { useNavigate, useLocation } from 'react-router-dom';
 
 import HomeIcon from '../../assets/footer/Home.svg';
@@ -10,6 +11,24 @@ import MyPageIcon from '../../assets/footer/MyPage.svg';
 const Footer: React.FC = () => {
   const navigate = useNavigate(); 
   const location = useLocation();
+
+  useEffect(() => {
+    const resetScroll = () => {
+      window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+      document.querySelectorAll("main, [data-scroll-container='true']").forEach((el) => {
+        if (el instanceof HTMLElement) {
+          el.scrollTo({ top: 0, left: 0, behavior: "auto" });
+          el.scrollTop = 0;
+        }
+      });
+    };
+
+    resetScroll();
+    requestAnimationFrame(resetScroll);
+    setTimeout(resetScroll, 0);
+  }, [location.pathname, location.search]);
 
    const navItems = [
    { id: 1, label: '홈', path: '/home', icon: HomeIcon },
@@ -34,7 +53,18 @@ const Footer: React.FC = () => {
             return (
               <li key={item.id} className="flex-1">
                 <button
-                  onClick={() => navigate(item.path)}
+                  onClick={() => {
+                    if (location.pathname === item.path) {
+                      window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+                      document.querySelectorAll("main, [data-scroll-container='true']").forEach((el) => {
+                        if (el instanceof HTMLElement) {
+                          el.scrollTo({ top: 0, left: 0, behavior: "auto" });
+                        }
+                      });
+                      return;
+                    }
+                    navigate(item.path);
+                  }}
                   className="w-full flex flex-col items-center gap-1.5"
                 >
                   <div className="flex items-center justify-center" style={{ width: '20px', height: '20px' }}>

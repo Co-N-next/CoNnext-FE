@@ -6,11 +6,12 @@ import wcWoman from "../../assets/logo/wc_woman.svg";
 import entranceIcon from "../../assets/logo/arrow_circle_up.svg";
 import storeIcon from "../../assets/logo/storefront.svg";
 import myLocation from "../../assets/logo/my_location.svg";
-import { fetchVenueMap } from "../../api/venueMap";
-import type { Venue } from "../../types/venue";
+import { fetchVenueMap, getPathByQuery } from "../../api/venueMap";
+import type { PathCoordinate, Venue } from "../../types/venue";
 import BottomSheet from "../../components/modal/BottomSheet";
 
 type FloorMode = number | "all";
+type SelectablePoint = PathCoordinate & { label: string };
 
 const HallMap = () => {
   const navigate = useNavigate();
@@ -24,6 +25,13 @@ const HallMap = () => {
   const [venue, setVenue] = useState<Venue | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedPoint, setSelectedPoint] = useState<SelectablePoint | null>(null);
+  const [startPoint, setStartPoint] = useState<SelectablePoint | null>(null);
+  const [endPoint, setEndPoint] = useState<SelectablePoint | null>(null);
+  const [pathCoordinates, setPathCoordinates] = useState<PathCoordinate[]>([]);
+  const [pathLoading, setPathLoading] = useState(false);
+  const [pathError, setPathError] = useState<string | null>(null);
+  const [pathDistance, setPathDistance] = useState<number | null>(null);
 
   useEffect(() => {
     const loadVenueData = async () => {
@@ -75,6 +83,77 @@ const HallMap = () => {
     selectedFilters.length > 0
       ? facilities.filter((f) => selectedFilters.includes(f.type))
       : [];
+
+  const visiblePathCoordinates =
+    currentFloor === "all"
+      ? pathCoordinates
+      : pathCoordinates.filter((point) => point.floor === Number(currentFloor));
+
+  const resolveSectionFloor = (sectionId: string) => {
+    if (currentFloor !== "all") return Number(currentFloor);
+    return (venue?.floors ?? []).find((floor) =>
+      floor.sections.some((section) => section.id === sectionId),
+    )?.floor ?? 1;
+  };
+
+  const resolveFacilityFloor = (facilityId: string) => {
+    if (currentFloor !== "all") return Number(currentFloor);
+    return (venue?.floors ?? []).find((floor) =>
+      floor.facilities.some((facility) => facility.id === facilityId),
+    )?.floor ?? 1;
+  };
+
+  const handleSetStartPoint = () => {
+    if (!selectedPoint) return false;
+    setStartPoint(selectedPoint);
+    setPathError(null);
+    return true;
+  };
+
+  const handleSetEndPoint = () => {
+    if (!selectedPoint) return false;
+    setEndPoint(selectedPoint);
+    setPathError(null);
+    return true;
+  };
+
+  const handleFindPath = async () => {
+    if (!venueId || !startPoint || !endPoint) return false;
+
+    try {
+      setPathLoading(true);
+      setPathError(null);
+
+      const result = await getPathByQuery(Number(venueId), {
+        startX: startPoint.x,
+        startY: startPoint.y,
+        startFloor: startPoint.floor,
+        endX: endPoint.x,
+        endY: endPoint.y,
+        endFloor: endPoint.floor,
+        includeGuide: true,
+      });
+
+      if (!result.success || !result.coordinates?.length) {
+        setPathCoordinates([]);
+        setPathDistance(null);
+        setPathError(result.errorMessage || "경로를 찾을 수 없습니다.");
+        return false;
+      }
+
+      setPathCoordinates(result.coordinates);
+      setPathDistance(result.totalDistance ?? null);
+      return true;
+    } catch (err) {
+      console.error("길찾기 실패:", err);
+      setPathCoordinates([]);
+      setPathDistance(null);
+      setPathError("길찾기 중 오류가 발생했습니다.");
+      return false;
+    } finally {
+      setPathLoading(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -187,9 +266,17 @@ const HallMap = () => {
                     fill={selectedSection === section.id ? "#7F5AFF" : section.color}
                     stroke="#0E172A"
                     strokeWidth="2"
-                    onClick={() =>
-                      setSelectedSection(section.id === selectedSection ? null : section.id)
-                    }
+                    onClick={() => {
+                      setSelectedSection(section.id === selectedSection ? null : section.id);
+                      if (section.x !== undefined && section.y !== undefined) {
+                        setSelectedPoint({
+                          x: section.x,
+                          y: section.y,
+                          floor: resolveSectionFloor(section.id),
+                          label: `${section.name} 구역`,
+                        });
+                      }
+                    }}
                   />
                   {section.x && section.y && (
                     <text
@@ -208,10 +295,43 @@ const HallMap = () => {
                 </g>
               ))}
               {filteredFacilities.map((f, i) => (
-                <g key={`${f.id}-${i}`}>
+                <g
+                  key={`${f.id}-${i}`}
+                  className="cursor-pointer"
+                  onClick={() =>
+                    setSelectedPoint({
+                      x: f.x,
+                      y: f.y,
+                      floor: resolveFacilityFloor(f.id),
+                      label: f.name,
+                    })
+                  }
+                >
                   <circle cx={f.x} cy={f.y} r="12" fill="#7F5AFF" stroke="#FFF" strokeWidth="2" />
                   <MapPin x={f.x - 9} y={f.y - 9} size={18} className="text-white" />
                 </g>
+              ))}
+              {visiblePathCoordinates.length > 1 && (
+                <polyline
+                  points={visiblePathCoordinates.map((point) => `${point.x},${point.y}`).join(" ")}
+                  fill="none"
+                  stroke="#F59E0B"
+                  strokeWidth="8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  opacity="0.9"
+                />
+              )}
+              {visiblePathCoordinates.map((point, idx) => (
+                <circle
+                  key={`path-point-${idx}`}
+                  cx={point.x}
+                  cy={point.y}
+                  r={idx === 0 || idx === visiblePathCoordinates.length - 1 ? 10 : 5}
+                  fill={idx === 0 ? "#22C55E" : idx === visiblePathCoordinates.length - 1 ? "#EF4444" : "#F59E0B"}
+                  stroke="#FFFFFF"
+                  strokeWidth="2"
+                />
               ))}
             </svg>
           </div>
@@ -236,6 +356,16 @@ const HallMap = () => {
         venueId={venue.id}
         venueName={venue.name}
         venueAddress={venue.address}
+        selectedPointLabel={selectedPoint?.label}
+        selectedPointFloor={selectedPoint?.floor}
+        startPointLabel={startPoint?.label}
+        endPointLabel={endPoint?.label}
+        pathDistance={pathDistance}
+        pathLoading={pathLoading}
+        pathError={pathError}
+        onSetStartPoint={handleSetStartPoint}
+        onSetEndPoint={handleSetEndPoint}
+        onFindPath={handleFindPath}
       />
     </div>
   );

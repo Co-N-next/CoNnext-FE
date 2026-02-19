@@ -3,6 +3,7 @@ import "./App.css";
 import { Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import ScrollToTop from "./components/common/ScrollToTop";
 
 /* 🔽 레이아웃 */
 import Layout from "./components/layout/Layout";
@@ -13,6 +14,7 @@ import FooterLayout from "./components/layout/FooterLayout";
 import Home from "./pages/home/HomePage";
 import Onboarding from "./pages/onboarding/Onboarding"; // HEAD에는 있었으나 사용되지 않을 수 있음, 일단 유지
 import ConcertDetail from "./pages/home/ConcertDetail";
+import ConcertList from "./pages/home/ConcertList";
 import FindHall from "./pages/findHall/FindHall";
 import SearchHall from "./pages/findHall/SearchHall";
 import HallMap from "./pages/hallMap/HallMap";
@@ -41,10 +43,12 @@ const queryClient = new QueryClient({
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
+        <ScrollToTop />
         <Routes>
           {/* 🔥 기본 Layout */}
           <Route element={<Layout />}>
             <Route path="/home" element={<Home />} />
+            <Route path="/concert" element={<ConcertList />} />
             <Route path="/concert/:id" element={<ConcertDetail />} />
             <Route path="/find" element={<FindHall />} />
             <Route path="/map/:venueId" element={<HallMap />} />
