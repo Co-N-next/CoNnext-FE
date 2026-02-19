@@ -97,7 +97,7 @@ const WithdrawalModal: React.FC<WithdrawalModalProps> = ({
               {/* 이유 선택 단계 */}
               <h2
                 style={{
-                fontFamily: 'Pretendard',
+                fontFamily: 'PretendardMedium',
                 fontWeight: 500,
                   fontSize: '18px',
                 color: '#FEFEFE',
@@ -110,7 +110,7 @@ const WithdrawalModal: React.FC<WithdrawalModalProps> = ({
 
               <p
                 style={{
-                  fontFamily: 'Pretendard',
+                  fontFamily: 'PretendardRegular',
                   fontWeight: 400,
                   fontSize: '13px',
                 color: '#CCCCCC',
@@ -142,7 +142,7 @@ const WithdrawalModal: React.FC<WithdrawalModalProps> = ({
                     />
                     <span
                       style={{
-                        fontFamily: 'Pretendard',
+                        fontFamily: 'PretendardRegular',
                         fontWeight: 400,
                         fontSize: '14px',
                       color: '#E8E8E8',
@@ -172,7 +172,7 @@ const WithdrawalModal: React.FC<WithdrawalModalProps> = ({
                 >
                   <span
                     style={{
-                    fontFamily: 'Pretendard',
+                    fontFamily: 'PretendardMedium',
                     fontWeight: 500,
                     fontSize: '13px',
                     color: '#FEFEFE',
@@ -200,7 +200,7 @@ const WithdrawalModal: React.FC<WithdrawalModalProps> = ({
                 >
                   <span
                     style={{
-                    fontFamily: 'Pretendard',
+                    fontFamily: 'PretendardMedium',
                     fontWeight: 500,
                     fontSize: '13px',
                     color: '#FEFEFE',
@@ -260,7 +260,7 @@ const WithdrawalModal: React.FC<WithdrawalModalProps> = ({
               />
               <h2
                 style={{
-                  fontFamily: 'Pretendard',
+                  fontFamily: 'PretendardSemiBold',
                   fontWeight: 500,
                   fontSize: '16px',
                   color: '#E8E8E8',
@@ -274,7 +274,7 @@ const WithdrawalModal: React.FC<WithdrawalModalProps> = ({
             {/* 설명 */}
             <p
               style={{
-                fontFamily: 'Pretendard',
+                fontFamily: 'PretendardRegular',
                 fontWeight: 400,
                 fontSize: '13px',
                 color: '#E8E8E8',
@@ -305,7 +305,7 @@ const WithdrawalModal: React.FC<WithdrawalModalProps> = ({
               >
                 <li
                   style={{
-                    fontFamily: 'Pretendard',
+                    fontFamily: 'PretendardRegular',
                     fontWeight: 400,
                     fontSize: '12px',
                     color: '#E8E8E8',
@@ -318,7 +318,7 @@ const WithdrawalModal: React.FC<WithdrawalModalProps> = ({
                 </li>
                 <li
                   style={{
-                    fontFamily: 'Pretendard',
+                    fontFamily: 'PretendardRegular',
                     fontWeight: 400,
                     fontSize: '12px',
                     color: '#E8E8E8',
@@ -350,7 +350,7 @@ const WithdrawalModal: React.FC<WithdrawalModalProps> = ({
               />
               <span
                 style={{
-                  fontFamily: 'Pretendard',
+                  fontFamily: 'PretendardMedium',
                   fontWeight: 500,
                   fontSize: '13px',
                   color: '#E8E8E8',
@@ -377,7 +377,7 @@ const WithdrawalModal: React.FC<WithdrawalModalProps> = ({
               >
                 <span
                   style={{
-                    fontFamily: 'Pretendard',
+                    fontFamily: 'PretendardSemiBold',
                     fontWeight: 600,
                     fontSize: '14px',
                     color: '#FFFFFF',
@@ -404,7 +404,7 @@ const WithdrawalModal: React.FC<WithdrawalModalProps> = ({
               >
                 <span
                   style={{
-                    fontFamily: 'Pretendard',
+                    fontFamily: 'PretendardSemiBold',
                     fontWeight: 600,
                     fontSize: '14px',
                     color: '#FFFFFF',
