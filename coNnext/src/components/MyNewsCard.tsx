@@ -1,5 +1,5 @@
-import Location from "../assets/logo/EyeOn.svg";
-import Friend from "../assets/logo/EyeOff.svg";
+import Location from "../assets/logo/Location.svg";
+import Friend from "../assets/logo/Friend.svg";
 import { useState } from "react";
 
 type NewsType = "LOCATION" | "FRIEND";

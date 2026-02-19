@@ -18,7 +18,7 @@ export default function AlarmPage() {
     <div className="min-h-screen bg-[#0a0f1e] text-white flex justify-center">
       <div className="w-full max-w-[450px]">
         {/* SelectBar 위치와 배경색을 HomePage와 동일하게 */}
-        <div className="mt-5">
+        <div>
           <SelectBar
             tabs={TABS}
             activeTab={activeTab}

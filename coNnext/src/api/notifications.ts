@@ -2,13 +2,21 @@
 
 // 내소식 전체 조회 : /notifications/news
 import api from "./axios";
-import type { NotificationListResponse } from "../types/notifications";
+import type { MyNotificationResponse, NoticeListResponse } from "../types/notifications";
 
 export const notifications = async (
   page: number = 0,
-): Promise<NotificationListResponse> => {
+): Promise<MyNotificationResponse> => {
   const { data } = await api.get("/notifications/news", {
     params: { page },
   });
   return data;
+};
+
+//notifications/notices
+export const getNotices = async (): Promise<NoticeListResponse> => {
+  const response = await api.get("/notifications/notices", {
+    params: { page: 0, size: 20 },
+  });
+  return response.data;
 };

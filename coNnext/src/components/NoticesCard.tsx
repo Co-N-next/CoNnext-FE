@@ -1,21 +1,47 @@
 import { useState, useRef, useEffect } from "react";
 import ConNext from "../assets/logo/Con-next.svg";
 
-interface NoticeCardProps {
-  type: string;
+ export interface Notice {
+  id: number;
+  logoImg: string;
   title: string;
   content: string;
-  time: string;
+  createdAt: string;
+  read: boolean;
 }
 
-const NoticeCard = ({ type, title, content, time }: NoticeCardProps) => {
+interface NoticeCardProps {
+  notice: Notice;
+}
+
+// 시간 변환 유틸 함수
+const formatRelativeTime = (dateString: string) => {
+  const createdAt = new Date(dateString);
+  const now = new Date();
+
+  const diffMs = now.getTime() - createdAt.getTime();
+  const diffSec = Math.floor(diffMs / 1000);
+  const diffMin = Math.floor(diffSec / 60);
+  const diffHour = Math.floor(diffMin / 60);
+  const diffDay = Math.floor(diffHour / 24);
+
+  if (diffSec < 60) return `${diffSec}초 전`;
+  if (diffMin < 60) return `${diffMin}분 전`;
+  if (diffHour < 24) return `${diffHour}시간 전`;
+  if (diffDay < 7) return `${diffDay}일 전`;
+
+  return createdAt.toLocaleDateString();
+};
+
+const NoticeCard = ({ notice }: NoticeCardProps) => {
+  const { title, content, createdAt } = notice;
+
   const [isExpanded, setIsExpanded] = useState(false);
   const [showMoreButton, setShowMoreButton] = useState(false);
   const contentRef = useRef<HTMLParagraphElement>(null);
 
   useEffect(() => {
     if (contentRef.current) {
-      // 실제 높이가 line-clamp-2 높이보다 크면 더보기 버튼 표시
       const isOverflowing =
         contentRef.current.scrollHeight > contentRef.current.clientHeight;
       setShowMoreButton(isOverflowing);
@@ -32,8 +58,8 @@ const NoticeCard = ({ type, title, content, time }: NoticeCardProps) => {
       </div>
       {/* 2. 상단 정보 (타입, 시간): 아이콘 옆에 위치 */}
       <div className="flex justify-between items-center mb-1">
-        <span className="text-sm text-gray-300">{type}</span>
-        <span className="text-xs text-gray-400">{time}</span>
+        <span className="text-sm text-gray-300">리뉴얼안내</span>
+        <span className="text-xs text-gray-400">{formatRelativeTime(createdAt)}</span>
       </div>
       {/* 3. 제목: 아이콘 옆에서 시작 */}
       <h3 className="font-semibold text-white mb-2">{title}</h3>

@@ -37,7 +37,7 @@ const Header: React.FC<HeaderProps> = ({ onTicketClick }) => {
           
           <button
             className="w-6 h-6 p-0 hover:opacity-80 transition-opacity shrink-0"
-            onClick={() => navigate('/mynews')}
+            onClick={() => navigate('/alarm')}
           >
             <img src={Bell} alt="Bell" className="w-6 h-6 block" />
           </button>

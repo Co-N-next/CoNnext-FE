@@ -22,16 +22,15 @@ export const getHomeVenues = async (): Promise<VenueListResponse> => {
   const { data } = await api.get<VenueListResponse>("/venues");
   return data;
 };
-
 //공연장검색(venue/search)
 export const searchVenues = async (
-  keyword: string,
+  query: string,
   page: number = 0,
 ): Promise<SearchVenuesResponse> => {
   const { data } = await api.get<SearchVenuesResponse>(
     "/venues/search",
     {
-      params: { keyword, page },
+      params: { query, page },
     },
   );
   return data;
@@ -53,6 +52,7 @@ export const getNearestVenue = async (
   );
   return data;
 };
+
 
 //venue/favoritte
 export const getFavoriteVenues =

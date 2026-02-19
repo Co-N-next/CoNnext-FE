@@ -27,8 +27,8 @@ const VenueCard = ({ name, city, imageUrl, isToday, isNew }: Venue) => {
         )}
       </div>
 
-      <span className="mt-2 ml-2 block text-[10px] text-gray-300">{city}</span>
-      <h3 className="font-semibold text-[16px] mb-2 ml-2">{name}</h3>
+      <span className="mt-2 ml-2 block text-[10px] text-gray-300 truncate pr-2">{city}</span>
+      <h3 className="font-semibold text-[16px] mb-2 ml-2 truncate pr-2">{name}</h3>
     </div>
   );
 };
