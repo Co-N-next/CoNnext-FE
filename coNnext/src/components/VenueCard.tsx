@@ -10,7 +10,7 @@ import type { Venue } from "../types/venueSearch";
 const VenueCard = ({ name, city, imageUrl, isToday, isNew }: Venue) => {
   return (
     <div className="h-[204px] w-[150px] overflow-hidden rounded-xl border border-white/20 text-white">
-      {/* ì´ë¯¸ì§€ */}
+      {/* ÀÌ¹ÌÁö */}
       <div className="relative h-[150px] w-[150px] overflow-hidden">
         <img src={imageUrl} alt={name} className="w-full h-full object-cover" />
 

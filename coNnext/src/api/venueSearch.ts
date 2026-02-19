@@ -23,7 +23,6 @@ export const getHomeVenues = async (): Promise<VenueListResponse> => {
   const { data } = await api.get<VenueListResponse>("/venues");
   return data;
 };
-
 //공연장검색(venue/search)
 export const searchVenues = async (
   query: string,
@@ -54,6 +53,7 @@ export const getNearestVenue = async (
   );
   return data ?? null;
 };
+
 
 //venue/favoritte
 export const getFavoriteVenues =

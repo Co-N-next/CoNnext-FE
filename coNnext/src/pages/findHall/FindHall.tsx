@@ -59,7 +59,7 @@ const FindHall = () => {
   return (
     <div className="flex min-h-screen justify-center bg-[#0a0f1f] text-white">
       <div className="w-full max-w-[600px] space-y-4 px-2.5 py-2.5">
-        <h1 className="text-[18px] font-semibold">ê³µì—°ì¥ ì°¾ê¸°</h1>
+        <h1 className="text-[18px] font-semibold">°ø¿¬Àå Ã£±â</h1>
 
         {!isNearestLoading && !isNearestError && nearestVenueData?.payload && (
           <div className="flex justify-center">
@@ -72,23 +72,23 @@ const FindHall = () => {
 
         {!isNearestLoading && !nearestVenueData?.payload && (
           <div className="rounded-xl bg-[#1B2540] p-4 text-sm text-gray-300">
-            ê·¼ì²˜ì— ê³µì—°ì¥ì´ ì—†ìŠµë‹ˆë‹¤.
+            ±ÙÃ³¿¡ °ø¿¬ÀåÀÌ ¾ø½À´Ï´Ù.
           </div>
         )}
 
         <Search readOnly onClick={() => navigate("/search")} />
 
         <section>
-          <h2 className="mb-1 text-[15px] font-semibold">ì¦ê²¨ì°¾ê¸°</h2>
+          <h2 className="mb-1 text-[15px] font-semibold">Áñ°ÜÃ£±â</h2>
 
           <div className="flex gap-2 overflow-x-auto pb-1">
             {isFavoritePending && (
-              <div className="text-sm text-gray-400">ë¶ˆëŸ¬ì˜¤ëŠ” ì¤‘...</div>
+              <div className="text-sm text-gray-400">ºÒ·¯¿À´Â Áß...</div>
             )}
 
             {isFavoriteError && (
               <div className="text-sm text-red-400">
-                ì¦ê²¨ì°¾ê¸°ë¥¼ ë¶ˆëŸ¬ì˜¤ì§€ ëª»í–ˆìŠµë‹ˆë‹¤.
+                Áñ°ÜÃ£±â¸¦ ºÒ·¯¿ÀÁö ¸øÇß½À´Ï´Ù.
               </div>
             )}
 
@@ -117,23 +117,23 @@ const FindHall = () => {
               !isFavoriteError &&
               (favoriteData?.payload ?? []).length === 0 && (
                 <div className="text-sm text-gray-500">
-                  ì¦ê²¨ì°¾ê¸° ê³µì—°ì¥ì´ ì—†ìŠµë‹ˆë‹¤.
+                  Áñ°ÜÃ£±â °ø¿¬ÀåÀÌ ¾ø½À´Ï´Ù.
                 </div>
               )}
           </div>
         </section>
 
         <section>
-          <h2 className="mb-1 text-[15px] font-semibold">ì¸ê¸° ê³µì—°ì¥</h2>
+          <h2 className="mb-1 text-[15px] font-semibold">ÀÎ±â °ø¿¬Àå</h2>
 
           <div className="flex gap-2 overflow-x-auto pb-1">
             {isTrendingPending && (
-              <div className="text-sm text-gray-400">ë¶ˆëŸ¬ì˜¤ëŠ” ì¤‘...</div>
+              <div className="text-sm text-gray-400">ºÒ·¯¿À´Â Áß...</div>
             )}
 
             {isTrendingError && (
               <div className="text-sm text-red-400">
-                ê³µì—°ì¥ì„ ë¶ˆëŸ¬ì˜¤ì§€ ëª»í–ˆìŠµë‹ˆë‹¤.
+                °ø¿¬ÀåÀ» ºÒ·¯¿ÀÁö ¸øÇß½À´Ï´Ù.
               </div>
             )}
 

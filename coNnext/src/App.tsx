@@ -3,6 +3,7 @@ import { Routes, Route, BrowserRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import Layout from "./components/layout/Layout";
+import BareLayout from "./components/layout/BareLayout";
 
 import Login from "./pages/login/Login";
 import SignUp from "./pages/login/SignUp";
@@ -10,8 +11,8 @@ import Home from "./pages/home/HomePage";
 import Onboarding from "./pages/onboarding/Onboarding";
 import ConcertDetail from "./pages/home/ConcertDetail";
 import ConcertList from "./pages/home/ConcertList";
-import MyNews from "./pages/alarm/MyNews";
-import Notices from "./pages/alarm/Notices";
+
+import AlarmIndex from "./pages/alarm/AlarmIndex";
 import FindHall from "./pages/findHall/FindHall";
 import SerchHall from "./pages/findHall/SearchHall";
 import HallMap from "./pages/hallMap/HallMap";
@@ -51,10 +52,9 @@ function App() {
             <Route path="/home" element={<Home />} />
              <Route path="/concert" element={<ConcertList />} />
              <Route path="/concert/:detailId" element={<ConcertDetail />} />
-            <Route path="/mynews" element={<MyNews />} />
-            <Route path="/notices" element={<Notices />} />
+          
+            <Route path="/alarm" element={<AlarmIndex />} />
             <Route path="/find" element={<FindHall />} />
-            <Route path="/search" element={<SerchHall />} />
             <Route path="/map/:venueId" element={<HallMap />} />
             <Route path="/mypage" element={<MyPage />} />
             <Route path="/mate" element={<Mate />} />
@@ -65,6 +65,10 @@ function App() {
             <Route path="/more-info" element={<MoreInform />} />
             <Route path="/add-detail" element={<AddDetail />} />
           </Route>
+          <Route element={<BareLayout />}>
+            <Route path="/search" element={<SerchHall />} />
+          </Route>
+
           
           <Route path="/" element={<Onboarding />} />
           <Route element={<FooterLayout />}>
