@@ -38,8 +38,6 @@ const FindHall = () => {
     isError: isTrendingError,
   } = useTrendingVenues();
 
-  console.log("🧭 lat:", lat, "lng:", lng);
-
   const {
     data: nearestVenueData,
     isLoading: isNearestLoading,
@@ -56,7 +54,7 @@ const FindHall = () => {
     isError: isFavoriteError,
   } = useFavoriteVenues();
 
-  const venues: VenueListItem[] = trendingData?.payload ?? [];
+  const venues: Venue[] = trendingData?.payload ?? [];
 
   return (
     <div className="flex min-h-screen justify-center bg-[#0a0f1f] text-white">

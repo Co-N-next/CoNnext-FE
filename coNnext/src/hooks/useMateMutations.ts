@@ -11,13 +11,13 @@ import {
 export function useMateMutations() {
   const queryClient = useQueryClient();
 
-  const requestMateMutation = useMutation({
-    mutationFn: (nickname: string) => requestMate(nickname),
-    onSuccess: () => {
-      // Invalidate queries if necessary? Maybe open requests list
-      console.log("Friend request sent!");
-    },
-  });
+const requestMateMutation = useMutation({
+  // string -> number 로 변경
+  mutationFn: (addresseeId: number) => requestMate(addresseeId),
+  onSuccess: () => {
+    queryClient.invalidateQueries({ queryKey: ["mates"] });
+  },
+});
 
   const acceptMateMutation = useMutation({
     mutationFn: (mateId: string) => acceptMate(mateId),

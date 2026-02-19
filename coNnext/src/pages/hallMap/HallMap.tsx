@@ -6,7 +6,7 @@ import wcWoman from "../../assets/logo/wc_woman.svg";
 import entranceIcon from "../../assets/logo/arrow_circle_up.svg";
 import storeIcon from "../../assets/logo/storefront.svg";
 import myLocation from "../../assets/logo/my_location.svg";
-import { fetchVenueMap } from "../../api/venue";
+import { fetchVenueMap } from "../../api/venueMap";
 import type { Venue } from "../../types/venue";
 import BottomSheet from "../../components/modal/BottomSheet";
 

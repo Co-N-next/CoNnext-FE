@@ -1,5 +1,6 @@
 import { apiClient } from "../config/api";
 import type { Concert } from "../types/concert";
+import type { SearchType } from "../types/searchHistory";
 
 // ✅ 1. 공연 기본 조회 응답 타입
 interface ConcertResponse {
@@ -134,8 +135,12 @@ export const fetchConcertDetail = async (detailId: string) => {
 
 // 4. 최근 검색어 조회
 // GET /searchHistory
-export const fetchSearchHistory = async () => {
-    const response = await apiClient.get<{ result: string[] }>('/searchHistory');
+export const fetchSearchHistory = async (type: SearchType = "CONCERT") => {
+    // ✅ params에 type을 넣어서 보냄 (핵심!)
+    const response = await apiClient.get<{ result: string[] }>('/searchHistory', {
+        params: { type } 
+    });
+    
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return (response.data as any).result || (response.data as any).payload || [];
 };
@@ -143,7 +148,10 @@ export const fetchSearchHistory = async () => {
 // 5. 최근 검색어 저장
 // POST /searchHistory
 export const saveSearchHistory = async (keyword: string) => {
-    const response = await apiClient.post('/searchHistory', { keyword });
+    const response = await apiClient.post('/searchHistory', { 
+        keyword, 
+        searchType: "CONCERT" // 👈 이게 빠져서 에러난 겁니다!
+    });
     return response.data;
 };
 

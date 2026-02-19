@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, ChevronRight, PlusCircle } from "lucide-react";
 import jinah from "../../assets/images/jinah.svg";
+// [수정 1] 변수명 충돌 방지를 위해 이름 변경 (mate -> defaultProfileImg)
+import defaultProfileImg from "../../assets/images/mate.svg"; 
 import star from "../../assets/Icons/star_on.svg";
 import setting from "../../assets/Icons/Settings.svg";
 import userplus from "../../assets/Icons/UserPlus.svg";
@@ -9,10 +11,11 @@ import kakao from "../../assets/Variables/kakao.svg";
 import { useDebounce } from "../../hooks/useDebounce";
 import { useMates } from "../../hooks/useMates";
 import { useQuery } from "@tanstack/react-query";
-import { getFavoriteMates } from "../../api/mate";
+import { getFavoriteMates, searchMates } from "../../api/mate";
 import { useMateMutations } from "../../hooks/useMateMutations";
 import MateSkeleton from "../../components/skeleton/MateSkeleton";
 
+// API 쪽 타입과 맞추는 것이 좋습니다. (일단 로컬 정의 유지)
 interface Mate {
   id: string;
   name: string;
@@ -36,11 +39,9 @@ const Mate = () => {
   const {
     requestMateMutation,
     deleteMateMutation,
-    // addFavoriteMutation, // (If needed for toggle)
-    // removeFavoriteMutation // (If needed for toggle)
   } = useMateMutations();
 
-  // ✅ Infinite Scroll을 위한 React Query 훅 (전체/검색 메이트)
+  // ✅ Infinite Scroll을 위한 React Query 훅
   const {
     data,
     fetchNextPage,
@@ -49,7 +50,7 @@ const Mate = () => {
     isLoading,
   } = useMates(debouncedSearchQuery);
 
-  // ✅ 자주 찾는 메이트 (API 호출)
+  // ✅ 자주 찾는 메이트
   const { data: frequentMatesData } = useQuery({
     queryKey: ["favoriteMates"],
     queryFn: getFavoriteMates,
@@ -57,7 +58,7 @@ const Mate = () => {
   
   const frequentMates = frequentMatesData || [];
 
-  // Infinite Scroll을 위한 Intersection Observer
+  // Infinite Scroll Observer
   const observerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -77,7 +78,7 @@ const Mate = () => {
     return () => observer.disconnect();
   }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
-  // ✅ API에서 받아온 데이터 (페이지별로 합치기)
+  // ✅ 데이터 병합
   const apiMates = data?.pages.flatMap((page) => page.mates) || [];
 
   const featuredMate: Mate = {
@@ -86,24 +87,44 @@ const Mate = () => {
     imageUrl: jinah,
   };
 
-  const handleRequestMate = () => {
-      if (!nicknameInput.trim()) return;
-      requestMateMutation.mutate(nicknameInput, {
-          onSuccess: () => {
-              alert("친구 신청을 보냈습니다.");
-              setIsNicknameModalOpen(false);
-              setNicknameInput("");
-          },
-          onError: (error) => {
-              console.error(error);
-              alert("친구 신청 실패. 닉네임을 확인해주세요.");
-          }
-      });
-  };
+  const handleRequestMate = async () => {
+    if (!nicknameInput.trim()) return;
+
+    try {
+        // 1. 먼저 닉네임으로 유저를 검색합니다. (API 직접 호출)
+        const searchResult = await searchMates(nicknameInput);
+        
+        // 검색 결과가 있는지 확인
+        if (!searchResult.mates || searchResult.mates.length === 0) {
+            alert("해당 닉네임을 가진 사용자를 찾을 수 없습니다.");
+            return;
+        }
+
+        // 2. 정확히 일치하는 닉네임 찾기 (혹은 첫 번째 결과 사용)
+        const targetUser = searchResult.mates.find(m => m.name === nicknameInput) || searchResult.mates[0];
+        
+        // 3. 찾은 유저의 ID(숫자)로 친구 신청 요청
+        // (ID가 string으로 오면 Number()로 변환 필요, 백엔드가 number를 원함)
+        requestMateMutation.mutate(Number(targetUser.id), {
+            onSuccess: () => {
+                alert(`${targetUser.name}님에게 친구 신청을 보냈습니다.`);
+                setIsNicknameModalOpen(false);
+                setNicknameInput("");
+            },
+            onError: (error) => {
+                console.error(error);
+                alert("친구 신청 실패. 이미 친구이거나 오류가 발생했습니다.");
+            }
+        });
+
+    } catch (error) {
+        console.error("검색 중 오류 발생", error);
+        alert("사용자 검색에 실패했습니다.");
+    }
+};
 
   const handleDeleteMates = async () => {
       if (confirm(`선택한 ${selectedMates.length}명의 메이트를 삭제하시겠습니까?`)) {
-          // 병렬 처리 혹은 순차 처리
           try {
             await Promise.all(selectedMates.map(id => deleteMateMutation.mutateAsync(id)));
             alert("삭제되었습니다.");
@@ -117,24 +138,20 @@ const Mate = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0E172A] text-white">
-      <div className="max-w-2xl mx-auto pb-50">
+    <div className="min-h-screen bg-[#0E172A] text-white relative">
+      {/* pb-32 추가: 하단 고정 버튼 공간 확보 */}
+      <div className="max-w-2xl mx-auto pb-32"> 
         {/* Section 1: 메이트 헤더 및 추천 메이트 카드 */}
         <section className="p-[16px] pl-[24px]">
           <h1 className="text-[23px] font-normal mb-[20px]">메이트</h1>
 
-          {/* 카드 컨테이너 */}
           <div className="w-[353px] h-[237px] bg-[#1E293B] rounded-[12px] flex items-center gap-[12px] p-[12px] pr-[10px]">
-            {/* 이미지 */}
             <img
               src={featuredMate.imageUrl}
               alt={featuredMate.name}
               className="w-[147px] h-[213px] object-cover rounded-[7px]"
             />
-
-            {/* 텍스트 영역 */}
             <div className="flex-1 h-full flex flex-col justify-between py-[8px]">
-              {/* 제목 */}
               <div className="flex justify-between">
                 <p className="text-[16px] font-semibold">{featuredMate.name}</p>
                 <div
@@ -146,7 +163,6 @@ const Mate = () => {
                 </div>
               </div>
 
-              {/* 설명 텍스트 */}
               <div className="flex-1 flex flex-col justify-center">
                 <p className="text-[#A1A1A1] text-[13px] font-medium leading-[1.4]">
                   공연을 예매한 메이트가
@@ -156,7 +172,6 @@ const Mate = () => {
                 </p>
               </div>
 
-              {/* 버튼 */}
               <button
                 onClick={() => navigate("/mate/map")}
                 className="w-[168px] h-[40px] bg-[#7F5AFF] hover:bg-[#6B4DE6] text-white text-[13px] font-medium rounded-[12px] transition"
@@ -182,8 +197,7 @@ const Mate = () => {
             </button>
           </div>
 
-          <div className="flex justify-end gap-2.5 mt-4 px-2">
-
+          <div className="flex justify-end gap-2.5 mt-4 px-2 relative">
             <button
               className="text-gray-400 hover:text-white transition"
               onClick={() => {
@@ -194,9 +208,8 @@ const Mate = () => {
               <img src={userplus} alt="" className="w-[24px] h-[24px]" />
             </button>
 
-            {/* Friend Request Popup */}
             {isDropdownOpen && (
-              <div className="absolute left-1/2 -translate-x-1/2 w-[220px] bg-[#2E364A] rounded-[16px] shadow-xl overflow-hidden z-50 border border-[#364057]">
+              <div className="absolute top-10 right-10 w-[220px] bg-[#2E364A] rounded-[16px] shadow-xl overflow-hidden z-30 border border-[#364057]">
                 <button className="w-full flex items-center justify-between px-[20px] py-[16px] hover:bg-[#364057] transition group">
                   <span className="text-[15px] font-medium text-white group-hover:text-white/90">카카오톡으로 친구 신청</span>
                   <div className="rounded-full p-1">
@@ -226,9 +239,8 @@ const Mate = () => {
               <img src={setting} alt="" className="w-[24px] h-[24px]" />
             </button>
 
-            {/* Settings Dropdown */}
             {isSettingsDropdownOpen && (
-              <div className="absolute left-1/2 -translate-x-1/2 w-[220px] bg-[#2E364A] rounded-[16px] shadow-xl overflow-hidden z-50 border border-[#364057]">
+              <div className="absolute top-10 right-0 w-[220px] bg-[#2E364A] rounded-[16px] shadow-xl overflow-hidden z-30 border border-[#364057]">
                 <button
                   onClick={() => {
                     setIsSettingsDropdownOpen(false);
@@ -237,12 +249,9 @@ const Mate = () => {
                   className="w-full flex items-center justify-between px-[20px] py-[16px] hover:bg-[#364057] transition group"
                 >
                   <span className="text-[15px] font-medium text-white group-hover:text-white/90">전체 메이트 편집하기</span>
-
                 </button>
               </div>
             )}
-
-
           </div>
         </section>
 
@@ -272,39 +281,23 @@ const Mate = () => {
                           className="flex flex-col items-center"
                         >
                           <div className="w-[60px] h-[60px] bg-gray-700 rounded-full overflow-hidden mb-1">
-                            {/* <img
-                              src={mate.imageUrl || mate} // Fallback image if url missing
+                            <img
+                              // [수정 2] 기본 이미지 변수명 변경 적용
+                              src={mate.imageUrl || defaultProfileImg}
                               alt={mate.name}
                               className="w-full h-full object-cover"
                               onError={(e) => {
-                                  (e.target as HTMLImageElement).src = mate;
+                                  (e.currentTarget as HTMLImageElement).src = defaultProfileImg;
                               }}
-                            /> */}
+                            />
                           </div>
                           <span className="text-[12px] text-[#F2EFFF] mb-2">{mate.name}</span>
                         </button>
-                        {isEditMode && (
-                          <button
-                            onClick={() => {
-                              setSelectedMates(prev =>
-                                prev.includes(mate.id)
-                                  ? prev.filter(id => id !== mate.id)
-                                  : [...prev, mate.id]
-                              );
-                            }}
-                            className="w-5 h-5 rounded-full border-2 border-white flex items-center justify-center"
-                          >
-                            {selectedMates.includes(mate.id) && (
-                              <div className="w-2.5 h-2.5 rounded-full bg-[#7F5AFF]" />
-                            )}
-                          </button>
-                        )}
                       </div>
                     ))}
                   </div>
                 </div>
             )}
-
           </section>
         )}
 
@@ -312,7 +305,6 @@ const Mate = () => {
         <section className="">
           <h2 className="text-[18px] font-bold mb-4 px-4">전체 메이트</h2>
 
-          {/* 로딩 상태 */}
           {isLoading ? (
             <MateSkeleton />
           ) : (
@@ -324,51 +316,56 @@ const Mate = () => {
                     </div>
                 ) : (
                     <div className="grid grid-cols-4 gap-4">
-                      {apiMates.map((mate: Mate) => (
-                        <div key={mate.id} className="flex flex-col items-center">
+                      {apiMates.map((mate: Mate, index: number) => (
+                        <div key={`${mate?.id}-${index}`} className="flex flex-col items-center">
                           <button
                             onClick={() => {
                               if (!isEditMode) {
-                                navigate('/mate/detail', { state: { mate } });
+                                navigate(`/mate/detail/${mate?.id}`, { state: { mate } });
                               }
                             }}
-                            className="flex flex-col items-center"
+                            className="flex flex-col items-center relative"
                           >
                             <div className="w-[60px] h-[60px] bg-gray-700 rounded-full overflow-hidden mb-1">
                               <img
-                                src={mate.imageUrl || jinah}
-                                alt={mate.name}
+                                // [수정 2] 기본 이미지 변수명 변경 적용
+                                src={mate?.imageUrl || defaultProfileImg} 
+                                alt={mate?.name}
                                 className="w-full h-full object-cover"
                                 onError={(e) => {
-                                    (e.target as HTMLImageElement).src = jinah;
+                                    (e.currentTarget as HTMLImageElement).src = defaultProfileImg;
                                 }}
                               />
                             </div>
-                            <span className="text-[12px] text-[#F2EFFF] mb-2">{mate.name}</span>
+                            <span className="text-[12px] text-[#F2EFFF] mb-2">{mate?.name}</span>
+                            
+                            {/* 편집 모드일 때 선택 표시 */}
+                            {isEditMode && (
+                                <div 
+                                    className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-lg cursor-pointer"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setSelectedMates(prev =>
+                                            prev.includes(mate?.id)
+                                              ? prev.filter(id => id !== mate?.id)
+                                              : [...prev, mate?.id]
+                                        );
+                                    }}
+                                >
+                                    <div className="w-5 h-5 rounded-full border-2 border-white flex items-center justify-center bg-black/50">
+                                      {selectedMates.includes(mate?.id) && (
+                                        <div className="w-2.5 h-2.5 rounded-full bg-[#7F5AFF]" />
+                                      )}
+                                    </div>
+                                </div>
+                            )}
                           </button>
-                          {isEditMode && (
-                            <button
-                              onClick={() => {
-                                setSelectedMates(prev =>
-                                  prev.includes(mate.id)
-                                    ? prev.filter(id => id !== mate.id)
-                                    : [...prev, mate.id]
-                                );
-                              }}
-                              className="w-4 h-4 rounded-full border-1 border-white flex items-center justify-center"
-                            >
-                              {selectedMates.includes(mate.id) && (
-                                <div className="w-2 h-2 rounded-full bg-[#7F5AFF]" />
-                              )}
-                            </button>
-                          )}
                         </div>
                       ))}
                     </div>
                 )}
               </div>
 
-              {/* ✅ Infinite Scroll - 더 불러오기 트리거 */}
               {hasNextPage && (
                 <div ref={observerRef} className="flex justify-center py-4">
                   {isFetchingNextPage ? (
@@ -380,51 +377,45 @@ const Mate = () => {
               )}
             </>
           )}
-
         </section>
-
-        {/* 설정 모드일 때 하단 버튼 */}
-        {isEditMode && (
-          <div className="bottom-0 left-0 right-0 p-4 bg-[#0E172A] flex gap-3 z-40 mt-8">
-            <button
-              onClick={() => {
-                setIsEditMode(false);
-                setSelectedMates([]);
-              }}
-              className="flex-1 py-3 bg-[#7A7A7A] hover:bg-[#6A6A6A] text-white rounded-[12px] text-[15px] font-norml transition"
-            >
-              취소하기
-            </button>
-            <button
-              onClick={handleDeleteMates}
-              className="flex-1 py-3 bg-[#7F5AFF] hover:bg-[#6B4DE6] text-white rounded-[12px] text-[15px] font-medium transition"
-            >
-              삭제하기
-            </button>
-          </div>
-        )}
       </div>
+
+      {/* [수정 3] 편집 모드 하단 버튼 (Fixed Position으로 변경하여 항상 보이게 함) */}
+      {isEditMode && (
+        <div className="fixed bottom-0 left-0 right-0 max-w-2xl mx-auto p-4 bg-[#0E172A] border-t border-[#1E293B] flex gap-3 z-40">
+          <button
+            onClick={() => {
+              setIsEditMode(false);
+              setSelectedMates([]);
+            }}
+            // [수정 4] font-norml 오타 수정
+            className="flex-1 py-3 bg-[#7A7A7A] hover:bg-[#6A6A6A] text-white rounded-[12px] text-[15px] font-normal transition"
+          >
+            취소하기
+          </button>
+          <button
+            onClick={handleDeleteMates}
+            className="flex-1 py-3 bg-[#7F5AFF] hover:bg-[#6B4DE6] text-white rounded-[12px] text-[15px] font-medium transition"
+          >
+            삭제하기
+          </button>
+        </div>
+      )}
 
       {/* 닉네임 친구 신청 모달 */}
       {isNicknameModalOpen && (
         <>
-          {/* 오버레이 */}
           <div
-            className="fixed inset-0 bg-black/60 z-40"
+            className="fixed inset-0 bg-black/60 z-50"
             onClick={() => {
               setIsNicknameModalOpen(false);
               setNicknameInput("");
             }}
           />
-
-          {/* 모달 컨텐츠 */}
-          <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[70%] max-w-[400px] bg-[#1E293B] rounded-[12px] z-50 overflow-hidden">
-            {/* 헤더 */}
+          <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[70%] max-w-[400px] bg-[#1E293B] rounded-[12px] z-[51] overflow-hidden">
             <div className="px-3 pt-2 pb-4 border-b border-[#3B455D]">
               <p className="text-[15px] text-gray-300 mt-4 text-center">친구의 닉네임을 입력해주세요</p>
             </div>
-
-            {/* 입력 필드 */}
             <div className="px-6 pb-6 pt-6">
               <input
                 type="text"
@@ -434,15 +425,13 @@ const Mate = () => {
                 className="w-full px-4 py-3 bg-[#293A5D] text-white rounded-[12px] placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#7F5AFF] text-[14px]"
               />
             </div>
-
-            {/* 버튼들 */}
             <div className="flex">
               <button
                 onClick={() => {
                   setIsNicknameModalOpen(false);
                   setNicknameInput("");
                 }}
-                className="flex-1 bg-[#7A7A7A] hover:bg-[#4A4D5E] text-white text-[14px] font-medium transition"
+                className="flex-1 bg-[#7A7A7A] hover:bg-[#4A4D5E] text-white text-[14px] font-medium transition py-3"
               >
                 취소
               </button>

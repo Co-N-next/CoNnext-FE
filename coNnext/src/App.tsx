@@ -27,8 +27,9 @@ import AddTicket from "./pages/reserve/AddTicket";
 import ReserveList from "./pages/reserve/ReserveList";
 import AddDetail from "./pages/reserve/AddDetail";
 import MoreInform from "./pages/reserve/components/MoreInform";
+import MateDetail from "./pages/mate/MateDetail";
 
-export const queryClient = new QueryClient({
+const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 1000 * 60,
@@ -67,6 +68,7 @@ function App() {
           {/* 🗺 FooterLayout */}
           <Route element={<FooterLayout />}>
             <Route path="/mate/map" element={<MateMap />} />
+            <Route path="/mate/detail/:id" element={<MateDetail />} />
           </Route>
 
           {/* 🌱 온보딩은 단독 */}
