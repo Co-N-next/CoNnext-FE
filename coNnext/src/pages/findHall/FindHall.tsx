@@ -9,7 +9,7 @@ import { useFavoriteVenues } from "../../hooks/queries/useFavoriteVenues";
 import type { Venue } from "../../types/venueSearch";
 
 const DEFAULT_LOCATION = { lat: 37.5665, lng: 126.978 };
-const DEFAULT_RADIUS = 500;
+const DEFAULT_RADIUS = 1000;
 
 const FindHall = () => {
   const navigate = useNavigate();
